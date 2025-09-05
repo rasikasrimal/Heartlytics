@@ -105,45 +105,6 @@
       </div>
     </div>
   </div>
-  <div class="col-12">
-    <div class="card shadow-sm h-100">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h3 class="h6 mb-0">Age Distribution per Dataset</h3>
-          <button class="btn btn-sm btn-outline-secondary" data-view="#age-charts" data-title="Age Distribution per Dataset">View</button>
-        </div>
-        <div id="age-charts">
-          <div id="viz-age-hist" class="chart-md"></div>
-          <div id="viz-age-box" class="chart-md mt-3"></div>
-        </div>
-        <div class="small text-muted">Overlay histograms (shared bins) and boxplots per dataset.</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-12">
-    <div class="card shadow-sm h-100">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center">
-          <h3 class="h6 mb-0">Resting Blood Pressure by Status</h3>
-          <button class="btn btn-sm btn-outline-secondary" data-view="#viz-bp-box" data-title="Resting Blood Pressure by Status">View</button>
-        </div>
-        <div id="viz-bp-box" class="chart-md mt-2"></div>
-        <div class="small text-muted">Boxplots for All / No Disease / Disease.</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-12">
-    <div class="card shadow-sm h-100">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center">
-          <h3 class="h6 mb-0">Cholesterol Distribution by Stage / Target</h3>
-          <button class="btn btn-sm btn-outline-secondary" data-view="#viz-chol-violin" data-title="Cholesterol Distribution by Stage / Target">View</button>
-        </div>
-        <div id="viz-chol-violin" class="chart-md mt-2"></div>
-        <div class="small text-muted">Violin plots for all patients and each status/stage.</div>
-      </div>
-    </div>
-  </div>
 </div>
 
 <!-- view modal -->
@@ -184,7 +145,6 @@ window.addEventListener('load', function(){
   const uid = {{ uid|tojson }};
   const eda = {{ eda_json|safe if eda_json is defined else '{}' }};
   const logDetails = {{ cleaning_log_json|safe if cleaning_log_json is defined else '[]' }};
-  const viz = (eda && eda.viz) ? eda.viz : {};
   let outliers = {{ outliers_json|safe if outliers_json is defined else '[]' }};
   const csrfToken = {{ csrf_token()|tojson }};
   const confirmModalEl = document.getElementById('confirmModal');
@@ -390,23 +350,6 @@ window.addEventListener('load', function(){
   if(corr && window.Plotly){
     Plotly.newPlot('corr-heatmap', [{z: corr.z||[], x: corr.x||[], y: corr.y||[], type:'heatmap', colorscale:'Viridis', zmin:-1, zmax:1, hovertemplate:'%{y} vs %{x}<br>r=%{z:.2f}<extra></extra>'}], {margin:{l:100,r:10,t:10,b:80}}, {displayModeBar:false, responsive:true});
   }
-  if(viz.age_hist_by_dataset && window.Plotly){
-    const hist = viz.age_hist_by_dataset;
-    const traces = (hist.series||[]).map(s => ({x: hist.bins, y: s.counts, name: s.name, type:'bar', opacity:0.5, hovertemplate:'age=%{x}<br>n=%{y}<extra></extra>'}));
-    Plotly.newPlot('viz-age-hist', traces, {barmode:'overlay', margin:{l:60,r:10,t:10,b:50}}, {displayModeBar:false, responsive:true});
-  }
-  if(viz.age_box_by_dataset && window.Plotly){
-    const traces = (viz.age_box_by_dataset||[]).map(s => ({y:s.values||[], name:s.name, type:'box', boxpoints:false}));
-    Plotly.newPlot('viz-age-box', traces, {margin:{l:60,r:10,t:10,b:50}}, {displayModeBar:false, responsive:true});
-  }
-  if(viz.bp_box_by_status && window.Plotly){
-    const traces = (viz.bp_box_by_status||[]).map(s => ({y:s.values||[], name:s.name, type:'box', boxpoints:false}));
-    Plotly.newPlot('viz-bp-box', traces, {margin:{l:60,r:10,t:10,b:60}, yaxis:{title:'Resting Blood Pressure (mmHg)'}}, {displayModeBar:false, responsive:true});
-  }
-  if(viz.chol_violin_by_stage && window.Plotly){
-    const traces = (viz.chol_violin_by_stage||[]).map(s => ({y:s.values||[], name:s.name, type:'violin', box:{visible:true}, meanline:{visible:true}}));
-    Plotly.newPlot('viz-chol-violin', traces, {margin:{l:70,r:10,t:10,b:60}, yaxis:{title:'Cholesterol (mg/dL)'}}, {displayModeBar:false, responsive:true});
-  }
 
   // ----- View buttons (delegated) -----
   document.addEventListener('click', function(e){
@@ -422,29 +365,6 @@ window.addEventListener('load', function(){
     } else if (target === '#corr-heatmap' && corr && window.Plotly) {
       body.innerHTML = '<div id="modal-corr" style="height:600px;"></div>';
       Plotly.newPlot('modal-corr', [{z: corr.z||[], x: corr.x||[], y: corr.y||[], type:'heatmap', colorscale:'Viridis', zmin:-1, zmax:1, hovertemplate:'%{y} vs %{x}<br>r=%{z:.2f}<extra></extra>'}], {margin:{l:100,r:10,t:10,b:80}});
-    } else if (target === '#age-charts') {
-      body.innerHTML = '<div id="modal-age-hist" style="height:400px;"></div><div id="modal-age-box" style="height:400px;"></div>';
-      if(window.Plotly && viz.age_hist_by_dataset){
-        const hist = viz.age_hist_by_dataset;
-        const tr = (hist.series||[]).map(s=>({x:hist.bins, y:s.counts, name:s.name, type:'bar', opacity:0.5, hovertemplate:'age=%{x}<br>n=%{y}<extra></extra>'}));
-        Plotly.newPlot('modal-age-hist', tr, {barmode:'overlay', margin:{l:60,r:10,t:10,b:50}});
-      }
-      if(window.Plotly && viz.age_box_by_dataset){
-        const trb = (viz.age_box_by_dataset||[]).map(s=>({y:s.values||[], name:s.name, type:'box', boxpoints:false}));
-        Plotly.newPlot('modal-age-box', trb, {margin:{l:60,r:10,t:10,b:50}});
-      }
-    } else if (target === '#viz-bp-box') {
-      if(viz.bp_box_by_status && window.Plotly){
-        body.innerHTML = '<div id="modal-bp" style="height:600px;"></div>';
-        const tr = (viz.bp_box_by_status||[]).map(s=>({y:s.values||[], name:s.name, type:'box', boxpoints:false}));
-        Plotly.newPlot('modal-bp', tr, {margin:{l:60,r:10,t:10,b:60}, yaxis:{title:'Resting Blood Pressure (mmHg)'}});
-      }
-    } else if (target === '#viz-chol-violin') {
-      if(viz.chol_violin_by_stage && window.Plotly){
-        body.innerHTML = '<div id="modal-chol" style="height:600px;"></div>';
-        const tr = (viz.chol_violin_by_stage||[]).map(s=>({y:s.values||[], name:s.name, type:'violin', box:{visible:true}, meanline:{visible:true}}));
-        Plotly.newPlot('modal-chol', tr, {margin:{l:70,r:10,t:10,b:60}, yaxis:{title:'Cholesterol (mg/dL)'}});
-      }
     }
     document.getElementById('viewTitle').textContent = title;
     showModal(modalEl);

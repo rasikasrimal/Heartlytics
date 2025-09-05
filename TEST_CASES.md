@@ -85,3 +85,8 @@
 | TC-048 | Multiple failed logins trigger temporary account lock. | Security | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-049 | User-supplied data is HTML-escaped to prevent XSS. | Security | 🟡 Medium | 🔒 Security | ⏳ Not Run |
 | TC-050 | Safe GET and HEAD requests bypass CSRF validation. | Security | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+
+## Regression
+| Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
+| --- | --- | --- | --- | --- | --- |
+| TC-051 | Batch prediction handles missing `num_major_vessels` values without error. | Batch Upload & EDA | 🟡 Medium | 🧪 Functional | ⏳ Not Run |

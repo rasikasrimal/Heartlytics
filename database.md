@@ -81,6 +81,8 @@ DESC prediction;
 | model_version | VARCHAR(120) |  |  |
 | cluster_id | INTEGER | FK | cluster_summary.cluster_id |
 
+Note: `num_major_vessels` accepts `NULL` when missing in uploaded data.
+
 ## role
 
 ```sql
