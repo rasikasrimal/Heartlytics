@@ -54,6 +54,21 @@
     </div>
   </div>
   <div class="col-lg-6">
+    {% if current_user.role == 'SuperAdmin' %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-header">Application Logo</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('superadmin.change_logo') }}" enctype="multipart/form-data">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+            <label class="form-label">Upload New Logo (SVG)</label>
+            <input class="form-control" type="file" name="logo" accept=".svg">
+          </div>
+          <button class="btn btn-brand" type="submit">Update Logo</button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
     <div class="card shadow-sm">
       <div class="card-header">Recent Activity</div>
       <ul class="list-group list-group-flush">
