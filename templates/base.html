@@ -104,7 +104,7 @@
     </nav>
     {% endblock %}
 
-      <main class="container my-4 flex-grow-1">
+      <main class="{% block main_classes %}container my-4 flex-grow-1{% endblock %}">
       {% block flashes %}
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}

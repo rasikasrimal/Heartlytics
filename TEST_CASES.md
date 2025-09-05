@@ -97,3 +97,4 @@
 | TC-052 | Login page shows branding, helpful links, and responsive design. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-053 | Password field eye icon toggles visibility on login page. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-054 | Identifier field on login page starts empty without displaying "None". | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-055 | Login form disables autofill so fields remain blank. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
