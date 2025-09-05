@@ -1494,25 +1494,6 @@ def _strip_count_from_stats(stats: dict) -> dict:
     stats.pop("count", None)
     return stats
 
-def _shared_hist(series_by_group: dict[str, pd.Series], nbins: int = 20):
-    """Compute shared-bin histograms for multiple groups.
-    Returns: {"bins": centers, "series": [{"name":..., "counts":[...]}, ...]}
-    """
-    all_values = pd.concat([s.dropna() for s in series_by_group.values()]) if series_by_group else pd.Series([], dtype=float)
-    if all_values.empty:
-        return {"bins": [], "series": []}
-    counts, edges = np.histogram(all_values, bins=nbins)
-    centers = ((edges[:-1] + edges[1:]) / 2).tolist()
-    out_series = []
-    for name, s in series_by_group.items():
-        vals = s.dropna().values
-        if len(vals) == 0:
-            out_series.append({"name": name, "counts": [0]*len(centers)})
-        else:
-            c, _ = np.histogram(vals, bins=edges)
-            out_series.append({"name": name, "counts": c.astype(int).tolist()})
-    return {"bins": centers, "series": out_series}
-
 
 def build_eda_payload(df: pd.DataFrame) -> dict:
     # Positive probability distribution (if available)
@@ -1708,205 +1689,8 @@ def build_eda_payload(df: pd.DataFrame) -> dict:
     if target_col is not None:
         counts = df[target_col].astype(str).value_counts(dropna=False).to_dict()
         target_dist = {"labels": list(counts.keys()), "values": list(counts.values())}
+    viz_payload = {}
 
-    # ==========================================================
-    # Enhanced Plotly-ready visual payloads for the frontend
-    # ==========================================================
-
-
-
-    # ==========================================================
-    # NEW: Notebook-style visual payloads for Plotly in frontend
-    # ==========================================================
-    # Map for sex labels (0/1 -> Female/Male) when we want readable axes
-    def _sex_label(val):
-        try:
-            ival = int(val)
-            return SEX_MAP.get(ival, str(val))
-        except Exception:
-            return str(val)
-
-    # 1) Gender distribution (Pie)
-    gender_pie = None
-    if "sex" in df.columns:
-        vc = df["sex"].value_counts(dropna=False)
-        labels = [ _sex_label(x) for x in vc.index.tolist() ]
-        values = vc.values.astype(int).tolist()
-        gender_pie = {"labels": labels, "values": values}  # Plotly: go.Pie(labels, values, ...)
-
-    # 2) Heatmap: Dataset × Gender Counts
-    ds_col = "dataset" if "dataset" in df.columns else None
-    dataset_gender_heatmap = None
-    if ds_col is not None and "sex" in df.columns:
-        tmp = df[[ds_col, "sex"]].dropna()
-        if not tmp.empty:
-            counts = tmp.groupby([ds_col, "sex"]).size().reset_index(name="Count")
-            pivot = counts.pivot(index=ds_col, columns="sex", values="Count").fillna(0)
-            x = [_sex_label(c) for c in pivot.columns.tolist()]
-            y = pivot.index.astype(str).tolist()
-            z = pivot.values.astype(int).tolist()
-            dataset_gender_heatmap = {"x": x, "y": y, "z": z}  # Plotly: go.Heatmap(z, x, y, ...)
-
-    # 3) Age distribution per dataset (shared-bin overlay hist) + box by dataset
-    age_hist_by_dataset = None
-    age_box_by_dataset = None
-    if "age" in df.columns and ds_col is not None and df[ds_col].notna().any():
-        groups = {str(name): grp["age"] for name, grp in df.groupby(ds_col)}
-        age_hist_by_dataset = _shared_hist(groups, nbins=20)
-        age_box_by_dataset = [
-            {"name": name, "values": series.dropna().tolist()}
-            for name, series in groups.items()
-        ]
-
-
-
-    # 4) Age distribution by Chest Pain Type (facet-like data)
-    age_by_cp = None
-    cp_col = "chest_pain_type" if "chest_pain_type" in df.columns else ("cp" if "cp" in df.columns else None)
-    if "age" in df.columns and cp_col is not None:
-        by_cp = {}
-        for cpv, sub in df.groupby(cp_col):
-            by_cp[str(cpv)] = sub["age"].dropna().tolist()
-        age_by_cp = by_cp  # Frontend can build px-like facets
-
-    # 5) Resting Blood Pressure boxplots by heart disease status
-    bp_box_by_status = None
-    if "resting_blood_pressure" in df.columns:
-        series = [
-            {
-                "name": "All Patients",
-                "values": df["resting_blood_pressure"].dropna().tolist(),
-            }
-        ]
-        status_col = target_col  # prefer staged num if present, else 0/1 target/prediction
-        if status_col is not None:
-            uniq = sorted(df[status_col].dropna().unique().tolist())
-            try:
-                uniq_num = set(int(float(x)) for x in uniq)
-            except Exception:
-                uniq_num = None
-            if uniq_num and uniq_num.issubset({0, 1}):
-                series.append(
-                    {
-                        "name": "No Disease",
-                        "values": df[
-                            df[status_col]
-                            .astype(float)
-                            .fillna(-1)
-                            .astype(int)
-                            == 0
-                        ]["resting_blood_pressure"].dropna().tolist(),
-                    }
-                )
-                series.append(
-                    {
-                        "name": "Heart Disease",
-                        "values": df[
-                            df[status_col]
-                            .astype(float)
-                            .fillna(-1)
-                            .astype(int)
-                            == 1
-                        ]["resting_blood_pressure"].dropna().tolist(),
-                    }
-                )
-            else:
-                for st in uniq:
-                    series.append(
-                        {
-                            "name": str(st),
-                            "values": df[df[status_col] == st][
-                                "resting_blood_pressure"
-                            ]
-                            .dropna()
-                            .tolist(),
-                        }
-                    )
-        bp_box_by_status = series
-
-    # 6) Resting BP histogram stacked by stage (or by target)
-    bp_hist_by_stage = None
-    if "resting_blood_pressure" in df.columns and target_col is not None:
-        groups = {}
-        uniq = sorted(df[target_col].dropna().unique().tolist())
-        try:
-            uniq_num = set(int(float(x)) for x in uniq)
-        except Exception:
-            uniq_num = None
-        if uniq_num and uniq_num.issubset({0, 1}):
-            groups["0 - No Disease"] = df[
-                df[target_col].astype(float).fillna(-1).astype(int) == 0
-            ]["resting_blood_pressure"]
-            groups["1 - Heart Disease"] = df[
-                df[target_col].astype(float).fillna(-1).astype(int) == 1
-            ]["resting_blood_pressure"]
-        else:
-            for st in uniq:
-                groups[str(st)] = df[df[target_col] == st][
-                    "resting_blood_pressure"
-                ]
-        bp_hist_by_stage = _shared_hist(groups, nbins=20)
-
-    # 7) Cholesterol violin by stage (or target)
-    chol_violin_by_stage = None
-    if "cholesterol" in df.columns:
-        series = [
-            {
-                "name": "All Patients",
-                "values": df["cholesterol"].dropna().tolist(),
-            }
-        ]
-        if target_col is not None:
-            uniq = sorted(df[target_col].dropna().unique().tolist())
-            try:
-                uniq_num = set(int(float(x)) for x in uniq)
-            except Exception:
-                uniq_num = None
-            if uniq_num and uniq_num.issubset({0, 1}):
-                series.append(
-                    {
-                        "name": "No Disease",
-                        "values": df[
-                            df[target_col]
-                            .astype(float)
-                            .fillna(-1)
-                            .astype(int)
-                            == 0
-                        ]["cholesterol"].dropna().tolist(),
-                    }
-                )
-                series.append(
-                    {
-                        "name": "Heart Disease",
-                        "values": df[
-                            df[target_col]
-                            .astype(float)
-                            .fillna(-1)
-                            .astype(int)
-                            == 1
-                        ]["cholesterol"].dropna().tolist(),
-                    }
-                )
-            else:
-                for st in uniq:
-                    series.append(
-                        {
-                            "name": str(st),
-                            "values": df[df[target_col] == st]["cholesterol"].dropna().tolist(),
-                        }
-                    )
-        chol_violin_by_stage = series
-
-    viz_payload = {
-        "gender_pie": gender_pie,                              # -> go.Pie(labels, values, ...)
-        "dataset_gender_heatmap": dataset_gender_heatmap,      # -> go.Heatmap(z, x, y, ...)
-        "age_hist_by_dataset": age_hist_by_dataset,            # -> overlay hist (bins + per-dataset counts)
-        "age_box_by_dataset": age_box_by_dataset,              # -> list of {name, values}
-        "age_by_cp": age_by_cp,                                # -> dict cp -> list of ages
-        "bp_box_by_status": bp_box_by_status,                  # -> list of {name, values}
-        "bp_hist_by_stage": bp_hist_by_stage,                  # -> stacked hist (bins + per-stage counts)
-        "chol_violin_by_stage": chol_violin_by_stage           # -> list of {name, values}
-    }
 
     return {
         "stats": stats,
@@ -2505,6 +2289,12 @@ def upload_predict(uid: str):
     for _, row in df.iterrows():
         prob1 = None if pd.isna(row["positive_probability"]) else float(row["positive_probability"])
         conf = prob1 if int(row["prediction"]) == 1 else (1.0 - prob1) if prob1 is not None else 0.5
+        def _int_or_none(value):
+            return int(value) if pd.notna(value) else None
+
+        nmv = _int_or_none(row.get("num_major_vessels"))
+        fbs = _int_or_none(row.get("fasting_blood_sugar"))
+        exang = _int_or_none(row.get("exercise_induced_angina"))
         pred = Prediction(
             patient_name=None,
             age=int(row["age"]),
@@ -2512,13 +2302,13 @@ def upload_predict(uid: str):
             chest_pain_type=str(row["chest_pain_type"]),
             resting_bp=float(row["resting_blood_pressure"]),
             cholesterol=float(row["cholesterol"]),
-            fasting_blood_sugar=int(row["fasting_blood_sugar"]),
+            fasting_blood_sugar=fbs,
             resting_ecg=str(row["Restecg"]),
             max_heart_rate=float(row["max_heart_rate_achieved"]),
-            exercise_angina=int(row["exercise_induced_angina"]),
+            exercise_angina=exang,
             oldpeak=float(row["st_depression"]),
             st_slope=str(row["st_slope_type"]),
-            num_major_vessels=int(row["num_major_vessels"]),
+            num_major_vessels=nmv,
             thalassemia_type=str(row["thalassemia_type"]),
             prediction=int(row["prediction"]),
             confidence=float(conf),

@@ -22,6 +22,8 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 - ⚙️ **Profile Settings**: Update username, email, nickname, avatar, and password while viewing recent activity logs.
 - 🧪 **Simulations**: What-if analysis and risk projections for variables such as age or exercise-induced angina.
 - 🕵️ **Outlier Detection**: Batch EDA includes IQR, Isolation Forest, Z-Score, LOF, and DBSCAN methods to highlight anomalous records.
+- 📈 **EDA**: Cleaning log, summary statistics, and numeric correlation heatmap.
+- 🛡️ **Resilient Batch Prediction**: Handles missing `num_major_vessels` values without failing.
 
 - 🎨 **Modern UI**: Responsive Bootstrap 5 theme with custom colors, icons, and charts.
 - 🔒 **Safe by design**:
