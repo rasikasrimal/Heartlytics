@@ -22,8 +22,7 @@ def test_superadmin_not_listed(superadmin_client):
     resp = superadmin_client.get("/superadmin/")
     assert resp.status_code == 200
     assert b"doc" in resp.data
-    # SuperAdmin should not appear in the user listing table
-    assert b"<td>superadmin</td>" not in resp.data
+    assert b"superadmin" not in resp.data
 
 
 def test_superadmin_cannot_suspend_self(superadmin_client):
