@@ -340,7 +340,13 @@ def change_logo():
             path = os.path.join(current_app.static_folder, "logo.svg")
             file.save(path)
             # update cache-busting version so new logo loads immediately
-            current_app.config["LOGO_VERSION"] = str(int(time.time()))
+            version = str(int(time.time()))
+            current_app.config["LOGO_VERSION"] = version
+            try:
+                with open(os.path.join(current_app.instance_path, "logo_version"), "w") as f:
+                    f.write(version)
+            except OSError:
+                pass
             flash("Logo updated", "success")
         else:
             flash("Please upload a valid SVG file", "error")

@@ -22,7 +22,9 @@ def test_superadmin_not_listed(superadmin_client):
     resp = superadmin_client.get("/superadmin/")
     assert resp.status_code == 200
     assert b"doc" in resp.data
-    assert b"superadmin" not in resp.data
+    # superadmin name may appear in navbar; ensure not in user table
+    table_section = resp.data.split(b"<tbody>")[1].split(b"</tbody>")[0]
+    assert b"superadmin" not in table_section
 
 
 def test_superadmin_cannot_suspend_self(superadmin_client):
