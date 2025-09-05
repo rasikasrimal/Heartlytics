@@ -2,15 +2,13 @@ from __future__ import annotations
 
 import secrets
 from functools import wraps
-from flask import request, session, abort, jsonify, current_app
+from flask import request, session, abort, jsonify
 
 
 def csrf_protect(fn):
     """Simple form-based CSRF protection decorator."""
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        if not current_app.config.get("WTF_CSRF_ENABLED", True):
-            return fn(*args, **kwargs)
         if request.method in ("GET", "HEAD", "OPTIONS"):
             return fn(*args, **kwargs)
         token_form = request.form.get("_csrf_token")
