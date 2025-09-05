@@ -1,4 +1,4 @@
-# Heart Disease Risk Prediction Web App
+# Heartlytics: Heart Disease Risk Prediction Web App
 
 A full-stack **Flask** application for predicting the risk of heart disease using a trained **Random Forest** model (scikit-learn).
 Users can enter patient data, upload CSV files for batch analysis, explore results in an interactive dashboard, and export rich PDF reports.
@@ -37,7 +37,7 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 
 ## 📂 Project Structure
 ```text
-heart-app/
+Heartlytics/
 ├── app.py               # Application entry point
 ├── config.py            # Configuration classes
 ├── helpers.py           # Shared utility functions
@@ -83,8 +83,8 @@ heart-app/
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/rasikasrimal/heart-disease-risk-app.git
-cd heart-disease-risk-app
+git clone https://github.com/rasikasrimal/Heartlytics.git
+cd Heartlytics
 ```
 
 ### 2. Create a virtual environment
