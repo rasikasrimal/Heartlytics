@@ -80,7 +80,8 @@ def _run_simulation(form: dict, defaults: dict):
         "cholesterol": (100, 600),
         "fasting_blood_sugar": (60, 200),
         "max_heart_rate_achieved": (60, 220),
-        "st_depression": (0, 10),
+        "st_depression": (0, 6.2),
+        "num_major_vessels": (0, 3),
     }
 
     try:
@@ -97,6 +98,8 @@ def _run_simulation(form: dict, defaults: dict):
             "resting_blood_pressure": "Resting Blood Pressure (systolic mmHg)",
             "fasting_blood_sugar": "Fasting Blood Sugar / Glucose (mg/dL)",
             "max_heart_rate_achieved": "Max Heart Rate Achieved (bpm)",
+            "st_depression": "ST Depression",
+            "num_major_vessels": "Num Major Vessels",
         }
         current = simulate_angina_sensitivity(
             model, baseline, variable, [baseline[variable]]

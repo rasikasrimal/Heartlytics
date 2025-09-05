@@ -1,7 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
   const runBtn = document.getElementById('run-sim');
   const form = document.getElementById('sim-form');
-  const inputs = form.querySelectorAll('input, select');
+  const variableSelect = document.getElementById('variable');
+  const inputs = [...form.querySelectorAll('input, select')];
+  if (variableSelect) {
+    inputs.push(variableSelect);
+  }
   let initialized = false;
 
   function updateSliderValue(id) {
@@ -12,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  ['age', 'bp', 'chol', 'fbs', 'mhr', 'st_dep'].forEach(id => {
+  ['age', 'bp', 'chol', 'fbs', 'mhr', 'st_dep', 'nmv'].forEach(id => {
     updateSliderValue(id);
     const el = document.getElementById(id);
     if (el) {
@@ -22,6 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function fetchSimulation() {
     const formData = new FormData(form);
+    if (variableSelect) {
+      formData.append('variable', variableSelect.value);
+    }
     return fetch('/simulations/run', {
       method: 'POST',
       body: formData

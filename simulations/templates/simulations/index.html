@@ -77,7 +77,7 @@
           </div>
           <div class="mb-3">
             <label class="form-label">ST Depression</label>
-            <input type="range" step="0.1" class="form-range" name="st_depression" id="st_dep" min="0" max="10" value="{{ baseline.st_depression }}">
+            <input type="range" step="0.1" class="form-range" name="st_depression" id="st_dep" min="0" max="6.2" value="{{ baseline.st_depression }}">
             <div class="form-text"><span id="st_dep-value">{{ baseline.st_depression }}</span></div>
           </div>
           <div class="mb-3">
@@ -91,7 +91,8 @@
           </div>
           <div class="mb-3">
             <label class="form-label">Num Major Vessels</label>
-            <input type="number" class="form-control" name="num_major_vessels" value="{{ baseline.num_major_vessels }}">
+            <input type="range" class="form-range" name="num_major_vessels" id="nmv" min="0" max="3" step="1" value="{{ baseline.num_major_vessels }}">
+            <div class="form-text"><span id="nmv-value">{{ baseline.num_major_vessels }}</span></div>
           </div>
           <div class="mb-3">
             <label class="form-label">Thalassemia Type</label>
@@ -105,21 +106,6 @@
         </div>
       </div>
 
-      <div class="row g-3 align-items-end">
-        <div class="col-md-6">
-          <label class="form-label">Variable</label>
-          <select class="form-select" name="variable" id="variable">
-            <option value="age">Age</option>
-            <option value="cholesterol">Cholesterol (mg/dL)</option>
-            <option value="resting_blood_pressure">Resting Blood Pressure (systolic mmHg)</option>
-            <option value="fasting_blood_sugar">Fasting Blood Sugar / Glucose (mg/dL)</option>
-            <option value="max_heart_rate_achieved">Max Heart Rate Achieved (bpm)</option>
-          </select>
-        </div>
-        <div class="col-md-6">
-          <button class="btn btn-brand w-100" id="run-sim">Run</button>
-        </div>
-      </div>
     </form>
   </div>
   <div class="col-lg-8 col-md-7">
@@ -129,6 +115,25 @@
     <div class="card">
       <div class="card-body">
         <div id="exercise-angina-chart" style="height:350px;"></div>
+      </div>
+    </div>
+    <div class="card mt-3">
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-6">
+            <label class="form-label">Variable</label>
+            <select class="form-select" name="variable" id="variable">
+              <option value="age">Age</option>
+              <option value="cholesterol">Cholesterol (mg/dL)</option>
+              <option value="resting_blood_pressure">Resting Blood Pressure (systolic mmHg)</option>
+              <option value="fasting_blood_sugar">Fasting Blood Sugar / Glucose (mg/dL)</option>
+              <option value="max_heart_rate_achieved">Max Heart Rate Achieved (bpm)</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <button class="btn btn-brand w-100" id="run-sim">Run</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
