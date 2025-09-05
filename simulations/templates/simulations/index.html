@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block title %}Simulations{% endblock %}
+{% block head %}
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" defer></script>
+{% endblock %}
+{% block content %}
+<h1 class="mb-4">Simulations</h1>
+<form method="get" class="row g-3 mb-4">
+  <div class="col-md-3">
+    <label class="form-label">Age</label>
+    <input type="number" class="form-control" name="age" value="{{ request.args.get('age', 50) }}">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Sex</label>
+    <select class="form-select" name="sex">
+      <option value="1" {% if request.args.get('sex','1')=='1' %}selected{% endif %}>1</option>
+      <option value="0" {% if request.args.get('sex')=='0' %}selected{% endif %}>0</option>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Chest Pain Type</label>
+    <select class="form-select" name="chest_pain_type">
+      {% set cpt = request.args.get('chest_pain_type','non-anginal') %}
+      {% for v in ['typical_angina','atypical_angina','non-anginal','asymptomatic'] %}
+      <option value="{{ v }}" {% if cpt==v %}selected{% endif %}>{{ v }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Country</label>
+    <select class="form-select" name="country">
+      {% set country = request.args.get('country','Cleveland') %}
+      {% for v in ['Cleveland','Hungary','Switzerland','Long_Beach'] %}
+      <option value="{{ v }}" {% if country==v %}selected{% endif %}>{{ v }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Resting BP</label>
+    <input type="number" class="form-control" name="resting_blood_pressure" value="{{ request.args.get('resting_blood_pressure',120) }}">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Cholesterol</label>
+    <input type="number" class="form-control" name="cholesterol" value="{{ request.args.get('cholesterol',200) }}">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Fasting Blood Sugar</label>
+    <select class="form-select" name="fasting_blood_sugar">
+      {% set fbs = request.args.get('fasting_blood_sugar','0') %}
+      <option value="0" {% if fbs=='0' %}selected{% endif %}>0</option>
+      <option value="1" {% if fbs=='1' %}selected{% endif %}>1</option>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Resting ECG</label>
+    <select class="form-select" name="Restecg">
+      {% set recg = request.args.get('Restecg','normal') %}
+      {% for v in ['normal','left_ventricular_hypertrophy','st_t_wave_abnormality'] %}
+      <option value="{{ v }}" {% if recg==v %}selected{% endif %}>{{ v }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Max Heart Rate</label>
+    <input type="number" class="form-control" name="max_heart_rate_achieved" value="{{ request.args.get('max_heart_rate_achieved',150) }}">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Exercise Angina</label>
+    <select class="form-select" name="exercise_induced_angina">
+      {% set exa = request.args.get('exercise_induced_angina','0') %}
+      <option value="0" {% if exa=='0' %}selected{% endif %}>0</option>
+      <option value="1" {% if exa=='1' %}selected{% endif %}>1</option>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">ST Depression</label>
+    <input type="number" step="0.1" class="form-control" name="st_depression" value="{{ request.args.get('st_depression',1.0) }}">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">ST Slope Type</label>
+    <select class="form-select" name="st_slope_type">
+      {% set slope = request.args.get('st_slope_type','flat') %}
+      {% for v in ['upsloping','flat','downsloping'] %}
+      <option value="{{ v }}" {% if slope==v %}selected{% endif %}>{{ v }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Num Major Vessels</label>
+    <input type="number" class="form-control" name="num_major_vessels" value="{{ request.args.get('num_major_vessels',0) }}">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Thalassemia Type</label>
+    <select class="form-select" name="thalassemia_type">
+      {% set thal = request.args.get('thalassemia_type','normal') %}
+      {% for v in ['normal','fixed_defect','reversible_defect'] %}
+      <option value="{{ v }}" {% if thal==v %}selected{% endif %}>{{ v }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Variable</label>
+    <select class="form-select" name="variable">
+      {% set variable = request.args.get('variable','cholesterol') %}
+      <option value="cholesterol" {% if variable=='cholesterol' %}selected{% endif %}>Cholesterol</option>
+      <option value="resting_blood_pressure" {% if variable=='resting_blood_pressure' %}selected{% endif %}>Blood Pressure</option>
+      <option value="age" {% if variable=='age' %}selected{% endif %}>Age</option>
+      <option value="max_heart_rate_achieved" {% if variable=='max_heart_rate_achieved' %}selected{% endif %}>Max Heart Rate</option>
+      <option value="st_depression" {% if variable=='st_depression' %}selected{% endif %}>ST Depression</option>
+    </select>
+  </div>
+  <div class="col-md-2 d-flex align-items-end">
+    <button class="btn btn-brand w-100" type="submit">Run</button>
+  </div>
+</form>
+{% if prediction %}
+<div class="mb-4">
+  <h2>Prediction Result</h2>
+  <p><strong>{{ prediction.label }}</strong></p>
+  {% if prediction.risk_pct is not none %}
+  <div class="progress mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ prediction.risk_pct }}">
+    <div class="progress-bar bg-info" style="width: {{ prediction.risk_pct }}%">{{ prediction.risk_pct }}%</div>
+  </div>
+  {% endif %}
+  {% if prediction.confidence_pct is not none %}
+  <p class="mb-0">Model confidence: {{ prediction.confidence_pct }}%</p>
+  {% endif %}
+</div>
+{% endif %}
+{% if results.what_if %}
+<div class="mb-5">
+  <h2>What-If: {{ results.what_if.variable }}</h2>
+  <div id="what-if-chart" style="height:350px;"></div>
+</div>
+{% endif %}
+{% if results.age_projection %}
+<div class="mb-5">
+  <h2>Age Projection</h2>
+  <div id="age-projection" style="height:350px;"></div>
+</div>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+  {{ super() }}
+  {% if results.what_if %}
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var seg = {{ results.what_if.segments|tojson }};
+    var traces = [];
+    if(seg.low.length){ traces.push({x:seg.low.map(r=>r.value), y:seg.low.map(r=>r.risk_pct), mode:'lines', line:{color:'green'}}); }
+    if(seg.mid.length){ traces.push({x:seg.mid.map(r=>r.value), y:seg.mid.map(r=>r.risk_pct), mode:'lines', line:{color:'yellow'}}); }
+    if(seg.high.length){ traces.push({x:seg.high.map(r=>r.value), y:seg.high.map(r=>r.risk_pct), mode:'lines', line:{color:'red'}}); }
+    Plotly.newPlot('what-if-chart', traces, {xaxis:{title:'{{ results.what_if.variable }}'}, yaxis:{title:'Risk (%)', rangemode:'tozero'}, margin:{t:30}});
+  });
+  </script>
+  {% endif %}
+  {% if results.age_projection %}
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var seg = {{ results.age_projection|tojson }};
+    var traces = [];
+    if(seg.low.length){ traces.push({x:seg.low.map(r=>r.age), y:seg.low.map(r=>r.risk_pct), mode:'lines', line:{color:'green'}}); }
+    if(seg.mid.length){ traces.push({x:seg.mid.map(r=>r.age), y:seg.mid.map(r=>r.risk_pct), mode:'lines', line:{color:'yellow'}}); }
+    if(seg.high.length){ traces.push({x:seg.high.map(r=>r.age), y:seg.high.map(r=>r.risk_pct), mode:'lines', line:{color:'red'}}); }
+    Plotly.newPlot('age-projection', traces, {xaxis:{title:'Age'}, yaxis:{title:'Risk (%)', rangemode:'tozero'}, margin:{t:30}});
+  });
+  </script>
+  {% endif %}
+{% endblock %}
