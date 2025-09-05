@@ -117,7 +117,7 @@ DESC user;
 | last_login | DATETIME |  |  |
 | avatar | VARCHAR(255) |  |  |
 
-Note: Users can log in using either the `username` or `email` field.
+Note: Users can log in using either the `username` or `email` field. The `last_login` column stores the timestamp of the most recent successful login.
 
 ## user_roles
 

@@ -95,3 +95,4 @@
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
 | --- | --- | --- | --- | --- | --- |
 | TC-052 | Login page shows branding, helpful links, and responsive design. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-053 | Password field eye icon toggles visibility on login page. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |

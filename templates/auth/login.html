@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
 {% block title %}Login{% endblock %}
 {% from 'components/forms.html' import text_input, password_input %}
+{% block navbar %}{% endblock %}
 
 {% block content %}
-<div class="row align-items-center py-5">
-  <div class="col-lg-6 text-center text-lg-start mb-4 mb-lg-0">
+<div class="row justify-content-center align-items-center py-5 g-4">
+  <div class="col-lg-5 text-center text-lg-start mb-4 mb-lg-0">
     <img src="{{ url_for('static', filename=app_logo) }}" alt="logo" style="max-width: 120px;">
     <h1 class="mt-3 fw-bold">{{ app_name }}</h1>
     <p class="lead">Predictive insights for a healthier heart.</p>
   </div>
-  <div class="col-lg-5 offset-lg-1">
+  <div class="col-lg-5">
     <div class="card shadow-sm p-4">
       <form method="post">
         {{ form.hidden_tag() }}
@@ -24,5 +25,9 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 {% endblock %}
 
