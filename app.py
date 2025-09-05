@@ -19,7 +19,7 @@ import pandas as pd
 import re
 from flask import (
     Flask, render_template, request, redirect, url_for, flash, jsonify,
-    send_file, session, abort
+    send_file, session, abort, current_app
 )
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, current_user, logout_user, login_required
@@ -92,6 +92,27 @@ AVATAR_DIR = app.config.get("AVATAR_UPLOAD_FOLDER")
 os.makedirs(AVATAR_DIR, exist_ok=True)
 ALLOWED_AVATAR_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 app.config["ALLOWED_AVATAR_EXTENSIONS"] = ALLOWED_AVATAR_EXTENSIONS
+
+# Branding configuration
+app.config.setdefault("APP_NAME", "HeartLytics")
+app.config.setdefault("APP_LOGO", "logo.svg")
+app.config.setdefault("BRANDING_FILE", os.path.join(app.instance_path, "branding.json"))
+if os.path.exists(app.config["BRANDING_FILE"]):
+    try:
+        with open(app.config["BRANDING_FILE"], "r", encoding="utf-8") as f:
+            data = json.load(f)
+            app.config["APP_NAME"] = data.get("app_name", app.config["APP_NAME"])
+            app.config["APP_LOGO"] = data.get("app_logo", app.config["APP_LOGO"])
+    except Exception:
+        pass
+
+
+@app.context_processor
+def inject_branding():
+    return {
+        "app_name": current_app.config.get("APP_NAME", "HeartLytics"),
+        "app_logo": current_app.config.get("APP_LOGO", "logo.svg"),
+    }
 
 # Security headers
 @app.after_request

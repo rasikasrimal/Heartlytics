@@ -1,0 +1,25 @@
+{% macro input(name, label, type='text', value='', **attrs) %}
+<div class="mb-3">
+  <label class="form-label" for="{{ attrs.get('id', name) }}">{{ label }}</label>
+  <input class="form-control" type="{{ type }}" name="{{ name }}" value="{{ value }}" {{ attrs|xmlattr }}>
+</div>
+{% endmacro %}
+
+{% macro text_input(name, label, value='', **attrs) %}
+  {{ input(name, label, type='text', value=value, **attrs) }}
+{% endmacro %}
+
+{% macro email_input(name, label, value='', **attrs) %}
+  {{ input(name, label, type='email', value=value, **attrs) }}
+{% endmacro %}
+
+{% macro password_input(name, label, **attrs) %}
+  {{ input(name, label, type='password', **attrs) }}
+{% endmacro %}
+
+{% macro file_input(name, label, **attrs) %}
+<div class="mb-3">
+  <label class="form-label" for="{{ attrs.get('id', name) }}">{{ label }}</label>
+  <input class="form-control" type="file" name="{{ name }}" {{ attrs|xmlattr }}>
+</div>
+{% endmacro %}
