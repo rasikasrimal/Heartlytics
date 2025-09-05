@@ -2291,6 +2291,8 @@ def upload_predict(uid: str):
         conf = prob1 if int(row["prediction"]) == 1 else (1.0 - prob1) if prob1 is not None else 0.5
         nmv = row.get("num_major_vessels")
         nmv = int(nmv) if pd.notna(nmv) else None
+        fbs = row.get("fasting_blood_sugar")
+        fbs = int(fbs) if pd.notna(fbs) else None
         pred = Prediction(
             patient_name=None,
             age=int(row["age"]),
@@ -2298,7 +2300,7 @@ def upload_predict(uid: str):
             chest_pain_type=str(row["chest_pain_type"]),
             resting_bp=float(row["resting_blood_pressure"]),
             cholesterol=float(row["cholesterol"]),
-            fasting_blood_sugar=int(row["fasting_blood_sugar"]),
+            fasting_blood_sugar=fbs,
             resting_ecg=str(row["Restecg"]),
             max_heart_rate=float(row["max_heart_rate_achieved"]),
             exercise_angina=int(row["exercise_induced_angina"]),
