@@ -113,11 +113,26 @@ body, .navbar, .card, .card-section, .table, .form-control, .form-select, .btn, 
   background-color: var(--brand);
   color: #fff;
   transition: background-color .2s, transform .2s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-brand::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 0;
+  background: var(--brand-dark);
+  transition: width .2s;
 }
 .btn-brand:hover {
   background-color: var(--brand-dark);
   color: #fff;
   transform: translateY(-2px);
+}
+.btn-brand:hover::after {
+  width: 100%;
 }
 
 .btn-success {

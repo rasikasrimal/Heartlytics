@@ -74,6 +74,9 @@ def login():
         session["login_attempts"] = data
         flash("Invalid credentials", "error")
 
+    # Clear sensitive fields so the form always renders blank
+    form.identifier.data = ""
+    form.password.data = ""
     return render_template("auth/login.html", form=form)
 
 
