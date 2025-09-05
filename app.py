@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-
 # ============================
-# Heart Disease Risk App + CSV Upload/EDA/Batch Predict
+# Heartlytics: Heart disease risk with CSV upload, EDA, batch prediction
 # ============================
 
 import os
@@ -1234,7 +1233,7 @@ def dashboard_pdf_generate():
         c.setFillColor(colors.HexColor("#dc2626"))
         c.drawString(cm, height - cm + 4, "\u2665")
         c.setFillColor(text_col)
-        c.drawString(cm + 14, height - cm, "Heart Disease Risk App")
+        c.drawString(cm + 14, height - cm, "Heartlytics")
         try:
             c.drawImage(
                 logo_path,
