@@ -40,8 +40,8 @@ def login():
 
         db = current_app.db
         User = current_app.User
-        ident = form.username.data.strip()
-        user = User.query.filter(or_(User.username == ident, User.email == ident)).first()
+        ident = form.email.data.strip()
+        user = User.query.filter_by(email=ident).first()
 
         if user and user.check_password(form.password.data):
             if user.status != "approved":

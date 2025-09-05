@@ -26,6 +26,8 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 - 🛡️ **Resilient Batch Prediction**: Handles missing `num_major_vessels` values without failing.
 
 - 🎨 **Modern UI**: Responsive Bootstrap 5 theme with custom colors, icons, and charts.
+- 🔐 **Redesigned Login**: Facebook-style layout with email sign-in and quick links.
+- 📌 **Sticky Footer**: Consistent footer on every page that stays at the bottom.
 - 🔒 **Safe by design**:
   - CSRF tokens for forms and API
   - Security headers (no-sniff, frame denial, no referrer, no FLoC)

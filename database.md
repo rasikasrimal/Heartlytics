@@ -117,6 +117,8 @@ DESC user;
 | last_login | DATETIME |  |  |
 | avatar | VARCHAR(255) |  |  |
 
+Note: Users log in using the `email` field.
+
 ## user_roles
 
 ```sql
