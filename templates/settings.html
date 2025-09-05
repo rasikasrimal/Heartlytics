@@ -1,51 +1,96 @@
 {% extends 'base.html' %}
 {% block title %}Settings{% endblock %}
+{% from 'components/forms.html' import text_input, email_input, password_input, file_input %}
 {% block content %}
 <h1 class="mb-4">Settings</h1>
-<div class="row">
+<div class="row g-4">
   <div class="col-md-6">
-    <form method="post" enctype="multipart/form-data" class="mb-4">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-      <div class="mb-3">
-        <label class="form-label">Username</label>
-        <input class="form-control" name="username" value="{{ current_user.username }}">
+    <div class="card shadow-sm">
+      <div class="card-header">Profile</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('settings.update_profile') }}" enctype="multipart/form-data">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+          {{ text_input('username', 'Username', value=current_user.username) }}
+          {{ email_input('email', 'Email', value=current_user.email) }}
+          {{ text_input('nickname', 'Nickname', value=current_user.nickname) }}
+          {{ file_input('avatar', 'Avatar') }}
+          <button class="btn btn-brand" type="submit">Save Profile</button>
+        </form>
       </div>
-      <div class="mb-3">
-        <label class="form-label">Email</label>
-        <input class="form-control" type="email" name="email" value="{{ current_user.email }}">
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Nickname</label>
-        <input class="form-control" name="nickname" value="{{ current_user.nickname }}">
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Avatar</label>
-        <input class="form-control" type="file" name="avatar">
-      </div>
-      <button class="btn btn-brand" type="submit">Save Profile</button>
-    </form>
-    <form method="post">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-      <div class="mb-3">
-        <label class="form-label">Current Password</label>
-        <input class="form-control" type="password" name="current_password">
-      </div>
-      <div class="mb-3">
-        <label class="form-label">New Password</label>
-        <input class="form-control" type="password" name="new_password">
-      </div>
-      <button class="btn btn-brand" type="submit">Change Password</button>
-    </form>
+    </div>
   </div>
   <div class="col-md-6">
-    <h5>Activity Log</h5>
-    <ul class="list-group">
-    {% for log in logs %}
-      <li class="list-group-item small">{{ log.timestamp }} - {{ log.action }}</li>
-    {% else %}
-      <li class="list-group-item small">No activity</li>
-    {% endfor %}
-    </ul>
+    <div class="card shadow-sm">
+      <div class="card-header">Change Password</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('settings.update_password') }}">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            {{ password_input('current_password', 'Current Password', attrs={'autocomplete': 'off'}) }}
+            {{ password_input('new_password', 'New Password', attrs={'id': 'new_password', 'autocomplete': 'new-password'}) }}
+            {{ password_input('confirm_password', 'Confirm New Password', attrs={'id': 'confirm_password', 'autocomplete': 'new-password'}) }}
+          <div id="password-match" class="small mt-2"></div>
+          <button class="btn btn-brand" type="submit" id="password-submit" disabled>Update Password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% if current_user.role == 'SuperAdmin' %}
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header">Customize App</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('settings.update_branding') }}" enctype="multipart/form-data">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+          {{ text_input('app_name', 'App Name', value=app_name) }}
+          {{ file_input('logo', 'Upload Logo') }}
+          <button class="btn btn-brand" type="submit">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header">Activity Log</div>
+      <ul class="list-group list-group-flush">
+      {% for log in logs %}
+        <li class="list-group-item small">{{ log.timestamp }} - {{ log.action }}</li>
+      {% else %}
+        <li class="list-group-item small">No activity</li>
+      {% endfor %}
+      </ul>
+    </div>
   </div>
 </div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const np = document.getElementById('new_password');
+  const cp = document.getElementById('confirm_password');
+  const msg = document.getElementById('password-match');
+  const btn = document.getElementById('password-submit');
+  function check(){
+    if(!np.value || !cp.value){
+      msg.textContent = '';
+      btn.disabled = true;
+      return;
+    }
+    if(np.value === cp.value){
+      msg.textContent = '✅ passwords match';
+      msg.classList.remove('text-danger');
+      msg.classList.add('text-success');
+      btn.disabled = false;
+    } else {
+      msg.textContent = '❌ passwords don\u2019t match';
+      msg.classList.remove('text-success');
+      msg.classList.add('text-danger');
+      btn.disabled = true;
+    }
+  }
+  np.addEventListener('input', check);
+  cp.addEventListener('input', check);
+});
+</script>
 {% endblock %}
