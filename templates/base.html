@@ -39,6 +39,13 @@
                 <i class="bi bi-speedometer2 me-1"></i>Dashboard
               </a>
             </li>
+            {% if current_user.role in ['Doctor', 'SuperAdmin'] %}
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center {% if request.endpoint.startswith('simulations.') %}active{% endif %}" href="{{ url_for('simulations.index') }}">
+                <i class="bi bi-graph-up me-1"></i>Simulations
+              </a>
+            </li>
+            {% endif %}
             <li class="nav-item">
               <a class="nav-link d-flex align-items-center {% if request.endpoint == 'research_paper' %}active{% endif %}" href="{{ url_for('research_paper') }}">
                 <i class="bi bi-journal-text me-1"></i>Research
