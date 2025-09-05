@@ -85,6 +85,15 @@ app.permanent_session_lifetime = timedelta(minutes=30)
 # Ensure instance dir
 os.makedirs(app.instance_path, exist_ok=True)
 
+# Load persisted logo version if available
+logo_version_file = os.path.join(app.instance_path, "logo_version")
+if os.path.exists(logo_version_file):
+    try:
+        with open(logo_version_file) as f:
+            app.config["LOGO_VERSION"] = f.read().strip() or "1"
+    except OSError:
+        pass
+
 # uploads dir (under instance/)
 UPLOADS_DIR = os.path.join(app.instance_path, "uploads")
 os.makedirs(UPLOADS_DIR, exist_ok=True)

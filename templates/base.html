@@ -65,9 +65,7 @@
                 {% else %}
                 <i class="bi bi-person-circle me-2"></i>
                 {% endif %}
-                  {% if current_user.role == 'SuperAdmin' %}Super Admin{% else %}
                   {{ current_user.nickname or current_user.username }}
-                  {% endif %}
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
                 <li><a class="dropdown-item" href="{{ url_for('settings.settings') }}">Settings</a></li>
