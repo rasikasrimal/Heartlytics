@@ -113,11 +113,26 @@ body, .navbar, .card, .card-section, .table, .form-control, .form-select, .btn, 
   background-color: var(--brand);
   color: #fff;
   transition: background-color .2s, transform .2s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-brand::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 0;
+  background: var(--brand-dark);
+  transition: width .2s;
 }
 .btn-brand:hover {
   background-color: var(--brand-dark);
   color: #fff;
   transform: translateY(-2px);
+}
+.btn-brand:hover::after {
+  width: 100%;
 }
 
 .btn-success {
@@ -196,6 +211,19 @@ footer {
 .btn-success:focus {
   outline: none;
   box-shadow: 0 0 0 .25rem rgba(22,163,74,.4);
+}
+
+.form-range::-webkit-slider-thumb {
+  background-color: var(--brand);
+}
+.form-range::-moz-range-thumb {
+  background-color: var(--brand);
+}
+.form-range:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 .25rem rgba(220,38,38,.4);
+}
+.form-range:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 .25rem rgba(220,38,38,.4);
 }
 
 .avatar {

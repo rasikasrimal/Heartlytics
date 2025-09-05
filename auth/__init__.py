@@ -40,8 +40,10 @@ def login():
 
         db = current_app.db
         User = current_app.User
-        ident = form.username.data.strip()
-        user = User.query.filter(or_(User.username == ident, User.email == ident)).first()
+        ident = form.identifier.data.strip()
+        user = User.query.filter(
+            or_(User.email == ident, User.username == ident)
+        ).first()
 
         if user and user.check_password(form.password.data):
             if user.status != "approved":
@@ -72,6 +74,9 @@ def login():
         session["login_attempts"] = data
         flash("Invalid credentials", "error")
 
+    # Clear sensitive fields so the form always renders blank
+    form.identifier.data = ""
+    form.password.data = ""
     return render_template("auth/login.html", form=form)
 
 

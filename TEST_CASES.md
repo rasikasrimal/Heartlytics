@@ -52,34 +52,49 @@
 | TC-031 | Admin cannot suspend or modify SuperAdmin status. | SuperAdmin Management | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-032 | Dashboard search filters users by username or email. | SuperAdmin Management | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-033 | Dashboard supports sorting users by role, status, or creation date. | SuperAdmin Management | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-034 | SuperAdmin account is hidden from user list. | SuperAdmin Management | 🔴 High | 🔒 Security | ⏳ Not Run |
 
 ## User Settings
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
 | --- | --- | --- | --- | --- | --- |
-| TC-034 | User updates profile information and avatar. | User Settings | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
-| TC-035 | User changes password successfully. | User Settings | 🔴 High | 🔒 Security | ⏳ Not Run |
-| TC-036 | Activity log shows recent user actions. | User Settings | 🟢 Low | 🧪 Functional | ⏳ Not Run |
-| TC-037 | Avatar upload rejects non-image files. | User Settings | 🟡 Medium | 🔒 Security | ⏳ Not Run |
-| TC-038 | Password change with incorrect current password is rejected. | User Settings | 🟡 Medium | 🔒 Security | ⏳ Not Run |
-| TC-039 | Profile update with invalid email format is rejected. | User Settings | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-035 | User updates profile information and avatar. | User Settings | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-036 | User changes password successfully. | User Settings | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-037 | Activity log shows recent user actions. | User Settings | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-038 | Avatar upload rejects non-image files. | User Settings | 🟡 Medium | 🔒 Security | ⏳ Not Run |
+| TC-039 | Password change with incorrect current password is rejected. | User Settings | 🟡 Medium | 🔒 Security | ⏳ Not Run |
+| TC-040 | Profile update with invalid email format is rejected. | User Settings | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 
 ## Simulations
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
 | --- | --- | --- | --- | --- | --- |
-| TC-040 | Simulations page loads without chart until variable selected. | Simulations | 🟢 Low | 🧪 Functional | ⏳ Not Run |
-| TC-041 | Simulation shows risk curve after selecting a variable. | Simulations | 🟢 Low | 🧪 Functional | ⏳ Not Run |
-| TC-042 | Selecting unsupported variable returns warning message. | Simulations | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-041 | Simulations page loads without chart until variable selected. | Simulations | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-042 | Simulation shows risk curve after selecting a variable. | Simulations | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-043 | Selecting unsupported variable returns warning message. | Simulations | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 
 ## Research Paper Viewer
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
 | --- | --- | --- | --- | --- | --- |
-| TC-043 | Research paper renders with sections and figures. | Research Paper Viewer | 🟢 Low | 🧪 Functional | ⏳ Not Run |
-| TC-044 | Navigating to non-existent paper returns 404. | Research Paper Viewer | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-044 | Research paper renders with sections and figures. | Research Paper Viewer | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-045 | Navigating to non-existent paper returns 404. | Research Paper Viewer | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 
 ## Security
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
 | --- | --- | --- | --- | --- | --- |
-| TC-045 | Submitting POST without CSRF token is rejected. | Security | 🔴 High | 🔒 Security | ⏳ Not Run |
-| TC-046 | Session times out after inactivity. | Security | 🔴 High | 🔒 Security | ⏳ Not Run |
-| TC-047 | Multiple failed logins trigger temporary account lock. | Security | 🔴 High | 🔒 Security | ⏳ Not Run |
-| TC-048 | User-supplied data is HTML-escaped to prevent XSS. | Security | 🟡 Medium | 🔒 Security | ⏳ Not Run |
+| TC-046 | Submitting POST without CSRF token is rejected. | Security | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-047 | Session times out after inactivity. | Security | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-048 | Multiple failed logins trigger temporary account lock. | Security | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-049 | User-supplied data is HTML-escaped to prevent XSS. | Security | 🟡 Medium | 🔒 Security | ⏳ Not Run |
+| TC-050 | Safe GET and HEAD requests bypass CSRF validation. | Security | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+
+## Regression
+| Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
+| --- | --- | --- | --- | --- | --- |
+| TC-051 | Batch prediction handles missing `num_major_vessels` values without error. | Batch Upload & EDA | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+
+## UI & Layout
+| Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
+| --- | --- | --- | --- | --- | --- |
+| TC-052 | Login page shows branding, helpful links, and responsive design. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-053 | Password field eye icon toggles visibility on login page. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-054 | Identifier field on login page starts empty without displaying "None". | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-055 | Login form disables autofill so fields remain blank. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
