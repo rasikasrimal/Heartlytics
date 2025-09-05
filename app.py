@@ -2,7 +2,7 @@ from __future__ import annotations
 
 
 # ============================
-# Heartlytics + CSV Upload/EDA/Batch Predict
+# Heart Disease Risk App + CSV Upload/EDA/Batch Predict
 # ============================
 
 import os
