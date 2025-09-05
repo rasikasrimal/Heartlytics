@@ -1,90 +1,29 @@
 # Test Cases
 
-## Authentication & Roles
-- **Login succeeds**
-  1. Navigate to `/auth/login`.
-  2. Enter valid credentials and submit.
-  - Expected: user is redirected to their dashboard.
-- **Login rate limit**
-  1. Attempt to log in with invalid credentials five times.
-  - Expected: further attempts show "Too many login attempts".
-- **Signup requires approval for Doctors/Admins**
-  1. Submit the signup form selecting the Doctor role.
-  - Expected: account status is `pending` and cannot log in until approved.
-- **Role restriction**
-  1. Log in as a regular user.
-  2. Navigate to `/superadmin`.
-  - Expected: `403 Forbidden`.
-
-## Prediction
-- **Single prediction**
-  1. Open the home page and submit the prediction form with valid data.
-  - Expected: prediction label, probability, risk band, and confidence are displayed.
-- **Validation errors**
-  1. Submit the prediction form with invalid values (e.g., text in numeric field).
-  - Expected: form redisplays with error messages.
-- **Patient PDF report**
-  1. After a prediction, click the PDF download link.
-  - Expected: PDF containing patient details and model outputs is downloaded.
-
-## Batch Upload & EDA
-- **CSV upload**
-  1. Navigate to the upload page and drop a CSV file.
-  2. Map columns and start the batch process.
-  - Expected: cleaned data preview and progress feedback.
-- **Outlier detection**
-  1. Run EDA after upload.
-  - Expected: tables highlighting IQR, Isolation Forest, Z‑Score, LOF, and DBSCAN outliers.
-- **Dashboard export**
-  1. From the dashboard, export the PDF report.
-  - Expected: PDF with KPIs, charts, and table of contents.
-
-## Doctor Dashboard
-- **Doctor sees own patients**
-  1. Log in as a doctor who has submitted predictions.
-  - Expected: dashboard lists only patients entered by that doctor.
-
-## SuperAdmin Management
-- **Approve user**
-  1. Log in as SuperAdmin and open the dashboard.
-  2. Approve a pending user.
-  - Expected: user status changes to `approved`.
-- **Change role or status**
-  1. From the dashboard, update a user's role or suspend them.
-  - Expected: change is persisted and recorded in audit logs.
-- **Reset password**
-  1. Trigger a password reset for a user.
-  - Expected: temporary password is displayed.
-- **View audit log**
-  1. Open `/superadmin/audit`.
-  - Expected: paginated list of administrative actions.
-
-## User Settings
-- **Update profile and avatar**
-  1. Navigate to `/settings` and change profile fields and upload an avatar.
-  - Expected: new information and image are saved.
-- **Change password**
-  1. Provide current and new passwords on the settings page.
-  - Expected: password updated confirmation.
-- **Activity log**
-  1. Visit `/settings`.
-  - Expected: recent actions appear in the activity table.
-
-## Simulations
-- **Exercise‑induced angina sensitivity**
-  1. Open `/simulations` and run the simulation for different variables.
-  - Expected: curves display risk changes and highlight the current baseline.
-
-## Research Paper Viewer
-- **Paper renders**
-  1. Navigate to `/research` (or corresponding route).
-  - Expected: LaTeX manuscript rendered with sections, figures, and references.
-
-## Security
-- **CSRF protection**
-  1. Submit a POST request without the CSRF token.
-  - Expected: request is rejected.
-- **Session timeout**
-  1. Log in and remain idle beyond the configured timeout.
-  - Expected: user is logged out on next request.
+| Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
+| --- | --- | --- | --- | --- | --- |
+| TC-001 | Successful login redirects user to dashboard. | Authentication & Roles | 🔴 High | 🧪 Functional | ⏳ Not Run |
+| TC-002 | Rate limiting blocks more than five invalid logins in 15 min. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-003 | Doctor/Admin signup remains pending until approved. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-004 | Regular user cannot access `/superadmin`. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-005 | Logout endpoint terminates session. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-006 | Unauthenticated user is redirected to login when accessing dashboard. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-007 | Submitting valid data returns prediction label, probability, risk band, and confidence. | Prediction | 🔴 High | 🧪 Functional | ⏳ Not Run |
+| TC-008 | Invalid values in prediction form show validation errors. | Prediction | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-009 | Prediction result can be downloaded as PDF report. | Prediction | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-010 | CSV upload cleans data and shows progress. | Batch Upload & EDA | 🔴 High | 🧪 Functional | ⏳ Not Run |
+| TC-011 | EDA highlights outliers using multiple algorithms. | Batch Upload & EDA | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-012 | Dashboard export creates PDF with KPIs and charts. | Batch Upload & EDA | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-013 | Doctor dashboard lists only doctor’s own patients. | Doctor Dashboard | 🔴 High | 🧪 Functional | ⏳ Not Run |
+| TC-014 | SuperAdmin approves a pending user. | SuperAdmin Management | 🔴 High | 🧪 Functional | ⏳ Not Run |
+| TC-015 | SuperAdmin changes user role or status with audit log. | SuperAdmin Management | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-016 | SuperAdmin resets a user password. | SuperAdmin Management | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-017 | Audit log displays administrative actions. | SuperAdmin Management | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-018 | User updates profile information and avatar. | User Settings | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-019 | User changes password successfully. | User Settings | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-020 | Activity log shows recent user actions. | User Settings | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-021 | Simulation shows risk curves for varying variables. | Simulations | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-022 | Research paper renders with sections and figures. | Research Paper Viewer | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-023 | Submitting POST without CSRF token is rejected. | Security | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-024 | Session times out after inactivity. | Security | 🔴 High | 🔒 Security | ⏳ Not Run |
 
