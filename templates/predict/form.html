@@ -11,176 +11,113 @@
 <div class="row g-4">
   <!-- Left: single patient form -->
   <div class="col-12 col-lg-6">
-    <div class="card shadow-sm h-100">
-      <div class="card-body p-4">
-        <h2 class="section-title mb-3"><i class="bi bi-person-lines-fill me-2"></i>Enter Patient Data</h2>
-        <form action="{{ url_for('predict.predict') }}" method="post" id="patient-form">
-          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-          <div id="form-errors" class="alert alert-danger d-none mb-3 small"></div>
-
-          <div class="card card-section mb-3">
-            <div class="card-body">
-            <h3 class="section-title h6 mb-3">Personal Info</h3>
-            <div class="row g-3">
-              <!-- patient name (not used by model, stored for dashboard/report) -->
-              <div class="col-12 form-floating">
-                <input class="form-control" name="patient_name" id="patient_name" placeholder="Patient name" value="{{ defaults.get('patient_name', '') }}">
-                <label for="patient_name">Patient name</label>
-              </div>
-              <!-- age -->
-              <div class="col-6">
-                <div class="input-group has-validation">
-                  <div class="form-floating flex-grow-1">
-                    <input class="form-control" type="number" name="age" id="age" min="0" max="120" value="{{ defaults.get('age', '') }}" placeholder="Age" required data-msg="Please enter a valid age (0–120)" data-bs-toggle="tooltip" title="Typical human range">
-                    <label for="age" class="required">Age</label>
-                  </div>
-                  <span class="input-group-text">yrs</span>
-                  <div class="invalid-feedback"></div>
-                </div>
-              </div>
-              <!-- sex (0/1 as in training data) -->
-              <div class="col-6 form-floating">
-                {% set _sex = defaults.get('sex', 1) %}
-                <select class="form-select" name="sex" id="sex" required title="1=male, 0=female">
-                  <option value="1" {{ 'selected' if _sex|int==1 else '' }}>1 (male)</option>
-                  <option value="0" {{ 'selected' if _sex|int==0 else '' }}>0 (female)</option>
-                </select>
-                <label for="sex" class="required">Sex</label>
-              </div>
-            </div>
-            </div>
+    <form action="{{ url_for('predict.predict') }}" method="post" id="patient-form">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Demographics</h5>
+          <div class="mb-3">
+            <label class="form-label">Patient Name</label>
+            <input type="text" class="form-control" name="patient_name" value="{{ defaults.patient_name }}">
           </div>
-
-          <div class="card card-section mb-3">
-            <div class="card-body">
-            <h3 class="section-title h6 mb-3">Vitals</h3>
-            <div class="row g-3">
-              <!-- chest_pain_type -->
-              <div class="col-12 form-floating">
-                {% set cpt = defaults.get('chest_pain_type', 'typical_angina') %}
-                <select class="form-select" name="chest_pain_type" id="chest_pain_type" required title="Patient chest pain category">
-                  {% for v in ['typical_angina','atypical_angina','non-anginal','asymptomatic'] %}
-                  <option value="{{ v }}" {{ 'selected' if cpt==v else '' }}>{{ v }}</option>
-                  {% endfor %}
-                </select>
-                <label for="chest_pain_type" class="required">Chest pain type</label>
-              </div>
-              <!-- resting_blood_pressure -->
-              <div class="col-6">
-                <div class="input-group has-validation">
-                  <div class="form-floating flex-grow-1">
-                    <input class="form-control" type="number" step="1" name="resting_blood_pressure" id="resting_blood_pressure" min="80" max="250" value="{{ defaults.get('resting_blood_pressure', 130) }}" placeholder="Resting blood pressure" required data-msg="BP must be between 80–250 mmHg" data-bs-toggle="tooltip" title="Typical human range">
-                    <label for="resting_blood_pressure" class="required">Resting blood pressure</label>
-                  </div>
-                  <span class="input-group-text">mmHg</span>
-                  <div class="invalid-feedback"></div>
-                </div>
-              </div>
-              <!-- cholesterol -->
-              <div class="col-6">
-                <div class="input-group has-validation">
-                  <div class="form-floating flex-grow-1">
-                    <input class="form-control" type="number" step="1" name="cholesterol" id="cholesterol" min="100" max="600" value="{{ defaults.get('cholesterol', 240) }}" placeholder="Cholesterol" required data-msg="Cholesterol must be between 100–600 mg/dL" data-bs-toggle="tooltip" title="Typical human range">
-                    <label for="cholesterol" class="required">Cholesterol</label>
-                  </div>
-                  <span class="input-group-text">mg/dL</span>
-                  <div class="invalid-feedback"></div>
-                </div>
-              </div>
-              <!-- fasting_blood_sugar (0/1) -->
-              <div class="col-6 form-floating">
-                {% set fbs = defaults.get('fasting_blood_sugar', 0) %}
-                <select class="form-select" name="fasting_blood_sugar" id="fasting_blood_sugar" required title=">120 mg/dl? 1=true, 0=false">
-                  <option value="0" {{ 'selected' if fbs|int==0 else '' }}>0</option>
-                  <option value="1" {{ 'selected' if fbs|int==1 else '' }}>1</option>
-                </select>
-                <label for="fasting_blood_sugar" class="required">Fasting blood sugar</label>
-              </div>
-            </div>
-            </div>
+          <div class="mb-3">
+            <label class="form-label">Age <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="Age in years">?</span></label>
+            <input type="range" class="form-range" name="age" id="age" min="0" max="120" value="{{ defaults.age }}">
+            <div class="form-text"><span id="age-value">{{ defaults.age }}</span> years</div>
           </div>
-
-          <div class="card card-section mb-3">
-            <div class="card-body">
-            <h3 class="section-title h6 mb-3">ECG & Imaging</h3>
-            <div class="row g-3">
-              <!-- Restecg -->
-              <div class="col-6 form-floating">
-                {% set recg = defaults.get('Restecg', 'normal') %}
-                <select class="form-select" name="Restecg" id="Restecg" required title="Resting ECG results">
-                  {% for v in ['normal','left_ventricular_hypertrophy','st_t_wave_abnormality'] %}
-                  <option value="{{ v }}" {{ 'selected' if recg==v else '' }}>{{ v }}</option>
-                  {% endfor %}
-                </select>
-                <label for="Restecg" class="required">Resting ECG</label>
-              </div>
-              <!-- max_heart_rate_achieved -->
-              <div class="col-6">
-                <div class="input-group has-validation">
-                  <div class="form-floating flex-grow-1">
-                    <input class="form-control" type="number" step="1" name="max_heart_rate_achieved" id="max_heart_rate_achieved" min="60" max="220" value="{{ defaults.get('max_heart_rate_achieved', 150) }}" placeholder="Max heart rate" required data-msg="Max Heart Rate must be 60–220 bpm" data-bs-toggle="tooltip" title="Typical human range">
-                    <label for="max_heart_rate_achieved" class="required">Max heart rate</label>
-                  </div>
-                  <span class="input-group-text">bpm</span>
-                  <div class="invalid-feedback"></div>
-                </div>
-              </div>
-              <!-- exercise_induced_angina (0/1) -->
-              <div class="col-6 form-floating">
-                {% set exa = defaults.get('exercise_induced_angina', 0) %}
-                <select class="form-select" name="exercise_induced_angina" id="exercise_induced_angina" required title="1=yes, 0=no">
-                  <option value="0" {{ 'selected' if exa|int==0 else '' }}>0</option>
-                  <option value="1" {{ 'selected' if exa|int==1 else '' }}>1</option>
-                </select>
-                <label for="exercise_induced_angina" class="required">Exercise-induced angina</label>
-              </div>
-              <!-- st_depression -->
-              <div class="col-6">
-                <div class="input-group has-validation">
-                  <div class="form-floating flex-grow-1">
-                    <input class="form-control" type="number" step="0.1" name="st_depression" id="st_depression" min="0" max="10" value="{{ defaults.get('st_depression', 1.0) }}" placeholder="ST depression" required data-msg="ST Depression must be 0–10" data-bs-toggle="tooltip" title="Typical human range">
-                    <label for="st_depression" class="required">ST depression</label>
-                  </div>
-                  <span class="input-group-text">mm</span>
-                  <div class="invalid-feedback"></div>
-                </div>
-              </div>
-              <!-- st_slope_type -->
-              <div class="col-6 form-floating">
-                {% set slope = defaults.get('st_slope_type', 'flat') %}
-                <select class="form-select" name="st_slope_type" id="st_slope_type" required title="Peak exercise ST segment">
-                  {% for v in ['upsloping','flat','downsloping'] %}
-                  <option value="{{ v }}" {{ 'selected' if slope==v else '' }}>{{ v }}</option>
-                  {% endfor %}
-                </select>
-                <label for="st_slope_type" class="required">ST slope type</label>
-              </div>
-              <!-- num_major_vessels -->
-              <div class="col-6 form-floating">
-                <input class="form-control" type="number" step="1" min="0" max="4" name="num_major_vessels" id="num_major_vessels" value="{{ defaults.get('num_major_vessels', 0) }}" placeholder="Num major vessels" required data-msg="Number of major vessels must be 0–4" data-bs-toggle="tooltip" title="Typical human range">
-                <label for="num_major_vessels" class="required">Num major vessels</label>
-                <div class="invalid-feedback"></div>
-              </div>
-              <!-- thalassemia_type -->
-              <div class="col-6 form-floating">
-                {% set thal = defaults.get('thalassemia_type', 'normal') %}
-                <select class="form-select" name="thalassemia_type" id="thalassemia_type" required>
-                  {% for v in ['normal','fixed_defect','reversible_defect'] %}
-                  <option value="{{ v }}" {{ 'selected' if thal==v else '' }}>{{ v }}</option>
-                  {% endfor %}
-                </select>
-                <label for="thalassemia_type" class="required">Thalassemia type</label>
-              </div>
-            </div>
-            </div>
+          <div class="mb-3">
+            <label class="form-label">Sex</label>
+            <select class="form-select" name="sex">
+              <option value="1" {% if defaults.sex==1 %}selected{% endif %}>Male</option>
+              <option value="0" {% if defaults.sex==0 %}selected{% endif %}>Female</option>
+            </select>
           </div>
-
-          <div class="d-grid">
-            <button class="btn btn-brand btn-lg">Predict Risk</button>
+          <div class="mb-3">
+            <label class="form-label">Chest Pain Type</label>
+            <select class="form-select" name="chest_pain_type">
+              {% set cpt = defaults.chest_pain_type %}
+              {% for v in ['typical_angina','atypical_angina','non-anginal','asymptomatic'] %}
+              <option value="{{ v }}" {% if cpt==v %}selected{% endif %}>{{ v }}</option>
+              {% endfor %}
+            </select>
           </div>
-        </form>
+        </div>
       </div>
-    </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Clinical Measurements</h5>
+          <div class="mb-3">
+            <label class="form-label">Resting BP</label>
+            <input type="range" class="form-range" name="resting_blood_pressure" id="bp" min="80" max="250" value="{{ defaults.resting_blood_pressure }}">
+            <div class="form-text"><span id="bp-value">{{ defaults.resting_blood_pressure }}</span> mmHg</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Cholesterol</label>
+            <input type="range" class="form-range" name="cholesterol" id="chol" min="100" max="600" value="{{ defaults.cholesterol }}">
+            <div class="form-text"><span id="chol-value">{{ defaults.cholesterol }}</span> mg/dL</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Fasting Blood Sugar / Glucose (mg/dL)</label>
+            <input type="range" class="form-range" name="fasting_blood_sugar" id="fbs" min="60" max="200" value="{{ defaults.fasting_blood_sugar }}">
+            <div class="form-text"><span id="fbs-value">{{ defaults.fasting_blood_sugar }}</span> mg/dL</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Resting ECG</label>
+            <select class="form-select" name="Restecg">
+              {% set recg = defaults.Restecg %}
+              {% for v in ['normal','left_ventricular_hypertrophy','st_t_wave_abnormality'] %}
+              <option value="{{ v }}" {% if recg==v %}selected{% endif %}>{{ v }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Max Heart Rate</label>
+            <input type="range" class="form-range" name="max_heart_rate_achieved" id="mhr" min="60" max="220" value="{{ defaults.max_heart_rate_achieved }}">
+            <div class="form-text"><span id="mhr-value">{{ defaults.max_heart_rate_achieved }}</span> bpm</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Exercise Angina</label>
+            <select class="form-select" name="exercise_induced_angina">
+              <option value="0" {% if defaults.exercise_induced_angina==0 %}selected{% endif %}>No</option>
+              <option value="1" {% if defaults.exercise_induced_angina==1 %}selected{% endif %}>Yes</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">ST Depression</label>
+            <input type="range" step="0.1" class="form-range" name="st_depression" id="st_dep" min="0" max="6.2" value="{{ defaults.st_depression }}">
+            <div class="form-text"><span id="st_dep-value">{{ defaults.st_depression }}</span></div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">ST Slope Type</label>
+            <select class="form-select" name="st_slope_type">
+              {% set slope = defaults.st_slope_type %}
+              {% for v in ['upsloping','flat','downsloping'] %}
+              <option value="{{ v }}" {% if slope==v %}selected{% endif %}>{{ v }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Num Major Vessels</label>
+            <input type="range" class="form-range" name="num_major_vessels" id="nmv" min="0" max="3" step="1" value="{{ defaults.num_major_vessels }}">
+            <div class="form-text"><span id="nmv-value">{{ defaults.num_major_vessels }}</span></div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Thalassemia Type</label>
+            <select class="form-select" name="thalassemia_type">
+              {% set thal = defaults.thalassemia_type %}
+              {% for v in ['normal','fixed_defect','reversible_defect'] %}
+              <option value="{{ v }}" {% if thal==v %}selected{% endif %}>{{ v }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-grid">
+        <button class="btn btn-brand btn-lg">Predict Risk</button>
+      </div>
+    </form>
   </div>
 
   <!-- Right: CSV upload + guidance -->
@@ -232,56 +169,23 @@ resting_blood_pressure, cholesterol,
 
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const inputs = document.querySelectorAll('#patient-form [data-msg]');
-  const submitBtn = document.querySelector('#patient-form button[type="submit"]');
-  const summary = document.getElementById('form-errors');
+document.addEventListener('DOMContentLoaded', () => {
+  function updateSliderValue(id) {
+    const input = document.getElementById(id);
+    const output = document.getElementById(id + '-value');
+    if (input && output) {
+      output.textContent = input.value;
+    }
+  }
+  ['age','bp','chol','fbs','mhr','st_dep','nmv'].forEach(id => {
+    updateSliderValue(id);
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', () => updateSliderValue(id));
+    }
+  });
   const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
   tooltipTriggerList.map(t => new bootstrap.Tooltip(t));
-
-  function validate(input) {
-    const value = parseFloat(input.value);
-    const min = parseFloat(input.getAttribute('min'));
-    const max = parseFloat(input.getAttribute('max'));
-    const msg = input.dataset.msg;
-    const group = input.closest('.input-group');
-    const container = group || input.parentElement;
-    const feedback = container.querySelector('.invalid-feedback');
-    if (input.value === '' || (value >= min && value <= max)) {
-      input.classList.remove('is-invalid');
-      feedback.textContent = '';
-    } else {
-      input.classList.add('is-invalid');
-      feedback.textContent = msg;
-    }
-    updateSummary();
-  }
-
-  function updateSummary() {
-    const invalids = Array.from(inputs).filter(i => i.classList.contains('is-invalid'));
-    if (invalids.length) {
-      submitBtn.disabled = true;
-      summary.classList.remove('d-none');
-      summary.innerHTML = '<ul class="mb-0">' + invalids.map(i => '<li>' + i.dataset.msg + '</li>').join('') + '</ul>';
-    } else {
-      submitBtn.disabled = false;
-      summary.classList.add('d-none');
-      summary.innerHTML = '';
-    }
-  }
-
-  inputs.forEach(input => {
-    input.addEventListener('input', () => validate(input));
-    input.addEventListener('blur', () => validate(input));
-  });
-
-  document.getElementById('patient-form').addEventListener('submit', function(e){
-    inputs.forEach(validate);
-    if (document.querySelectorAll('#patient-form .is-invalid').length) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  });
 });
 </script>
 {% endblock %}
