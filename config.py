@@ -23,6 +23,11 @@ class Config:
     AVATAR_UPLOAD_FOLDER = os.environ.get(
         "AVATAR_UPLOAD_FOLDER", str(BASE_DIR / "static" / "avatars")
     )
+    SIMULATION_FEATURES = {
+        "what_if": os.environ.get("SIM_WHAT_IF", "1").lower() not in {"0", "false"},
+        "age_projection": os.environ.get("SIM_AGE_PROJECTION", "1").lower()
+        not in {"0", "false"},
+    }
 
 class DevelopmentConfig(Config):
     DEBUG = True

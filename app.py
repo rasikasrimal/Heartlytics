@@ -243,7 +243,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(80), unique=True, nullable=False)
     nickname = db.Column(db.String(80), unique=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False, default="")
     role = db.Column(db.String(20), default="User")
     status = db.Column(db.String(20), default="pending")
     requested_role = db.Column(db.String(20))
@@ -728,6 +728,7 @@ from superadmin import superadmin_bp
 from doctor import doctor_bp
 from user import user_bp
 from routes.settings import settings_bp
+from simulations import simulations_bp
 
 app.register_blueprint(predict_bp)
 app.register_blueprint(auth_bp)
@@ -735,6 +736,7 @@ app.register_blueprint(superadmin_bp)
 app.register_blueprint(doctor_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(settings_bp)
+app.register_blueprint(simulations_bp)
 
 
 @app.route("/admin/")
