@@ -54,7 +54,7 @@ def auth_client(client):
 
     client.post(
         "/auth/login",
-        data={"email": "t@example.com", "password": "testpass"},
+        data={"identifier": "t@example.com", "password": "testpass"},
         follow_redirects=True,
     )
     return client
@@ -81,7 +81,7 @@ def superadmin_client(client):
 
     client.post(
         "/auth/login",
-        data={"email": "sa@example.com", "password": "sapass"},
+        data={"identifier": "superadmin", "password": "sapass"},
         follow_redirects=True,
     )
     return client

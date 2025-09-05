@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Login{% endblock %}
-{% from 'components/forms.html' import email_input, password_input %}
+{% from 'components/forms.html' import text_input, password_input %}
 
 {% block content %}
 <div class="row align-items-center py-5">
@@ -13,7 +13,7 @@
     <div class="card shadow-sm p-4">
       <form method="post">
         {{ form.hidden_tag() }}
-        {{ email_input('email', 'Email', value=form.email.data, attrs={'required': '', 'autocomplete': 'email'}, error=form.email.errors[0] if form.email.errors else None) }}
+        {{ text_input('identifier', 'Email or Username', value=form.identifier.data, attrs={'required': '', 'autocomplete': 'username'}, error=form.identifier.errors[0] if form.identifier.errors else None) }}
         {{ password_input('password', 'Password', attrs={'required': '', 'autocomplete': 'current-password'}, error=form.password.errors[0] if form.password.errors else None) }}
         <button type="submit" class="btn btn-brand w-100 mb-3">Login</button>
         <div class="d-flex justify-content-between">
