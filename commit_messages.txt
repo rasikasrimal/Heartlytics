@@ -1,0 +1,307 @@
+Create commit_messages.txt
+Merge pull request #197 from rasikasrimal/test
+Merge pull request #191 from rasikasrimal/codex/add-settings-page-with-user-options
+Merge pull request #195 from rasikasrimal/codex/unify-superadmin-and-admin-dashboards
+Merge pull request #192 from rasikasrimal/codex/unify-superadmin-and-admin-dashboards
+Create 16023be2-d2be-451e-8050-049de42d96df.png
+Create None.jpg
+Merge pull request #194 from rasikasrimal/codex/fix-undefined-role_required-error
+Skip CSRF check for safe methods
+Merge pull request #193 from rasikasrimal/codex/fix-undefined-role_required-error
+Import role_required for admin route
+Unify dashboards and add nickname with logout modal
+Add user settings with avatar upload and logout confirmation
+Merge pull request #186 from rasikasrimal/codex/update-signup-page-with-role-selection
+Merge pull request #187 from rasikasrimal/codex/hide-signup-approval-request-for-login
+Merge pull request #188 from rasikasrimal/codex/hide-signup-approval-request-for-login-04y665
+fix: add requested_role migration and relax optional deps
+fix: store requested signup role and adjust approval flow
+feat: enhance signup roles and password strength
+Merge pull request #185 from rasikasrimal/codex/fix-blueprint-registration-issue-in-routes
+Merge pull request #180 from rasikasrimal/codex/refactor-roles-and-permissions-structure
+Avoid circular app import in doctor routes
+Restrict user role to prediction page
+Merge pull request #181 from rasikasrimal/codex/refactor-roles-and-permissions-structure-5di3kz
+Allow assigning User role from superadmin
+Add doctor and user blueprints with role-aware routing
+Merge pull request #179 from rasikasrimal/codex/update-project-structure-in-readme.md
+docs: expand project structure
+Merge pull request #175 from rasikasrimal/codex/build-role-based-web-app-with-flask-9xu7rz
+Merge pull request #176 from rasikasrimal/codex/fix-operationalerror-for-user.uid-column
+Ensure uid and updated_at columns exist
+Seed default roles and add user UID
+Merge pull request #169 from rasikasrimal/codex/refactor-superadmin-dashboard-layout-and-features
+Merge pull request #172 from rasikasrimal/codex/replace-browser-confirm-with-custom-modal
+Merge pull request #173 from rasikasrimal/codex/adjust-button-alignment-for-records
+Constrain width of action button columns
+Merge branch 'codex/refactor-superadmin-dashboard-layout-and-features' into codex/replace-browser-confirm-with-custom-modal
+Separate user action buttons into columns
+Merge pull request #171 from rasikasrimal/codex/replace-browser-confirm-with-custom-modal
+Use modal for suspend confirmation
+Merge pull request #170 from rasikasrimal/codex/remove-superadmin-from-user-table
+Hide superadmin from dashboard and add tests
+Refactor superadmin dashboard and audit filters
+Merge pull request #167 from rasikasrimal/codex/enhance-user-management-features
+Merge pull request #168 from rasikasrimal/codex/remove-duplicate-page-arg-from-pagination-links
+Fix pagination and protect superadmin role
+Add audit log view template
+Merge pull request #164 from rasikasrimal/codex/fix-typo-in-codebase
+Add risk simulation and Plotly projection chart
+Merge pull request #163 from rasikasrimal/codex/fix-typo-in-codebase
+Correct thalassemia spelling, fix outlier reasoning, update docs and tests
+Merge pull request #161 from rasikasrimal/codex/implement-role-based-authentication-system
+Remove obsolete admin forms
+Merge pull request #160 from rasikasrimal/codex/update-flask-app-for-authentication-enforcement
+Enforce authentication and add forbidden page
+Merge pull request #159 from rasikasrimal/codex/fix-signup-flow-and-improve-feedback
+Improve signup flow with validation and redirects
+Merge pull request #158 from rasikasrimal/codex/implement-role-based-login/signup-system-evgmti
+Validate unique credentials in admin user edit
+Merge pull request #153 from rasikasrimal/codex/fix-missing-eda-visualizations
+Merge pull request #154 from rasikasrimal/codex/update-eda-charts-for-heart-disease-status
+Merge pull request #155 from rasikasrimal/codex/add-boxplots-and-violin-plots-for-eda
+fix: rebuild EDA charts after predictions
+Handle string-coded targets in EDA plots
+Improve EDA viz rebuild and add target fallback
+Merge pull request #152 from rasikasrimal/codex/fix-loading-issues-for-charts-and-info-7n82x5
+Rebuild EDA from results when missing charts
+Merge pull request #151 from rasikasrimal/codex/fix-loading-issues-for-charts-and-info
+Persist EDA after predictions and expand column aliases
+Merge pull request #150 from rasikasrimal/codex/fix-sqlalchemy-registration-issue
+Fix prediction DB access and expand EDA target detection
+Merge pull request #149 from rasikasrimal/codex/fix-import-errors-after-project-restructure-qiwp3j
+Refactor CSRF helpers to avoid circular imports
+Merge pull request #148 from rasikasrimal/codex/fix-import-errors-after-project-restructure
+Enable iterative imputer and update dependencies
+Merge pull request #147 from rasikasrimal/codex/document-project-structure-and-setup-steps
+docs: document structure and setup
+Merge pull request #146 from rasikasrimal/codex/set-up-initial-test-structure-with-pytest
+Add basic pytest setup and placeholders
+Merge pull request #144 from rasikasrimal/codex/organize-templates-into-subfolders
+Organize templates into feature subfolders
+Merge pull request #143 from rasikasrimal/codex/refactor-and-move-helpers-to-modules
+refactor: extract helpers into services
+Merge pull request #142 from rasikasrimal/codex/create-predict-blueprint-in-routes
+refactor: extract prediction routes to blueprint
+Merge pull request #141 from rasikasrimal/codex/create-config.py-with-environment-variable-support
+Add environment-based configuration
+Merge pull request #140 from rasikasrimal/test
+Merge pull request #139 from rasikasrimal/codex/add-comments-to-project-files
+docs: clarify project structure
+Merge pull request #138 from rasikasrimal/test
+Merge pull request #137 from rasikasrimal/codex/remove-dashboard-page-elements
+Implement responsive predict view template
+Merge pull request #136 from rasikasrimal/codex/remove-dashboard-page-elements
+Remove dashboard filters and notes section
+Merge pull request #131 from rasikasrimal/codex/fix-date-range-inclusivity-in-filter-logic
+Merge branch 'test' into codex/fix-date-range-inclusivity-in-filter-logic
+fix dashboard pdf pagination spacing
+Merge pull request #130 from rasikasrimal/codex/fix-date-range-inclusivity-in-filter-logic
+Merge branch 'test' into codex/fix-date-range-inclusivity-in-filter-logic
+Update pagination after column toggle
+Merge pull request #129 from rasikasrimal/codex/fix-date-range-inclusivity-in-filter-logic
+Make PDF dashboard filters and table fully dynamic
+Merge pull request #128 from rasikasrimal/codex/redesign-patient-table-and-filter-panel-dl43cc
+Make dashboard filters inclusive and restructure layout
+Merge pull request #126 from rasikasrimal/codex/review-and-update-app-theme-for-consistency
+Enforce light theme across app
+Merge pull request #116 from rasikasrimal/codex/fix-probability-formatting-to-percentages-qoat34
+Merge branch 'test' into codex/fix-probability-formatting-to-percentages-qoat34
+Refine PDF filters with range pickers and advanced SQL
+Merge pull request #114 from rasikasrimal/codex/fix-probability-formatting-to-percentages-i5s5ez
+Merge branch 'test' into codex/fix-probability-formatting-to-percentages-i5s5ez
+Default PDF theme to light
+Merge pull request #112 from rasikasrimal/codex/fix-probability-formatting-to-percentages-xs0i3i
+Merge branch 'test' into codex/fix-probability-formatting-to-percentages-xs0i3i
+Add PDF options page and fix report generation
+Merge pull request #110 from rasikasrimal/codex/fix-probability-formatting-to-percentages-bnouds
+Merge branch 'test' into codex/fix-probability-formatting-to-percentages-bnouds
+Simplify risk probability bar color
+Merge pull request #107 from rasikasrimal/codex/fix-probability-formatting-to-percentages-uiislr
+Merge branch 'test' into codex/fix-probability-formatting-to-percentages-uiislr
+Format percentages as whole numbers
+Merge pull request #106 from rasikasrimal/codex/fix-probability-formatting-to-percentages-hkiy7v
+Merge branch 'test' into codex/fix-probability-formatting-to-percentages-hkiy7v
+Color-code risk bar based on band
+Merge pull request #105 from rasikasrimal/codex/fix-probability-formatting-to-percentages-8djs3k
+Replace gauges with Bootstrap progress bars
+Update index.html
+Merge pull request #100 from rasikasrimal/testing
+Merge pull request #99 from rasikasrimal/codex/improve-ui-ux-for-manual-data-entry
+Merge branch 'testing' into codex/improve-ui-ux-for-manual-data-entry
+feat: add theme toggle and dark mode
+Merge pull request #98 from rasikasrimal/testing
+Merge pull request #97 from rasikasrimal/codex/improve-ui-ux-for-manual-data-entry
+Merge branch 'testing' into codex/improve-ui-ux-for-manual-data-entry
+style: polish manual entry form and focus cues
+Merge pull request #96 from rasikasrimal/codex/improve-ui-ux-for-manual-data-entry
+Enhance manual data entry UI and table usability
+Merge pull request #94 from rasikasrimal/codex/update-layout-for-predictions-and-analysis-4yizk3
+Merge branch 'testing' into codex/update-layout-for-predictions-and-analysis-4yizk3
+Add client-side validation for patient entry form
+Merge pull request #93 from rasikasrimal/codex/update-layout-for-predictions-and-analysis
+Merge branch 'testing' into codex/update-layout-for-predictions-and-analysis
+Move outlier detection to dedicated page
+Merge pull request #89 from rasikasrimal/codex/update-layout-for-predictions-and-analysis
+Merge branch 'testing' into codex/update-layout-for-predictions-and-analysis
+Refine outlier workflow with charts and manual control
+Merge pull request #88 from rasikasrimal/codex/update-layout-for-predictions-and-analysis
+Merge branch 'testing' into codex/update-layout-for-predictions-and-analysis
+Add Isolation Forest and IQR outlier detection
+Merge pull request #87 from rasikasrimal/codex/update-layout-for-predictions-and-analysis
+Merge branch 'testing' into codex/update-layout-for-predictions-and-analysis
+Add confirmation modals for batch deletions
+Merge pull request #86 from rasikasrimal/codex/update-layout-for-predictions-and-analysis-45xk7v
+Merge branch 'testing' into codex/update-layout-for-predictions-and-analysis-45xk7v
+Auto-upload CSV and add success state
+Merge pull request #84 from rasikasrimal/codex/update-layout-for-predictions-and-analysis-y0mu6b
+Merge branch 'testing' into codex/update-layout-for-predictions-and-analysis-y0mu6b
+Polish navigation, hierarchy, and light theme
+Merge pull request #83 from rasikasrimal/codex/update-layout-for-predictions-and-analysis
+Merge branch 'testing' into codex/update-layout-for-predictions-and-analysis
+Group prediction form fields and enhance batch upload UI
+Merge pull request #82 from rasikasrimal/codex/update-layout-for-predictions-and-analysis
+Improve prediction page layout and typography
+Merge pull request #81 from rasikasrimal/codex/testing
+Merge pull request #80 from rasikasrimal/codex/enhance-pdf-report-with-visualizations
+Merge branch 'codex/testing' into codex/enhance-pdf-report-with-visualizations
+docs: refresh README for batch analysis and PDF export
+Merge pull request #79 from rasikasrimal/codex/testing
+Merge pull request #78 from rasikasrimal/codex/enhance-pdf-report-with-visualizations
+Remove unwanted charts from dashboard PDF
+Merge pull request #68 from rasikasrimal/codex/testing
+Merge pull request #67 from rasikasrimal/codex/add-cluster-profiles-display-details
+Merge branch 'codex/testing' into codex/add-cluster-profiles-display-details
+refactor: use dropdowns for table filters
+Merge pull request #66 from rasikasrimal/codex/add-cluster-profiles-display-details-196bec
+Update templates/dashboard.html
+Update templates/dashboard.html
+Merge branch 'codex/testing' into codex/add-cluster-profiles-display-details-196bec
+style: enrich outlier table with filters
+Merge pull request #65 from rasikasrimal/codex/add-cluster-profiles-display-details
+Merge branch 'codex/testing' into codex/add-cluster-profiles-display-details
+feat: add column filters to predictions table
+Update dashboard.html
+Merge branch 'codex/testing' of https://github.com/rasikasrimal/Heart-Disease-Risk-App into codex/testing
+Update dashboard.html
+Merge pull request #64 from rasikasrimal/codex/add-cluster-profiles-display-details-zrv1a1
+Merge branch 'codex/testing' into codex/add-cluster-profiles-display-details-zrv1a1
+style: tidy recent predictions section
+Merge pull request #63 from rasikasrimal/codex/add-cluster-profiles-display-details
+Update templates/dashboard.html
+Update dashboard.html
+Update templates/dashboard.html
+Merge branch 'codex/testing' into codex/add-cluster-profiles-display-details
+feat: add patient search and health stats
+Merge pull request #62 from rasikasrimal/codex/add-cluster-profiles-display-details-kid6t3
+Merge branch 'codex/testing' into codex/add-cluster-profiles-display-details-kid6t3
+feat: streamline cluster scatter controls
+Merge pull request #59 from rasikasrimal/codex/add-cluster-profiles-display-details
+Merge branch 'codex/testing' into codex/add-cluster-profiles-display-details
+feat: expand cluster profile view
+Merge pull request #58 from rasikasrimal/codex/add-cluster-profiles-display-details
+feat: enhance cluster profiles view
+Merge pull request #57 from rasikasrimal/codex/testing
+Merge pull request #56 from rasikasrimal/codex/reduce-space-for-box-plots-and-heatmap
+Update dashboard.html
+Merge branch 'codex/testing' into codex/reduce-space-for-box-plots-and-heatmap
+Refine cluster views and exports
+Merge pull request #54 from rasikasrimal/codex/testing
+Merge pull request #53 from rasikasrimal/codex/reduce-space-for-box-plots-and-heatmap-icemb3
+Merge branch 'codex/testing' into codex/reduce-space-for-box-plots-and-heatmap-icemb3
+Add cluster scatter plot
+Merge pull request #49 from rasikasrimal/codex/reduce-space-for-box-plots-and-heatmap
+Merge branch 'codex/testing' into codex/reduce-space-for-box-plots-and-heatmap
+Replace patient name with ID in tables
+Merge pull request #48 from rasikasrimal/codex/reduce-space-for-box-plots-and-heatmap
+Merge branch 'codex/testing' into codex/reduce-space-for-box-plots-and-heatmap
+Add modal view buttons for dashboard charts
+Merge pull request #47 from rasikasrimal/main
+Merge pull request #46 from rasikasrimal/codex/reduce-space-for-box-plots-and-heatmap
+Reduce dashboard chart size and remove duplicate table
+Merge pull request #37 from rasikasrimal/codex/redesign-ui-for-flask-web-app-kgnz7q
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app-kgnz7q
+Merge pull request #42 from rasikasrimal/codex/fix-issues-on-upload-page-d852nt
+Fix correlation heatmap and round summary stats
+Merge pull request #41 from rasikasrimal/codex/fix-issues-on-upload-page-797xmi
+Fix dashboard script error blocking action buttons
+Merge pull request #40 from rasikasrimal/codex/fix-issues-on-upload-page-k6pgmm
+Fix view buttons on preprocess and dashboard pages
+Merge pull request #38 from rasikasrimal/codex/fix-issues-on-upload-page
+Remove static EDA fallbacks and fix interactive plots
+Fix dashboard data parsing to restore chart rendering
+Merge pull request #30 from rasikasrimal/codex/refactor-outlier-detection-logic
+refactor: reuse outlier detector
+Merge pull request #28 from rasikasrimal/codex/redesign-ui-for-flask-web-app-lwu6ho
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app-lwu6ho
+fix: guard empty categorical columns and tidy outlier renderer
+Merge pull request #27 from rasikasrimal/codex/redesign-ui-for-flask-web-app-2lstjm
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app-2lstjm
+fix: avoid double-reading response streams
+Merge pull request #25 from rasikasrimal/codex/redesign-ui-for-flask-web-app-rk6lud
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app-rk6lud
+feat: add dataset preview controls and API
+Update README.md
+Merge pull request #24 from rasikasrimal/codex/redesign-ui-for-flask-web-app-hyfsfm
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app-hyfsfm
+Fix cleaning log structure for batch prediction EDA
+Merge pull request #22 from rasikasrimal/codex/redesign-ui-for-flask-web-app
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app
+Enhance dashboard outlier tools and preprocessing logs
+Merge pull request #20 from rasikasrimal/codex/redesign-ui-for-flask-web-app-67ea82
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app-67ea82
+Harden preprocessing for string sex values and JSON errors
+Merge pull request #19 from rasikasrimal/codex/redesign-ui-for-flask-web-app-svt663
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app-svt663
+Normalize category strings and harden preprocessing preview
+Merge pull request #18 from rasikasrimal/codex/redesign-ui-for-flask-web-app-pd9lxp
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app-pd9lxp
+chore: refactor preprocess template script
+Merge pull request #17 from rasikasrimal/codex/redesign-ui-for-flask-web-app-91a8u4
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app-91a8u4
+Add configurable preprocessing step
+Merge pull request #16 from rasikasrimal/codex/redesign-ui-for-flask-web-app-25zi0c
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app-25zi0c
+Improve research paper rendering
+Add research paper page and icon nav
+Merge pull request #13 from rasikasrimal/codex/redesign-ui-for-flask-web-app
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app
+docs: clarify risk distribution feature
+Update app.py
+Merge pull request #10 from rasikasrimal/codex/redesign-ui-for-flask-web-app
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app
+Handle missing matplotlib for dashboard PDF
+docs: mention CSV export in dashboard features
+Merge pull request #8 from rasikasrimal/codex/redesign-ui-for-flask-web-app
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app
+Document new dashboard features
+Merge pull request #6 from rasikasrimal/codex/redesign-ui-for-flask-web-app-jgq1jq
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app-jgq1jq
+Revise dashboard analytics and visuals
+Merge pull request #5 from rasikasrimal/codex/redesign-ui-for-flask-web-app
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app
+Merge branch 'codex/redesign-ui-for-flask-web-app' of https://github.com/rasikasrimal/Heart-Disease-Risk-App into codex/redesign-ui-for-flask-web-app
+Embed dashboard data without JSON.parse
+Merge pull request #3 from rasikasrimal/codex/redesign-ui-for-flask-web-app-8jlw0y
+Merge branch 'main' into codex/redesign-ui-for-flask-web-app-8jlw0y
+Update app.py
+Update templates/dashboard.html
+Enhance dashboard visuals and controls
+Merge pull request #2 from rasikasrimal/codex/redesign-ui-for-flask-web-app-tl7bi3
+Add probability histogram to dashboard
+Add probability histogram to dashboard
+Merge pull request #1 from rasikasrimal/codex/redesign-ui-for-flask-web-app
+Polish UI with floating forms and branded charts
+Revamp UI with cohesive Bootstrap theme
+Issues Fixed
+Issues Fixed
+Almost good
+Version Update
+CSV EDA
+Update README.md
+Initial Setup
+Add .gitignore for Python and IDE files
+Add files via upload
+Enhance README with project structure and setup steps
+Update README.md
+Initial commit
