@@ -25,9 +25,9 @@
       <div class="card-body">
         <form method="post" action="{{ url_for('settings.update_password') }}">
           <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-          {{ password_input('current_password', 'Current Password', autocomplete='off') }}
-          {{ password_input('new_password', 'New Password', id='new_password', autocomplete='new-password') }}
-          {{ password_input('confirm_password', 'Confirm New Password', id='confirm_password', autocomplete='new-password') }}
+            {{ password_input('current_password', 'Current Password', attrs={'autocomplete': 'off'}) }}
+            {{ password_input('new_password', 'New Password', attrs={'id': 'new_password', 'autocomplete': 'new-password'}) }}
+            {{ password_input('confirm_password', 'Confirm New Password', attrs={'id': 'confirm_password', 'autocomplete': 'new-password'}) }}
           <div id="password-match" class="small mt-2"></div>
           <button class="btn btn-brand" type="submit" id="password-submit" disabled>Update Password</button>
         </form>
