@@ -1,0 +1,254 @@
+\documentclass[conference]{IEEEtran}
+
+% ---------- Packages ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{siunitx}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{cite}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=blue,
+  citecolor=black
+}
+
+% ---------- Header/Footer (IEEE-style markers) ----------
+
+\markboth{Journal of Final Year Projects,~Vol.~1, No.~1, August~2025}%
+{Samaranayaka: Prediction of Heart Disease Using Machine Learning Algorithms}
+
+
+
+% ---------- Title & Author ----------
+\title{Prediction of Heart Disease Using Machine Learning Algorithms}
+
+\author{
+\IEEEauthorblockN{HMRS Samaranayaka}
+\IEEEauthorblockA{Department of Computer Science \& Software Engineering\\
+NSBM Green University, Homagama, Sri Lanka\\
+\texttt{hmrssamaranayaka.students.nsbm.ac.lk}}
+}
+
+\begin{document}
+\maketitle
+
+% ---------- Abstract ----------
+\begin{abstract}
+Heart disease remains a leading cause of mortality worldwide. This paper develops a machine-learning system to predict heart disease using the UCI Heart Disease dataset. We perform robust preprocessing (missing value imputation, outlier mitigation, feature scaling) and conduct an extensive exploratory data analysis (EDA) to understand demographic and clinical patterns. We train and optimize ensemble classifiers---Random Forest and XGBoost---via grid search, and evaluate with accuracy, precision, recall, F1-score, and ROC--AUC. XGBoost slightly outperforms Random Forest (\(\sim\)92\% vs.\ 91\% accuracy). We deploy the best model in a Flask web application to demonstrate real-time usability. Results validate ensemble methods for clinical decision support and highlight data characteristics that influence model performance.
+\end{abstract}
+
+% ---------- Keywords ----------
+\begin{IEEEkeywords}
+Heart Disease, Machine Learning, Random Forest, XGBoost, Exploratory Data Analysis, Flask, Clinical Decision Support
+\end{IEEEkeywords}
+
+% =======================================================
+\section{Introduction}
+Cardiovascular diseases (CVDs) are the leading cause of global mortality, with an estimated 17.9 million deaths annually \cite{who2021}. Early detection of heart disease is crucial to reduce morbidity and mortality. While tests such as ECG and angiography remain gold standards, machine learning (ML) can complement clinical workflows by learning patterns from multi-attribute patient data.
+
+Recent work shows strong performance for supervised ML models in heart disease prediction, particularly tree ensembles (Random Forest, Gradient Boosting) that capture nonlinearity and interactions \cite{zhang2021, chen2016xgb}. In this study, we:
+\begin{enumerate}
+\item Preprocess and analyze the UCI Heart Disease dataset.
+\item Perform EDA to characterize demographics and risk-factor distributions.
+\item Train and tune Random Forest and XGBoost models.
+\item Compare models on accuracy, precision, recall, F1, and ROC--AUC.
+\item Deploy the best model as a Flask web application.
+\end{enumerate}
+
+% =======================================================
+\section{Dataset and Exploratory Data Analysis (EDA)}
+\subsection{Dataset Description}
+We use the UCI Heart Disease repository \cite{uci1988}, consolidated across Cleveland (USA), Hungarian Institute of Cardiology, University Hospital Zurich (Switzerland), and V.A.\ Medical Center Long Beach (USA). After harmonization, the working table contains \(\sim\)920 instances and 16 attributes. The raw target \(num \in \{0,1,2,3,4\}\) indicates disease severity; we binarize to \(\texttt{target\_bin} = \mathbf{1}(num>0)\).
+
+Outcome prevalence is approximately 55.3\% positive vs.\ 44.7\% negative. Core features include: \textit{age}, \textit{sex}, chest pain type (\textit{cp}), resting blood pressure (\textit{trestbps}), cholesterol (\textit{chol}), maximum heart rate (\textit{thalach}), ST depression (\textit{oldpeak}), number of vessels (\textit{ca}), and thalassemia status (\textit{thal}).
+
+\subsection{EDA Highlights and Figures}
+\textbf{Gender distribution.} The dataset is male-skewed (\(\sim\)79\% male), raising fairness considerations (Fig.~\ref{fig:gender}).
+
+\textbf{Dataset$\times$Gender.} A heatmap (Fig.~\ref{fig:heatmap}) shows male predominance across centers with site-specific skews.
+
+\textbf{Age by dataset.} Box plots (Fig.~\ref{fig:agebox}) reveal age shifts and outliers between centers, implying potential domain shift.
+
+\textbf{Heart disease vs.\ chest pain type.} Stacked bars (Fig.~\ref{fig:cpstack}) show \textit{asymptomatic} has the highest positive rate ($\sim$79\%), while \textit{atypical angina} is lowest ($\sim$14\%).
+
+\textbf{Age by chest pain type.} Histogram with marginal boxplot (Fig.~\ref{fig:agecp}) shows older ages aligned with asymptomatic/typical angina.
+
+\textbf{Resting blood pressure (BP).} Boxplots by disease status (Fig.~\ref{fig:bpbox}) show higher central tendency in positives; stage-wise histograms with KDE (Fig.~\ref{fig:bphist}) show gradual right-shift with severity.
+
+\textbf{Cholesterol by stage.} Violin plots (Fig.~\ref{fig:cholvio}) show stage-wise differences in distribution and spread.
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.9\linewidth]{fig1_gender_donut.png}
+  \caption{Gender distribution (donut).}
+  \label{fig:gender}
+\end{figure}
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.95\linewidth]{fig2_dataset_gender_heatmap.png}
+  \caption{Dataset $\times$ Gender counts (heatmap).}
+  \label{fig:heatmap}
+\end{figure}
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.95\linewidth]{fig3_age_box_by_dataset.png}
+  \caption{Age distribution per dataset (box plot).}
+  \label{fig:agebox}
+\end{figure}
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.95\linewidth]{fig4_cp_stacked_bar_target.png}
+  \caption{Heart disease frequency for each chest pain type (stacked bar).}
+  \label{fig:cpstack}
+\end{figure}
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.95\linewidth]{fig5_age_hist_by_cp_with_marginal_box.png}
+  \caption{Age distribution by chest pain type (histogram; marginal box).}
+  \label{fig:agecp}
+\end{figure}
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.95\linewidth]{fig6_trestbps_box_by_status.png}
+  \caption{Resting BP distribution by heart disease status (box plot).}
+  \label{fig:bpbox}
+\end{figure}
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.95\linewidth]{fig7_trestbps_hist_kde_by_stage.png}
+  \caption{Resting BP distribution by disease stage (histogram with KDE).}
+  \label{fig:bphist}
+\end{figure}
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.95\linewidth]{fig8_chol_violin_by_stage.png}
+  \caption{Cholesterol distribution by disease stage (violin plots).}
+  \label{fig:cholvio}
+\end{figure}
+
+% =======================================================
+\section{Methodology}
+\subsection{Preprocessing}
+We detect and impute missing values (e.g., in \textit{ca}, \textit{thal}, \textit{slope}) using iterative models (Random Forest classifier/regressor). Clinically implausible values (e.g., \(\textit{chol}=0\)) are treated as missing. Column-level outliers are flagged with the interpretable interquartile range (IQR) rule, and an Isolation Forest identifies patients with unusual feature patterns, providing an anomaly score. Numerical features are standardized (z-score). Categorical variables are retained as binary/ordinal or one-hot encoded as appropriate. Table~\ref{tab:features} summarizes features.
+
+\begin{table}[!t]
+\centering
+\caption{Key Features After Preprocessing}
+\label{tab:features}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Feature} & \textbf{Description} \\
+\midrule
+Age & Age in years \\
+Sex & 1 = male, 0 = female \\
+CP & Chest pain type (4 classes) \\
+Trestbps & Resting blood pressure (mmHg) \\
+Chol & Serum cholesterol (mg/dL) \\
+FBS & Fasting blood sugar $>$ 120 mg/dL (1/0) \\
+Restecg & Resting ECG result (0,1,2) \\
+Thalach & Maximum heart rate \\
+Exang & Exercise-induced angina (1/0) \\
+Oldpeak & ST depression (relative to rest) \\
+Slope & Slope of peak exercise ST (0,1,2) \\
+CA & Major vessels (0--3) \\
+Thal & Thalassemia (3, 6, 7) \\
+Target & 0 = No disease, 1 = Disease \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Models and Tuning}
+We compare:
+\begin{itemize}
+\item \textbf{Random Forest (RF)} \cite{breiman2001rf}: 100 trees, max depth 7, class\_weight=balanced.
+\item \textbf{XGBoost} \cite{chen2016xgb}: tuned via grid search, e.g., \(n\_estimators=150\), depth=3, learning rate=0.01, subsample=0.8, colsample\_bytree=0.8.
+\end{itemize}
+Hyperparameters are optimized using 5-fold CV on the training set (stratified split, 70/30).
+
+\subsection{Evaluation}
+We report accuracy, precision, recall, F1-score (positive class), ROC--AUC, and confusion matrices. In clinical screening, recall (sensitivity) is critical to minimize false negatives.
+
+\subsection{Deployment}
+The best model is wrapped in a Flask web app \cite{flaskdocs}; inputs are preprocessed with the same pipeline and predictions (with confidence) are returned. A small dashboard summarizes recent usage statistics.
+
+% =======================================================
+\section{Results and Discussion}
+Table~\ref{tab:perf} compares performance on the held-out test set (30\%).
+
+\begin{table}[!t]
+\centering
+\caption{Performance Comparison on Test Set}
+\label{tab:perf}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Model} & \textbf{Acc.} & \textbf{Prec.} & \textbf{Rec.} & \textbf{F1} \\
+\midrule
+Random Forest & 91.2\% & 0.93 & 0.91 & 0.92 \\
+XGBoost & 92.0\% & 0.94 & 0.92 & 0.93 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+XGBoost slightly reduces both false positives and false negatives relative to RF. Feature importance (gain) highlights \textit{cp}, \textit{thal}, \textit{ca}, and \textit{oldpeak}, consistent with clinical intuition and prior work \cite{zhang2021}. Overlap in \textit{trestbps} and \textit{chol} distributions (Figs.~\ref{fig:bpbox}--\ref{fig:cholvio}) underlines the value of ensembles that exploit multi-feature interactions.
+
+\textbf{Deployment.} The Flask prototype returns instant predictions with confidence. Example stress tests confirm sensible risk dynamics (e.g., elevated BP/cholesterol with angina increases predicted risk).
+
+\textbf{Limitations.} Dataset size is modest; gender/site skews warrant fairness analysis. External validation on independent cohorts is required for clinical adoption. Prototype deployment requires hardening (security, audit logs, governance).
+
+% =======================================================
+\section{Conclusion and Future Work}
+We presented an end-to-end heart disease prediction system using the UCI dataset. EDA uncovered demographic and center-specific patterns; RF and XGBoost achieved strong results, with XGBoost best overall. A Flask app demonstrated practical deployment.
+
+Future work includes: (i) larger, more diverse cohorts; (ii) threshold tuning for sensitivity-first screening; (iii) probability calibration; (iv) subgroup fairness audits; (v) external validation; and (vi) integration with clinical systems.
+
+% =======================================================
+\begin{thebibliography}{00}
+
+\bibitem{who2021}
+World Health Organization, ``Cardiovascular diseases (CVDs),'' Fact Sheet, 2021. [Online]. Available: \url{https://www.who.int/health-topics/cardiovascular-diseases}
+
+\bibitem{zhang2021}
+D.~Zhang, et al., ``Heart disease prediction based on the embedded feature selection method and deep neural network,'' \emph{Journal of Healthcare Engineering}, vol.~2021, Article ID~6260022, 2021. doi: 10.1155/2021/6260022.
+
+\bibitem{chen2016xgb}
+T.~Chen and C.~Guestrin, ``XGBoost: A scalable tree boosting system,'' in \emph{Proc. 22nd ACM SIGKDD Int. Conf. Knowledge Discovery \& Data Mining (KDD'16)}, San Francisco, CA, USA, 2016, pp.~785--794. doi: 10.1145/2939672.2939785.
+
+\bibitem{uci1988}
+A.~Janosi, W.~Steinbrunn, M.~Pfisterer, and R.~Detrano, ``Heart Disease Dataset,'' UCI Machine Learning Repository, 1988. [Online]. Available: \url{https://archive.ics.uci.edu/ml/datasets/Heart+Disease}
+
+\bibitem{breiman2001rf}
+L.~Breiman, ``Random forests,'' \emph{Machine Learning}, vol.~45, no.~1, pp.~5--32, 2001. doi: 10.1023/A:1010933404324.
+
+\bibitem{flaskdocs}
+A.~Ronacher, ``Flask Documentation,'' Pallets Projects, v2.0, 2021. [Online]. Available: \url{https://flask.palletsprojects.com}
+
+\end{thebibliography}
+\pagebreak
+
+% =======================================================
+\appendices
+\section{Hyperparameter Grids (Abbrev.)}
+\textbf{Random Forest:} \(n\_estimators \in \{50,100,150\}\), max\_depth \(\in \{\text{None},3,5,7,9\}\), min\_samples\_split \(\in \{2,4,6,8\}\), min\_samples\_leaf \(\in \{1,2,4\}\), class\_weight=balanced.\\
+\textbf{XGBoost:} \(n\_estimators \in \{100,150,200\}\), learning\_rate \(\in \{0.01,0.05,0.1\}\), max\_depth \(\in \{3,4,5\}\), subsample \(\in \{0.6,0.8,1.0\}\), colsample\_bytree \(\in \{0.6,0.8,1.0\}\), \(\gamma \in \{0,0.1,0.5\}\).
+
+\IEEEoverridecommandlockouts
+\IEEEpubid{978-1-6654-XXXX-X/25/\$31.00~\copyright~2025 IEEE}
+% If using two columns, place this after the first column of the last page:
+% \IEEEpubidadjcol
+% ---------- End ----------
+\end{document}

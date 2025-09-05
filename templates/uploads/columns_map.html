@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Map Columns | Heart Disease Risk{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-body p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="h5 mb-0">Match Your CSV Columns</h1>
+      <a href="{{ url_for('upload_form') }}" class="btn btn-outline-secondary">Upload another file</a>
+    </div>
+
+    <p class="text-muted">
+      Your CSV headers didn’t match the expected model features.  
+      Please map each <strong>Expected Column</strong> to a column from your file.
+    </p>
+
+    <form action="{{ url_for('upload_columns_map_submit', uid=uid) }}" method="post" class="row g-3">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+      <div class="table-responsive">
+        <table class="table table-sm table-striped table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Expected column</th>
+              <th>Choose from your CSV</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for need in required_cols %}
+            <tr>
+              <td><code>{{ need }}</code></td>
+              <td style="min-width:320px;">
+                {% set pre = proposal.get(need, '') %}
+                <select class="form-select" name="map__{{ need }}" required>
+                  <option value="">— Select column —</option>
+                  {% for col in uploaded_cols %}
+                    <option value="{{ col }}" {{ 'selected' if col==pre else '' }}>{{ col }}</option>
+                  {% endfor %}
+                </select>
+                {% if need == 'country' %}
+                  <div class="form-text">Tip: map your <em>dataset</em> column to <code>country</code> (e.g., Cleveland, Hungary, etc.).</div>
+                {% elif need == 'max_heart_rate_achieved' %}
+                  <div class="form-text">Tip: map <em>thalch</em> or <em>thalach</em> here.</div>
+                {% elif need == 'st_depression' %}
+                  <div class="form-text">Tip: map <em>oldpeak</em> here.</div>
+                {% elif need == 'num_major_vessels' %}
+                  <div class="form-text">Tip: map <em>ca</em> here (0–4).</div>
+                {% elif need == 'thalassemia_type' %}
+                  <div class="form-text">Tip: map <em>thal</em> here (normal, fixed defect, reversible defect).</div>
+                {% elif need == 'resting_blood_pressure' %}
+                  <div class="form-text">Tip: map <em>trestbps</em> here.</div>
+                {% elif need == 'cholesterol' %}
+                  <div class="form-text">Tip: map <em>chol</em> here.</div>
+                {% elif need == 'Restecg' %}
+                  <div class="form-text">Tip: map <em>restecg</em> here.</div>
+                {% elif need == 'exercise_induced_angina' %}
+                  <div class="form-text">Tip: map <em>exang</em> here.</div>
+                {% elif need == 'fasting_blood_sugar' %}
+                  <div class="form-text">Tip: map <em>fbs</em> here (TRUE/FALSE or 1/0).</div>
+                {% elif need == 'chest_pain_type' %}
+                  <div class="form-text">Tip: map <em>cp</em> here (typical, atypical, non-anginal, asymptomatic).</div>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button class="btn btn-brand">Continue</button>
+        <a class="btn btn-outline-secondary" href="{{ url_for('upload_form') }}">Cancel</a>
+      </div>
+    </form>
+
+    <hr>
+    <h2 class="h6">Your CSV columns</h2>
+    <p class="small mb-0">
+      {% for c in uploaded_cols %}
+        <code class="me-2">{{ c }}</code>
+      {% endfor %}
+    </p>
+  </div>
+</div>
+{% endblock %}

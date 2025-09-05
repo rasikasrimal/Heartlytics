@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ title or 'Error' }} | Heart Disease Risk{% endblock %}
+{% block content %}
+<div class="py-5 text-center">
+  <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size:4rem;"></i>
+  <h1 class="h4 mt-3">{{ title or 'Error' }}</h1>
+  {% if message %}
+  <p class="mb-3">{{ message }}</p>
+  {% endif %}
+  {% if messages %}
+  <ul class="list-unstyled mb-3">
+    {% for m in messages %}
+    <li>{{ m }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <a class="btn btn-primary" href="{{ url_for('index') }}">Back to homepage</a>
+</div>
+{% endblock %}

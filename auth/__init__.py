@@ -1,0 +1,145 @@
+"""Authentication blueprint handling user login, sign-up and logout."""
+
+from __future__ import annotations
+
+from datetime import datetime, timedelta
+
+from flask import Blueprint, current_app, flash, redirect, render_template, session, url_for
+from flask_login import login_user, logout_user, current_user
+from sqlalchemy import or_
+
+from .forms import LoginForm, SignupForm
+
+
+auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+
+
+def _too_many_attempts() -> bool:
+    """Simple rate limiter: allow 5 attempts per 15 minutes."""
+    data = session.get("login_attempts")
+    if not data:
+        return False
+    count = data.get("count", 0)
+    ts = datetime.fromisoformat(data.get("ts"))
+    if count >= 5 and datetime.utcnow() - ts < timedelta(minutes=15):
+        return True
+    if datetime.utcnow() - ts >= timedelta(minutes=15):
+        session["login_attempts"] = {"count": 0, "ts": datetime.utcnow().isoformat()}
+    return False
+
+
+@auth_bp.route("/login", methods=["GET", "POST"])
+def login():
+    """Authenticate a user and start a session."""
+
+    form = LoginForm()
+    if form.validate_on_submit():
+        if _too_many_attempts():
+            flash("Too many login attempts. Please try again later.", "error")
+            return render_template("auth/login.html", form=form)
+
+        db = current_app.db
+        User = current_app.User
+        ident = form.username.data.strip()
+        user = User.query.filter(or_(User.username == ident, User.email == ident)).first()
+
+        if user and user.check_password(form.password.data):
+            if user.status != "approved":
+                if user.status == "pending":
+                    msg = "Account pending approval"
+                elif user.status == "suspended":
+                    msg = "Account suspended"
+                else:
+                    msg = "Account rejected"
+                flash(msg, "error")
+                return render_template("auth/login.html", form=form)
+
+            login_user(user)
+            user.last_login = datetime.utcnow()
+            db.session.commit()
+            session["login_attempts"] = {"count": 0, "ts": datetime.utcnow().isoformat()}
+            session.permanent = True  # enable session timeout
+            if user.role == "SuperAdmin":
+                return redirect(url_for("superadmin.dashboard"))
+            if user.role == "Admin":
+                return redirect(url_for("superadmin.dashboard"))
+            if user.role == "Doctor":
+                return redirect(url_for("doctor.dashboard"))
+            return redirect(url_for("index"))
+
+        data = session.get("login_attempts") or {"count": 0, "ts": datetime.utcnow().isoformat()}
+        data["count"] += 1
+        session["login_attempts"] = data
+        flash("Invalid credentials", "error")
+
+    return render_template("auth/login.html", form=form)
+
+
+@auth_bp.route("/signup", methods=["GET", "POST"])
+def signup():
+    """Register a new user. Users activate immediately; Doctors/Admins await approval."""
+
+    form = SignupForm()
+    # Limit role choices for public signups to non-superadmin roles.
+    if not (current_user.is_authenticated and current_user.role == "SuperAdmin"):
+        form.role.choices = [("User", "User"), ("Doctor", "Doctor"), ("Admin", "Admin")]
+
+    if form.validate_on_submit():
+        db = current_app.db
+        User = current_app.User
+
+        # Prevent duplicate usernames/emails.
+        if User.query.filter(
+            or_(User.username == form.username.data, User.email == form.email.data)
+        ).first():
+            flash("Username or email already exists", "error")
+            return render_template("auth/signup.html", form=form)
+        if form.nickname.data and User.query.filter_by(nickname=form.nickname.data).first():
+            flash("Nickname already exists", "error")
+            return render_template("auth/signup.html", form=form)
+
+        if current_user.is_authenticated and current_user.role == "SuperAdmin":
+            role = form.role.data
+            status = "approved"
+            requested_role = None
+        else:
+            requested_role = form.role.data if form.role.data != "User" else None
+            role = "User"
+            status = "approved" if requested_role is None else "pending"
+
+        user = User(
+            username=form.username.data,
+            nickname=form.nickname.data or None,
+            email=form.email.data,
+            role=role,
+            status=status,
+            requested_role=requested_role,
+            created_at=datetime.utcnow(),
+        )
+        user.set_password(form.password.data)
+
+        db.session.add(user)
+        db.session.commit()
+
+        if current_user.is_authenticated and current_user.role == "SuperAdmin":
+            flash("User created", "success")
+            return redirect(url_for("superadmin.dashboard"))
+
+        if status == "approved":
+            flash("Account created. You can log in.", "success")
+        else:
+            flash("Signup request submitted. Await approval", "success")
+        return redirect(url_for("auth.login"))
+
+    return render_template("auth/signup.html", form=form)
+
+
+@auth_bp.route("/logout")
+def logout():
+    """Log out the current user."""
+
+    if current_user.is_authenticated:
+        logout_user()
+        flash("Logged out", "success")
+    return redirect(url_for("auth.login"))
+

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Audit Logs{% endblock %}
+
+{% block content %}
+<ul class="nav nav-tabs mb-4">
+  <li class="nav-item"><a class="nav-link" href="{{ url_for('superadmin.dashboard') }}">Users</a></li>
+  <li class="nav-item"><a class="nav-link active" href="{{ url_for('superadmin.audit_logs') }}">Audit Logs</a></li>
+</ul>
+
+<div class="card shadow-sm rounded-3 mb-5">
+  <div class="card-body">
+    <form class="row g-3 align-items-end mb-4" method="get">
+      <div class="col-md-3">
+        <input class="form-control" name="username" placeholder="Username" value="{{ request.args.get('username','') }}">
+      </div>
+      <div class="col-md-2">
+        <select class="form-select" name="role">
+          <option value="">All Roles</option>
+          <option value="Doctor" {% if request.args.get('role')=='Doctor' %}selected{% endif %}>Doctor</option>
+          <option value="Admin" {% if request.args.get('role')=='Admin' %}selected{% endif %}>Admin</option>
+          <option value="SuperAdmin" {% if request.args.get('role')=='SuperAdmin' %}selected{% endif %}>SuperAdmin</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select class="form-select" name="action">
+          <option value="">All Actions</option>
+          <option value="approve" {% if request.args.get('action')=='approve' %}selected{% endif %}>Approve</option>
+          <option value="reject" {% if request.args.get('action')=='reject' %}selected{% endif %}>Reject</option>
+          <option value="promote" {% if request.args.get('action')=='promote' %}selected{% endif %}>Promote</option>
+          <option value="change_role" {% if request.args.get('action')=='change_role' %}selected{% endif %}>Change Role</option>
+          <option value="toggle_status" {% if request.args.get('action')=='toggle_status' %}selected{% endif %}>Toggle Status</option>
+          <option value="reset_password" {% if request.args.get('action')=='reset_password' %}selected{% endif %}>Reset Password</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <input type="date" class="form-control" name="start" value="{{ request.args.get('start','') }}">
+      </div>
+      <div class="col-md-2">
+        <input type="date" class="form-control" name="end" value="{{ request.args.get('end','') }}">
+      </div>
+      <div class="col-md-1">
+        <select class="form-select" name="per_page">
+          <option value="20" {% if pagination.per_page==20 %}selected{% endif %}>20</option>
+          <option value="50" {% if pagination.per_page==50 %}selected{% endif %}>50</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-1">
+        <button class="btn btn-primary w-100">Apply</button>
+      </div>
+    </form>
+
+    <div class="table-responsive">
+      <table class="table table-striped align-middle mb-3">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Admin</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Old → New</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+          <tr>
+            <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>{{ log.acting_user.username }}</td>
+            <td>{{ log.target_user.username }}</td>
+            <td>{{ log.action }}</td>
+            <td>{{ log.old_value }} → {{ log.new_value }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <nav>
+      <ul class="pagination mb-0">
+        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}"><a class="page-link" href="{{ url_for('superadmin.audit_logs', page=pagination.prev_num, **query_args) if pagination.has_prev else '#' }}">Prev</a></li>
+        <li class="page-item disabled"><span class="page-link">Page {{ pagination.page }} of {{ pagination.pages }}</span></li>
+        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}"><a class="page-link" href="{{ url_for('superadmin.audit_logs', page=pagination.next_num, **query_args) if pagination.has_next else '#' }}">Next</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>
+{% endblock %}
+

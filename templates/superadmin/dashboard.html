@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ 'Super Admin Panel' if current_user.role == 'SuperAdmin' else 'Admin Panel' }}{% endblock %}
+
+{% block content %}
+<ul class="nav nav-tabs mb-4">
+  <li class="nav-item"><a class="nav-link active" href="{{ url_for('superadmin.dashboard') }}">Users</a></li>
+  <li class="nav-item"><a class="nav-link" href="{{ url_for('superadmin.audit_logs') }}">Audit Logs</a></li>
+</ul>
+
+<div class="row mb-5">
+  <div class="col-md-3 mb-3 mb-md-0">
+    <div class="card text-center shadow-sm rounded-3">
+      <div class="card-body">
+        <h6 class="text-muted">Total Users</h6>
+        <h3>{{ stats.total_users }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 mb-3 mb-md-0">
+    <div class="card text-center shadow-sm rounded-3">
+      <div class="card-body">
+        <h6 class="text-muted">Active Doctors</h6>
+        <h3>{{ stats.active_doctors }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 mb-3 mb-md-0">
+    <div class="card text-center shadow-sm rounded-3">
+      <div class="card-body">
+        <h6 class="text-muted">Pending</h6>
+        <h3>{{ stats.pending }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center shadow-sm rounded-3">
+      <div class="card-body">
+        <h6 class="text-muted">Suspended</h6>
+        <h3>{{ stats.suspended }}</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm rounded-3 mb-5">
+  <div class="card-body">
+    <form class="row g-3 align-items-end mb-4" method="get">
+      <div class="col-md-4">
+        <input class="form-control" type="text" name="q" placeholder="Search username/email" value="{{ request.args.get('q', '') }}">
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" name="sort">
+          <option value="date" {% if request.args.get('sort','date')=='date' %}selected{% endif %}>Date</option>
+          <option value="role" {% if request.args.get('sort')=='role' %}selected{% endif %}>Role</option>
+          <option value="status" {% if request.args.get('sort')=='status' %}selected{% endif %}>Status</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select class="form-select" name="order">
+          <option value="desc" {% if request.args.get('order','desc')=='desc' %}selected{% endif %}>Desc</option>
+          <option value="asc" {% if request.args.get('order')=='asc' %}selected{% endif %}>Asc</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select class="form-select" name="per_page">
+          <option value="10" {% if pagination.per_page==10 %}selected{% endif %}>10</option>
+          <option value="20" {% if pagination.per_page==20 %}selected{% endif %}>20</option>
+          <option value="50" {% if pagination.per_page==50 %}selected{% endif %}>50</option>
+        </select>
+      </div>
+      <div class="col-md-1"><button class="btn btn-primary w-100">Apply</button></div>
+    </form>
+
+    <div class="table-responsive">
+      <table class="table table-striped align-middle mb-3">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th class="text-nowrap" style="width:1%;"></th>
+            <th class="text-nowrap" style="width:1%;"></th>
+            <th class="text-nowrap" style="width:1%;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td>{{ u.username }}</td>
+            <td>{{ u.email }}</td>
+            <td>
+              {% if u.status != 'pending' and u.role != 'SuperAdmin' %}
+              <form method="post" action="{{ url_for('superadmin.update_role', user_id=u.id) }}" class="d-inline">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <select name="role" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+                  <option value="User" {% if u.role=='User' %}selected{% endif %}>User</option>
+                  <option value="Doctor" {% if u.role=='Doctor' %}selected{% endif %}>Doctor</option>
+                  {% if current_user.role == 'SuperAdmin' %}
+                  <option value="Admin" {% if u.role=='Admin' %}selected{% endif %}>Admin</option>
+                  {% endif %}
+                </select>
+              </form>
+              {% else %}
+                {{ u.role }}
+                {% if u.status == 'pending' and u.requested_role %}
+                  <span class="text-muted">(requested {{ u.requested_role }})</span>
+                {% endif %}
+              {% endif %}
+            </td>
+            <td>
+              {% if u.status == 'approved' %}
+                <span class="badge bg-success">Active</span>
+              {% elif u.status == 'suspended' %}
+                <span class="badge bg-danger">Suspended</span>
+              {% elif u.status == 'pending' %}
+                <span class="badge bg-secondary">Pending</span>
+              {% else %}
+                <span class="badge bg-secondary">{{ u.status }}</span>
+              {% endif %}
+            </td>
+            <td class="text-nowrap" style="width:1%;">
+              {% if u.status == 'pending' %}
+                <form method="post" action="{{ url_for('superadmin.approve_user', user_id=u.id) }}" class="d-inline">
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-sm btn-success">Approve</button>
+                </form>
+                <form method="post" action="{{ url_for('superadmin.reject_user', user_id=u.id) }}" class="d-inline">
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-sm btn-danger">Reject</button>
+                </form>
+              {% elif u.status in ['approved','suspended'] %}
+                <form method="post" action="{{ url_for('superadmin.toggle_status', user_id=u.id) }}" class="d-inline" id="status-form-{{ u.id }}">
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  {% if u.status == 'approved' %}
+                  <button type="button" class="btn btn-sm btn-warning suspend-btn" data-username="{{ u.username }}" data-form="status-form-{{ u.id }}">Suspend</button>
+                  {% else %}
+                  <button class="btn btn-sm btn-success">Unsuspend</button>
+                  {% endif %}
+                </form>
+              {% endif %}
+            </td>
+            <td class="text-nowrap" style="width:1%;">
+              {% if u.status != 'pending' %}
+              <form method="post" action="{{ url_for('superadmin.reset_password', user_id=u.id) }}" class="d-inline">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-sm btn-outline-secondary">Reset PW</button>
+              </form>
+              {% endif %}
+            </td>
+            <td class="text-nowrap" style="width:1%;">
+              {% if u.status != 'pending' %}
+              <a href="{{ url_for('superadmin.audit_logs', username=u.username) }}" class="btn btn-sm btn-outline-primary">Audit</a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <nav>
+      <ul class="pagination mb-0">
+        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('superadmin.dashboard', page=pagination.prev_num, **query_args) if pagination.has_prev else '#' }}">Prev</a>
+        </li>
+        <li class="page-item disabled"><span class="page-link">Page {{ pagination.page }} of {{ pagination.pages }}</span></li>
+        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('superadmin.dashboard', page=pagination.next_num, **query_args) if pagination.has_next else '#' }}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<div class="card shadow-sm rounded-3 mb-5">
+  <div class="card-body">
+    <canvas id="regChart"></canvas>
+  </div>
+</div>
+
+<div class="modal fade" id="suspendModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Suspension</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="suspendModalText">⚠️ Are you sure you want to suspend this user?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-warning" id="confirmSuspendBtn">Yes, Suspend</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const regCtx = document.getElementById('regChart');
+if (regCtx) {
+  new Chart(regCtx, {
+    type: 'line',
+    data: {labels: {{ trend_labels|tojson }}, datasets:[{label:'Registrations', data: {{ trend_values|tojson }}, borderColor:'#0d6efd', fill:false}]}
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  let formToSubmit = null;
+  const modalEl = document.getElementById('suspendModal');
+  const suspendModal = new bootstrap.Modal(modalEl);
+  const modalText = document.getElementById('suspendModalText');
+  document.querySelectorAll('.suspend-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      formToSubmit = document.getElementById(btn.dataset.form);
+      const username = btn.dataset.username;
+      modalText.textContent = `⚠️ Are you sure you want to suspend ${username}?`;
+      suspendModal.show();
+    });
+  });
+  document.getElementById('confirmSuspendBtn').addEventListener('click', () => {
+    if (formToSubmit) {
+      formToSubmit.submit();
+    }
+  });
+});
+</script>
+{% endblock %}
+

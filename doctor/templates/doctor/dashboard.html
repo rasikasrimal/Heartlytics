@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Doctor Dashboard</h1>
+<p>Your patients:</p>
+<ul>
+  {% for patient in patients %}
+  <li>{{ patient.patient_data.get('name', 'Patient') }} - {{ patient.prediction_result or 'N/A' }}</li>
+  {% else %}
+  <li>No patients found.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Prediction | Heart Disease Risk{% endblock %}
+{% block head %}
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" defer></script>
+{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <!-- Left column: prediction, personal info, vitals -->
+  <div class="col-12 col-lg-6 d-flex flex-column gap-4">
+    <div class="card shadow-sm card-hover h-100">
+      <div class="card-header bg-body sticky-top"><h2 class="h5 mb-0">Prediction Result</h2></div>
+      <div class="card-body">
+        {% if pred %}
+        <div class="mb-4">
+          <span class="badge rounded-pill fs-5 bg-{{ 'danger' if pred.prediction==1 else 'success' }}">{{ 'Risk Detected' if pred.prediction==1 else 'No Heart Disease' }}</span>
+          {% if risk_band %}<span class="badge bg-secondary fs-6 ms-2">{{ risk_band }} risk band</span>{% endif %}
+        </div>
+        {% if pos_prob is not none %}
+          <h5 class="mb-2">Risk Probability</h5>
+          <div class="progress progress-hover mb-4" role="progressbar" aria-valuenow="{{ risk_pct_val }}" aria-valuemin="0" aria-valuemax="100" data-bs-toggle="tooltip" title="{{ risk_band }} Risk ({{ risk_pct }})">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-{{ 'success' if risk_band=='Low' else 'warning' if risk_band=='Moderate' else 'danger' }} fw-semibold" data-target="{{ risk_pct_val }}" style="width:0;">{{ risk_pct }}</div>
+          </div>
+          <h5 class="mb-2">Model Confidence</h5>
+          <div class="progress progress-hover mb-4" role="progressbar" aria-valuenow="{{ confidence_pct_val }}" aria-valuemin="0" aria-valuemax="100" data-bs-toggle="tooltip" title="Model is {{ confidence_pct }} confident in this prediction">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-info fw-semibold" data-target="{{ confidence_pct_val }}" style="width:0;">{{ confidence_pct }}</div>
+          </div>
+        {% else %}
+          <div class="alert alert-warning mb-3">Probability unavailable (model doesn’t expose <code>predict_proba</code>).</div>
+        {% endif %}
+        <div class="d-flex gap-2 mb-3">
+          <a href="{{ url_for('index') }}" class="btn btn-brand">Try another</a>
+          {% if pred %}<a class="btn btn-outline-secondary" href="{{ url_for('report', pid=pred.id) }}">Download PDF report</a>{% endif %}
+        </div>
+        <p class="small text-muted mb-0">Educational demo — not a medical diagnosis.</p>
+        {% else %}
+        <p class="mb-0 text-muted">No prediction yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card shadow-sm card-hover h-100">
+      <div class="card-header bg-body sticky-top"><h2 class="h5 mb-0">Personal Info</h2></div>
+      <div class="card-body">
+        {% if pred %}
+        <ul class="list-unstyled mb-0">
+          <li class="mb-2"><span class="me-2">🆔</span>ID: {{ pred.id }}</li>
+          <li class="mb-2"><span class="me-2">🎂</span>Age: {{ pred.age }}</li>
+          <li class="mb-2"><span class="me-2">{{ '♂️' if pred.sex==1 else '♀️' }}</span>Sex: {{ SEX_MAP.get(pred.sex, pred.sex) }}</li>
+          <li><span class="me-2">🌎</span>Country: {{ pred.country or '—' }}</li>
+        </ul>
+        {% else %}
+        <p class="mb-0 text-muted">Awaiting patient details.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card shadow-sm card-hover h-100">
+      <div class="card-header bg-body sticky-top"><h2 class="h5 mb-0">Vitals</h2></div>
+      <div class="card-body">
+        {% if pred %}
+        <ul class="list-unstyled mb-0">
+          <li class="mb-2"><span class="me-2">🩸</span>BP: {{ '%.0f'|format(pred.resting_bp) }} {{ UNITS['resting_bp'] }}</li>
+          <li class="mb-2"><span class="me-2">🧬</span>Cholesterol: {{ '%.0f'|format(pred.cholesterol) }} {{ UNITS['cholesterol'] }}</li>
+          <li class="mb-2"><span class="me-2">🍬</span>FBS ≥ 120: {{ YESNO.get(pred.fasting_blood_sugar, pred.fasting_blood_sugar) }}</li>
+          <li><span class="me-2">💓</span>Max HR: {{ '%.0f'|format(pred.max_heart_rate) }} {{ UNITS['max_heart_rate'] }}</li>
+        </ul>
+        {% else %}
+        <p class="mb-0 text-muted">Vitals will appear here.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right column: ECG & Imaging, model details -->
+  <div class="col-12 col-lg-6 d-flex flex-column gap-4">
+    <div class="card shadow-sm card-hover h-100">
+      <div class="card-header bg-body sticky-top"><h2 class="h5 mb-0">ECG & Imaging</h2></div>
+      <div class="card-body">
+        {% if pred %}
+        <ul class="list-unstyled mb-0">
+          <li class="mb-2"><span class="me-2">🫀</span>ECG: {{ pred.resting_ecg.replace('_',' ') }}</li>
+          <li class="mb-2"><span class="me-2">📉</span>ST Depression: {{ '%.1f'|format(pred.oldpeak) }}</li>
+          <li class="mb-2"><span class="me-2">📈</span>ST Slope: {{ pred.st_slope.replace('_',' ') }}</li>
+          <li class="mb-2"><span class="me-2">🩺</span>Vessels: {{ pred.num_major_vessels }}</li>
+          <li><span class="me-2">🧪</span>Thalassemia: {{ pred.thalassemia_type.replace('_',' ') }}</li>
+        </ul>
+        {% else %}
+        <p class="mb-0 text-muted">ECG and imaging data pending.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card shadow-sm card-hover h-100">
+      <div class="card-header bg-body sticky-top"><h2 class="h5 mb-0">Model Details</h2></div>
+      <div class="card-body">
+        {% if pred %}
+        <p class="mb-1"><strong>Model:</strong> {{ pred.model_version }}</p>
+        <p class="mb-1"><strong>Record ID:</strong> {{ pred.id }}</p>
+        <p class="mb-0"><strong>Saved:</strong> {{ pred.created_at.strftime('%Y-%m-%d %H:%M UTC') }}</p>
+        {% else %}
+        <p class="mb-0 text-muted">Model information will display after prediction.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card shadow-sm card-hover h-100">
+      <div class="card-header bg-body sticky-top"><h2 class="h5 mb-0">Future Risk Projection</h2></div>
+      <div class="card-body">
+        {% if projection %}
+        <div id="risk-projection" style="height:350px;"></div>
+        {% else %}
+        <p class="mb-0 text-muted">Projection appears after a prediction.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      {% if pos_prob is not none %}
+      document.querySelectorAll('.progress-bar[data-target]').forEach(function(bar) {
+        var target = bar.getAttribute('data-target');
+        setTimeout(function() { bar.style.width = target + '%'; }, 200);
+      });
+      {% endif %}
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+      {% if projection %}
+      var proj = {{ projection|tojson }};
+      var trace = {
+        x: proj.map(function(p){ return p.age; }),
+        y: proj.map(function(p){ return p.risk_pct; }),
+        mode: 'lines+markers',
+        hovertemplate: 'Age %{x}<br>Risk %{y:.1f}%<extra></extra>'
+      };
+      var layout = {
+        title: 'Projected Heart Disease Risk vs Age (What-If Scenario)',
+        xaxis: {title: 'Age'},
+        yaxis: {title: 'Risk (%)', rangemode: 'tozero'},
+        margin: {t: 50, r: 20, l: 50, b: 50}
+      };
+      Plotly.newPlot('risk-projection', [trace], layout);
+      {% endif %}
+    });
+  </script>
+{% endblock %}
+
