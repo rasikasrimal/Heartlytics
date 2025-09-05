@@ -4,8 +4,11 @@
 
 {% block content %}
 <ul class="nav nav-tabs mb-4">
-  <li class="nav-item"><a class="nav-link active" href="{{ url_for('superadmin.dashboard') }}">Users</a></li>
-  <li class="nav-item"><a class="nav-link" href="{{ url_for('superadmin.audit_logs') }}">Audit Logs</a></li>
+  <li class="nav-item"><a class="nav-link active" href="{{ sa_url('superadmin.dashboard') }}">Users</a></li>
+  <li class="nav-item"><a class="nav-link" href="{{ sa_url('superadmin.audit_logs') }}">Audit Logs</a></li>
+  {% if current_user.role == 'SuperAdmin' %}
+  <li class="nav-item"><a class="nav-link" href="{{ sa_url('superadmin.change_logo') }}">Logo</a></li>
+  {% endif %}
 </ul>
 
 <div class="row mb-5">
@@ -92,7 +95,7 @@
             <td>{{ u.email }}</td>
             <td>
               {% if u.status != 'pending' and u.role != 'SuperAdmin' %}
-              <form method="post" action="{{ url_for('superadmin.update_role', user_id=u.id) }}" class="d-inline">
+                <form method="post" action="{{ sa_url('superadmin.update_role', user_id=u.id) }}" class="d-inline">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <select name="role" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
                   <option value="User" {% if u.role=='User' %}selected{% endif %}>User</option>
@@ -122,16 +125,16 @@
             </td>
             <td class="text-nowrap" style="width:1%;">
               {% if u.status == 'pending' %}
-                <form method="post" action="{{ url_for('superadmin.approve_user', user_id=u.id) }}" class="d-inline">
+                  <form method="post" action="{{ sa_url('superadmin.approve_user', user_id=u.id) }}" class="d-inline">
                   <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                   <button class="btn btn-sm btn-success">Approve</button>
                 </form>
-                <form method="post" action="{{ url_for('superadmin.reject_user', user_id=u.id) }}" class="d-inline">
+                  <form method="post" action="{{ sa_url('superadmin.reject_user', user_id=u.id) }}" class="d-inline">
                   <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                   <button class="btn btn-sm btn-danger">Reject</button>
                 </form>
               {% elif u.status in ['approved','suspended'] %}
-                <form method="post" action="{{ url_for('superadmin.toggle_status', user_id=u.id) }}" class="d-inline" id="status-form-{{ u.id }}">
+                  <form method="post" action="{{ sa_url('superadmin.toggle_status', user_id=u.id) }}" class="d-inline" id="status-form-{{ u.id }}">
                   <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                   {% if u.status == 'approved' %}
                   <button type="button" class="btn btn-sm btn-warning suspend-btn" data-username="{{ u.username }}" data-form="status-form-{{ u.id }}">Suspend</button>
@@ -143,7 +146,7 @@
             </td>
             <td class="text-nowrap" style="width:1%;">
               {% if u.status != 'pending' %}
-              <form method="post" action="{{ url_for('superadmin.reset_password', user_id=u.id) }}" class="d-inline">
+                <form method="post" action="{{ sa_url('superadmin.reset_password', user_id=u.id) }}" class="d-inline">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <button class="btn btn-sm btn-outline-secondary">Reset PW</button>
               </form>
@@ -151,7 +154,7 @@
             </td>
             <td class="text-nowrap" style="width:1%;">
               {% if u.status != 'pending' %}
-              <a href="{{ url_for('superadmin.audit_logs', username=u.username) }}" class="btn btn-sm btn-outline-primary">Audit</a>
+                <a href="{{ sa_url('superadmin.audit_logs', username=u.username) }}" class="btn btn-sm btn-outline-primary">Audit</a>
               {% endif %}
             </td>
           </tr>
@@ -163,11 +166,11 @@
     <nav>
       <ul class="pagination mb-0">
         <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
-          <a class="page-link" href="{{ url_for('superadmin.dashboard', page=pagination.prev_num, **query_args) if pagination.has_prev else '#' }}">Prev</a>
+          <a class="page-link" href="{{ sa_url('superadmin.dashboard', page=pagination.prev_num, **query_args) if pagination.has_prev else '#' }}">Prev</a>
         </li>
         <li class="page-item disabled"><span class="page-link">Page {{ pagination.page }} of {{ pagination.pages }}</span></li>
         <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
-          <a class="page-link" href="{{ url_for('superadmin.dashboard', page=pagination.next_num, **query_args) if pagination.has_next else '#' }}">Next</a>
+          <a class="page-link" href="{{ sa_url('superadmin.dashboard', page=pagination.next_num, **query_args) if pagination.has_next else '#' }}">Next</a>
         </li>
       </ul>
     </nav>

@@ -15,6 +15,8 @@ from flask_login import current_user, login_required
 from sqlalchemy import func, or_
 from datetime import datetime, timedelta
 import secrets
+import os
+import time
 
 from services.auth import role_required
 from services.security import csrf_protect
@@ -324,3 +326,29 @@ def audit_logs():
     return render_template(
         "superadmin/audit.html", logs=logs, pagination=pagination, query_args=query_args
     )
+
+
+@superadmin_bp.route("/logo", methods=["GET", "POST"])
+@login_required
+@role_required(["SuperAdmin"])
+@csrf_protect
+def change_logo():
+    """Allow SuperAdmin to upload a new logo for the application."""
+    if request.method == "POST":
+        file = request.files.get("logo")
+        if file and file.filename.lower().endswith(".svg"):
+            path = os.path.join(current_app.static_folder, "logo.svg")
+            file.save(path)
+            # update cache-busting version so new logo loads immediately
+            version = str(int(time.time()))
+            current_app.config["LOGO_VERSION"] = version
+            try:
+                with open(os.path.join(current_app.instance_path, "logo_version"), "w") as f:
+                    f.write(version)
+            except OSError:
+                pass
+            flash("Logo updated", "success")
+        else:
+            flash("Please upload a valid SVG file", "error")
+        return redirect(url_for("superadmin.change_logo"))
+    return render_template("superadmin/logo.html")

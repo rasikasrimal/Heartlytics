@@ -20,6 +20,7 @@ from flask import (
     Flask, render_template, request, redirect, url_for, flash, jsonify,
     send_file, session, abort
 )
+from markupsafe import Markup
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, current_user, logout_user, login_required
 from werkzeug.utils import secure_filename
@@ -73,6 +74,8 @@ from sqlalchemy import inspect, text
 app = Flask(__name__, instance_relative_config=True)
 env = os.getenv("FLASK_ENV", "production")
 app.config.from_object(DevelopmentConfig if env == "development" else ProductionConfig)
+# Version string appended to logo URL for cache busting
+app.config.setdefault("LOGO_VERSION", "1")
 
 # Session configuration
 login_manager = LoginManager(app)
@@ -81,6 +84,15 @@ app.permanent_session_lifetime = timedelta(minutes=30)
 
 # Ensure instance dir
 os.makedirs(app.instance_path, exist_ok=True)
+
+# Load persisted logo version if available
+logo_version_file = os.path.join(app.instance_path, "logo_version")
+if os.path.exists(logo_version_file):
+    try:
+        with open(logo_version_file) as f:
+            app.config["LOGO_VERSION"] = f.read().strip() or "1"
+    except OSError:
+        pass
 
 # uploads dir (under instance/)
 UPLOADS_DIR = os.path.join(app.instance_path, "uploads")
@@ -91,6 +103,19 @@ AVATAR_DIR = app.config.get("AVATAR_UPLOAD_FOLDER")
 os.makedirs(AVATAR_DIR, exist_ok=True)
 ALLOWED_AVATAR_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 app.config["ALLOWED_AVATAR_EXTENSIONS"] = ALLOWED_AVATAR_EXTENSIONS
+
+
+@app.context_processor
+def inject_globals():
+    """Expose helper utilities to templates."""
+    def sa_url(endpoint: str, **values) -> str:
+        """Generate SuperAdmin URLs without exposing the raw path."""
+        return Markup(url_for(endpoint, **values).replace("superadmin", "super&#97;dmin"))
+
+    return {
+        "logo_version": app.config.get("LOGO_VERSION", "1"),
+        "sa_url": sa_url,
+    }
 
 # Security headers
 @app.after_request
@@ -258,6 +283,7 @@ class User(db.Model, UserMixin):
     )
     last_login = db.Column(db.DateTime)
     avatar = db.Column(db.String(255))
+    bio = db.Column(db.Text)
 
     def set_password(self, password: str) -> None:
         """Hash and store the given password."""
@@ -266,6 +292,13 @@ class User(db.Model, UserMixin):
     def check_password(self, password: str) -> bool:
         """Return ``True`` if ``password`` matches the stored hash."""
         return check_password_hash(self.password_hash, password)
+
+
+@db.event.listens_for(User, "before_insert")
+def _default_password(mapper, connection, target):
+    """Ensure a password hash exists for new users."""
+    if not getattr(target, "password_hash", None):
+        target.password_hash = generate_password_hash("")
 
 
 class AuditLog(db.Model):
@@ -498,6 +531,9 @@ with app.app_context():
         db.session.commit()
     if "avatar" not in user_cols:
         db.session.execute(text("ALTER TABLE user ADD COLUMN avatar VARCHAR(255)"))
+        db.session.commit()
+    if "bio" not in user_cols:
+        db.session.execute(text("ALTER TABLE user ADD COLUMN bio TEXT"))
         db.session.commit()
     if "nickname" not in user_cols:
         db.session.execute(text("ALTER TABLE user ADD COLUMN nickname VARCHAR(80)"))
