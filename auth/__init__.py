@@ -64,7 +64,7 @@ def login():
             if user.role == "Admin":
                 return redirect(url_for("superadmin.dashboard"))
             if user.role == "Doctor":
-                return redirect(url_for("doctor.dashboard"))
+                return redirect(url_for("dashboard"))
             return redirect(url_for("index"))
 
         data = session.get("login_attempts") or {"count": 0, "ts": datetime.utcnow().isoformat()}

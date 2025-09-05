@@ -57,7 +57,7 @@ CATEGORICAL_FEATURES = {
 }
 
 REQUIRED_INTERNAL_COLUMNS = set(INPUT_COLUMNS)
-OPTIONAL_KEEP = {"country"}
+OPTIONAL_KEEP = set()
 NUMERIC_FEATURES_INT = {"age", "resting_blood_pressure", "cholesterol", "max_heart_rate_achieved", "num_major_vessels"}
 NUMERIC_FEATURES_FLOAT = {"st_depression"}
 BINARY_FEATURES = {"sex", "fasting_blood_sugar", "exercise_induced_angina"}
@@ -96,9 +96,7 @@ COLUMN_ALIASES = {
     "age": "age",
     "sex": "sex",
 
-    # dataset -> country (optional keep)
-    "dataset": "country",
-    "country": "country",
+
 
     # chest pain
     "cp": "chest_pain_type",

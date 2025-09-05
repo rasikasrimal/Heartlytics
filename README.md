@@ -7,7 +7,7 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 
 ## ✨ Features
 - 🧠 **ML Model**: Random Forest (GridSearchCV tuned), trained on the UCI Heart Disease dataset (Cleveland + others).
-- 📋 **Form Input**: Collects key clinical features (age, sex, chest pain type, blood pressure, cholesterol, fasting blood sugar, ECG results, max heart rate, exercise angina, ST depression, slope, number of major vessels, thalassemia type, country).
+- 📋 **Form Input**: Collects key clinical features (age, sex, chest pain type, blood pressure, cholesterol, fasting blood sugar, ECG results, max heart rate, exercise angina, ST depression, slope, number of major vessels, thalassemia type).
 - 📂 **Batch Analysis**: Step-by-step workflow with drag‑and‑drop CSV upload, column mapping, auto-cleaning, and progress feedback.
 - 📊 **Dashboard & PDF Export**:
   - KPIs: total predictions, positive rate, average risk
@@ -17,11 +17,17 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
   - Exports all visuals and records to a styled PDF with table of contents and responsive column widths
 - 📑 **Patient PDF Reports**: Generate downloadable patient-level summaries with all inputs, prediction, probability, risk band, and confidence.
 - 📚 **Research Paper Viewer**: Renders a bundled LaTeX manuscript with MathJax, tables, figures, and reference links.
+- 👥 **Role-Based Access Control**: Users, Doctors, Admins, and SuperAdmins with dedicated dashboards, account approval workflow, and audit logs.
+- 🩺 **Doctor Portal**: Doctors can review their own patient predictions and histories.
+- ⚙️ **Profile Settings**: Update username, email, nickname, avatar, and password while viewing recent activity logs.
+- 🧪 **Simulations**: What-if analysis and risk projections for variables such as age or exercise-induced angina.
+- 🕵️ **Outlier Detection**: Batch EDA includes IQR, Isolation Forest, Z-Score, LOF, and DBSCAN methods to highlight anomalous records.
 
 - 🎨 **Modern UI**: Responsive Bootstrap 5 theme with custom colors, icons, and charts.
 - 🔒 **Safe by design**:
   - CSRF tokens for forms and API
   - Security headers (no-sniff, frame denial, no referrer, no FLoC)
+  - Login rate limiting and session timeouts
   - 🗄 **Persistence**: SQLite database via SQLAlchemy, storing predictions with metadata.
 
 ---
@@ -42,17 +48,21 @@ heart-app/
 ├── config.py            # Configuration classes
 ├── helpers.py           # Shared utility functions
 ├── outlier_detection.py # Outlier detection helpers
-├── admin/               # Admin blueprint
 ├── auth/                # Authentication blueprint and forms
+├── doctor/              # Doctor dashboard
 ├── routes/              # Core Flask blueprints
 │   ├── __init__.py
-│   └── predict.py
+│   ├── predict.py
+│   └── settings.py
 ├── services/            # Business logic and ML helpers
 │   ├── auth.py
 │   ├── data.py
 │   ├── pdf.py
 │   ├── security.py
 │   └── simulation.py
+├── simulations/         # What-if risk modules
+├── superadmin/          # Superadmin dashboard and management
+├── user/                # Basic user dashboard
 ├── templates/           # Jinja2 templates
 │   ├── base.html
 │   ├── error.html
@@ -65,7 +75,6 @@ heart-app/
 │   └── sample.csv
 ├── ml/                  # Trained model artifacts
 │   └── model.pkl
-├── superadmin/          # Superadmin blueprint
 ├── tests/               # Pytest suites
 │   ├── test_predict.py
 │   └── ...
@@ -76,6 +85,11 @@ heart-app/
 ## 🗺️ Blueprints
 
 - `predict` – renders the prediction form and returns the model's risk assessment.
+- `settings` – profile management and activity logs.
+- `simulations` – interactive what‑if analysis tools.
+- `doctor` – dashboard for doctors to view their patients.
+- `user` – simple dashboard for regular users.
+- `superadmin` – user management, approvals, and audit logs.
 
 ---
 

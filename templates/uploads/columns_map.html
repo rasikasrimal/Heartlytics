@@ -37,9 +37,7 @@
                     <option value="{{ col }}" {{ 'selected' if col==pre else '' }}>{{ col }}</option>
                   {% endfor %}
                 </select>
-                {% if need == 'country' %}
-                  <div class="form-text">Tip: map your <em>dataset</em> column to <code>country</code> (e.g., Cleveland, Hungary, etc.).</div>
-                {% elif need == 'max_heart_rate_achieved' %}
+                {% if need == 'max_heart_rate_achieved' %}
                   <div class="form-text">Tip: map <em>thalch</em> or <em>thalach</em> here.</div>
                 {% elif need == 'st_depression' %}
                   <div class="form-text">Tip: map <em>oldpeak</em> here.</div>

@@ -57,7 +57,7 @@ def predict():
         flash("Model not loaded. Please place ml/model.pkl and restart the app.", "error")
         return redirect(url_for("index"))
 
-    payload = {k: request.form.get(k) for k in (["patient_name", "country"] + INPUT_COLUMNS)}
+    payload = {k: request.form.get(k) for k in (["patient_name"] + INPUT_COLUMNS)}
 
     errors = {}
     cleaned: dict[str, object] = {}
@@ -70,7 +70,7 @@ def predict():
         except Exception:
             errors[col] = f"Must be {caster.__name__}"
 
-    # categoricals (validated ones only; country is NOT validated)
+    # categoricals
     for col, allowed in CATEGORICAL_COLS.items():
         v = (payload.get(col) or "").strip()
         if v not in allowed:
@@ -82,9 +82,6 @@ def predict():
     patient_name = (payload.get("patient_name") or "").strip()
     if patient_name and len(patient_name) > 120:
         errors["patient_name"] = "Max length is 120"
-
-    # optional country (any string)
-    country_val = (payload.get("country") or "").strip() or None
 
     if errors:
         for f, msg in errors.items():
@@ -108,7 +105,6 @@ def predict():
         age=int(cleaned["age"]),
         sex=int(cleaned["sex"]),
         chest_pain_type=str(cleaned["chest_pain_type"]),
-        country=country_val,
         resting_bp=float(cleaned["resting_blood_pressure"]),
         cholesterol=float(cleaned["cholesterol"]),
         fasting_blood_sugar=int(cleaned["fasting_blood_sugar"]),

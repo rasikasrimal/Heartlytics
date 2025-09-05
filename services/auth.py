@@ -13,7 +13,7 @@ from __future__ import annotations
 from functools import wraps
 from typing import Iterable
 
-from flask import abort
+from flask import abort, current_app
 from flask_login import current_user
 
 
@@ -89,8 +89,8 @@ def permission_required(permission: str):
                 pass
             if not user_perms and getattr(current_user, "role", None):
                 try:
-                    from app import Role  # local import to avoid circular
-
+                    db = current_app.extensions["sqlalchemy"]
+                    Role = db.Model.registry._class_registry.get("Role")
                     role_obj = Role.query.filter_by(
                         role_name=current_user.role
                     ).first()

@@ -46,7 +46,6 @@
           <li class="mb-2"><span class="me-2">🆔</span>ID: {{ pred.id }}</li>
           <li class="mb-2"><span class="me-2">🎂</span>Age: {{ pred.age }}</li>
           <li class="mb-2"><span class="me-2">{{ '♂️' if pred.sex==1 else '♀️' }}</span>Sex: {{ SEX_MAP.get(pred.sex, pred.sex) }}</li>
-          <li><span class="me-2">🌎</span>Country: {{ pred.country or '—' }}</li>
         </ul>
         {% else %}
         <p class="mb-0 text-muted">Awaiting patient details.</p>
