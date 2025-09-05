@@ -1,142 +1,137 @@
 {% extends "base.html" %}
 {% block title %}Simulations{% endblock %}
 {% block head %}
-  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" defer></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="{{ url_for('static', filename='js/simulations.js') }}" defer></script>
 {% endblock %}
 {% block content %}
 <h1 class="mb-4">Simulations</h1>
-<form method="post" class="mb-4">
-  <div class="row g-3 mb-3">
-  <div class="col-md-3">
-    <label class="form-label">Age</label>
-    <input type="number" class="form-control" name="age" value="{{ baseline.age }}">
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">Sex</label>
-    <select class="form-select" name="sex">
-      <option value="1" {% if baseline.sex==1 %}selected{% endif %}>1</option>
-      <option value="0" {% if baseline.sex==0 %}selected{% endif %}>0</option>
-    </select>
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">Chest Pain Type</label>
-    <select class="form-select" name="chest_pain_type">
-      {% set cpt = baseline.chest_pain_type %}
-      {% for v in ['typical_angina','atypical_angina','non-anginal','asymptomatic'] %}
-      <option value="{{ v }}" {% if cpt==v %}selected{% endif %}>{{ v }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">Resting BP</label>
-    <input type="number" class="form-control" name="resting_blood_pressure" value="{{ baseline.resting_blood_pressure }}">
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">Cholesterol</label>
-    <input type="number" class="form-control" name="cholesterol" value="{{ baseline.cholesterol }}">
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">Fasting Blood Sugar / Glucose (mg/dL)</label>
-    <input type="number" class="form-control" name="fasting_blood_sugar" value="{{ baseline.fasting_blood_sugar }}">
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">Resting ECG</label>
-    <select class="form-select" name="Restecg">
-      {% set recg = baseline.Restecg %}
-      {% for v in ['normal','left_ventricular_hypertrophy','st_t_wave_abnormality'] %}
-      <option value="{{ v }}" {% if recg==v %}selected{% endif %}>{{ v }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">Max Heart Rate</label>
-    <input type="number" class="form-control" name="max_heart_rate_achieved" value="{{ baseline.max_heart_rate_achieved }}">
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">Exercise Angina</label>
-    <select class="form-select" name="exercise_induced_angina">
-      <option value="0" {% if baseline.exercise_induced_angina==0 %}selected{% endif %}>0</option>
-      <option value="1" {% if baseline.exercise_induced_angina==1 %}selected{% endif %}>1</option>
-    </select>
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">ST Depression</label>
-    <input type="number" step="0.1" class="form-control" name="st_depression" value="{{ baseline.st_depression }}">
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">ST Slope Type</label>
-    <select class="form-select" name="st_slope_type">
-      {% set slope = baseline.st_slope_type %}
-      {% for v in ['upsloping','flat','downsloping'] %}
-      <option value="{{ v }}" {% if slope==v %}selected{% endif %}>{{ v }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">Num Major Vessels</label>
-    <input type="number" class="form-control" name="num_major_vessels" value="{{ baseline.num_major_vessels }}">
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">Thalassemia Type</label>
-    <select class="form-select" name="thalassemia_type">
-      {% set thal = baseline.thalassemia_type %}
-      {% for v in ['normal','fixed_defect','reversible_defect'] %}
-      <option value="{{ v }}" {% if thal==v %}selected{% endif %}>{{ v }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  </div>
+<div class="row">
+  <div class="col-lg-4 col-md-5 mb-4">
+    <form id="sim-form">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Demographics</h5>
+          <div class="mb-3">
+            <label class="form-label">Age <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="Age in years">?</span></label>
+            <input type="range" class="form-range" name="age" id="age" min="0" max="120" value="{{ baseline.age }}">
+            <div class="form-text"><span id="age-value">{{ baseline.age }}</span> years</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Sex</label>
+            <select class="form-select" name="sex">
+              <option value="1" {% if baseline.sex==1 %}selected{% endif %}>Male</option>
+              <option value="0" {% if baseline.sex==0 %}selected{% endif %}>Female</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Chest Pain Type</label>
+            <select class="form-select" name="chest_pain_type">
+              {% set cpt = baseline.chest_pain_type %}
+              {% for v in ['typical_angina','atypical_angina','non-anginal','asymptomatic'] %}
+              <option value="{{ v }}" {% if cpt==v %}selected{% endif %}>{{ v }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
 
-  {% if prediction %}
-  <div class="mb-4">
-    <h2>Prediction Result</h2>
-    <p><strong>{{ prediction.label }}</strong></p>
-    {% if prediction.risk_pct is not none %}
-    <div class="progress mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ prediction.risk_pct }}">
-      <div class="progress-bar bg-info" style="width: {{ prediction.risk_pct }}%">{{ prediction.risk_pct }}%</div>
-    </div>
-    {% endif %}
-    {% if prediction.confidence_pct is not none %}
-    <p class="mb-0">Model confidence: {{ prediction.confidence_pct }}%</p>
-    {% endif %}
-  </div>
-  {% endif %}
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Clinical Measurements</h5>
+          <div class="mb-3">
+            <label class="form-label">Resting BP</label>
+            <input type="range" class="form-range" name="resting_blood_pressure" id="bp" min="80" max="250" value="{{ baseline.resting_blood_pressure }}">
+            <div class="form-text"><span id="bp-value">{{ baseline.resting_blood_pressure }}</span> mmHg</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Cholesterol</label>
+            <input type="range" class="form-range" name="cholesterol" id="chol" min="100" max="600" value="{{ baseline.cholesterol }}">
+            <div class="form-text"><span id="chol-value">{{ baseline.cholesterol }}</span> mg/dL</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Fasting Blood Sugar / Glucose (mg/dL)</label>
+            <input type="range" class="form-range" name="fasting_blood_sugar" id="fbs" min="60" max="200" value="{{ baseline.fasting_blood_sugar }}">
+            <div class="form-text"><span id="fbs-value">{{ baseline.fasting_blood_sugar }}</span> mg/dL</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Resting ECG</label>
+            <select class="form-select" name="Restecg">
+              {% set recg = baseline.Restecg %}
+              {% for v in ['normal','left_ventricular_hypertrophy','st_t_wave_abnormality'] %}
+              <option value="{{ v }}" {% if recg==v %}selected{% endif %}>{{ v }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Max Heart Rate</label>
+            <input type="range" class="form-range" name="max_heart_rate_achieved" id="mhr" min="60" max="220" value="{{ baseline.max_heart_rate_achieved }}">
+            <div class="form-text"><span id="mhr-value">{{ baseline.max_heart_rate_achieved }}</span> bpm</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Exercise Angina</label>
+            <select class="form-select" name="exercise_induced_angina">
+              <option value="0" {% if baseline.exercise_induced_angina==0 %}selected{% endif %}>No</option>
+              <option value="1" {% if baseline.exercise_induced_angina==1 %}selected{% endif %}>Yes</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">ST Depression</label>
+            <input type="range" step="0.1" class="form-range" name="st_depression" id="st_dep" min="0" max="10" value="{{ baseline.st_depression }}">
+            <div class="form-text"><span id="st_dep-value">{{ baseline.st_depression }}</span></div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">ST Slope Type</label>
+            <select class="form-select" name="st_slope_type">
+              {% set slope = baseline.st_slope_type %}
+              {% for v in ['upsloping','flat','downsloping'] %}
+              <option value="{{ v }}" {% if slope==v %}selected{% endif %}>{{ v }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Num Major Vessels</label>
+            <input type="number" class="form-control" name="num_major_vessels" value="{{ baseline.num_major_vessels }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Thalassemia Type</label>
+            <select class="form-select" name="thalassemia_type">
+              {% set thal = baseline.thalassemia_type %}
+              {% for v in ['normal','fixed_defect','reversible_defect'] %}
+              <option value="{{ v }}" {% if thal==v %}selected{% endif %}>{{ v }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
 
-  <div class="row g-3 align-items-end mb-4">
-    <div class="col-md-3">
-      <label class="form-label">Variable</label>
-      <select class="form-select" name="variable">
-        <option value="age" {% if variable=='age' %}selected{% endif %}>Age</option>
-        <option value="cholesterol" {% if variable=='cholesterol' %}selected{% endif %}>Cholesterol (mg/dL)</option>
-        <option value="resting_blood_pressure" {% if variable=='resting_blood_pressure' %}selected{% endif %}>Resting Blood Pressure (systolic mmHg)</option>
-        <option value="fasting_blood_sugar" {% if variable=='fasting_blood_sugar' %}selected{% endif %}>Fasting Blood Sugar / Glucose (mg/dL)</option>
-        <option value="max_heart_rate_achieved" {% if variable=='max_heart_rate_achieved' %}selected{% endif %}>Max Heart Rate Achieved (bpm)</option>
-      </select>
+      <div class="row g-3 align-items-end">
+        <div class="col-md-6">
+          <label class="form-label">Variable</label>
+          <select class="form-select" name="variable" id="variable">
+            <option value="age">Age</option>
+            <option value="cholesterol">Cholesterol (mg/dL)</option>
+            <option value="resting_blood_pressure">Resting Blood Pressure (systolic mmHg)</option>
+            <option value="fasting_blood_sugar">Fasting Blood Sugar / Glucose (mg/dL)</option>
+            <option value="max_heart_rate_achieved">Max Heart Rate Achieved (bpm)</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <button class="btn btn-brand w-100" id="run-sim">Run</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="col-lg-8 col-md-7">
+    <div class="card mb-3">
+      <div class="card-body" id="prediction"></div>
     </div>
-    <div class="col-md-2">
-      <button class="btn btn-brand w-100" type="submit">Run</button>
+    <div class="card">
+      <div class="card-body">
+        <div id="exercise-angina-chart" style="height:350px;"></div>
+      </div>
     </div>
   </div>
-
-  {% if results.exercise_angina %}
-  <div class="mb-5">
-    <h2>Heart disease risk change with {{ results.exercise_angina.label }}</h2>
-    <div id="exercise-angina-chart" style="height:350px;"></div>
-  </div>
-  {% endif %}
-</form>
+</div>
 {% endblock %}
-{% block scripts %}
-  {{ super() }}
-  {% if results.exercise_angina %}
-  <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var res = {{ results.exercise_angina|tojson }};
-    var no = {x: res.no.map(r=>r.value), y: res.no.map(r=>r.risk_pct), mode:'lines', name:'No Angina', line:{color:'green'}};
-    var yes = {x: res.yes.map(r=>r.value), y: res.yes.map(r=>r.risk_pct), mode:'lines', name:'Yes Angina', line:{color:'red'}};
-    var cur = {x:[res.current.value], y:[res.current.risk_pct], mode:'markers+text', text:['You\'re here'], textposition:'top center', marker:{color:res.current.angina ? 'red':'green', size:8}, showlegend:false};
-    Plotly.newPlot('exercise-angina-chart', [no, yes, cur], {xaxis:{title: res.label, range:[res.vmin, res.vmax]}, yaxis:{title:'Risk (%)', range:[0,100]}, margin:{t:30}});
-  });
-  </script>
-  {% endif %}
-{% endblock %}
+
