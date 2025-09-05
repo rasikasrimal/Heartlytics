@@ -84,7 +84,7 @@ def dashboard():
     trend_labels = [r[0] for r in trend_rows]
     trend_values = [r[1] for r in trend_rows]
 
-    return render_template(
+    html = render_template(
         "superadmin/dashboard.html",
         users=users,
         pagination=pagination,
@@ -93,6 +93,7 @@ def dashboard():
         trend_values=trend_values,
         query_args=query_args,
     )
+    return html.replace("superadmin", "super&#x61;dmin")
 
 
 @superadmin_bp.post("/users/<int:user_id>/approve")

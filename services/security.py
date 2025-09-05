@@ -2,14 +2,17 @@ from __future__ import annotations
 
 import secrets
 from functools import wraps
-from flask import request, session, abort, jsonify
+from flask import current_app, request, session, abort, jsonify
 
 
 def csrf_protect(fn):
     """Simple form-based CSRF protection decorator."""
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        if request.method in ("GET", "HEAD", "OPTIONS"):
+        if (
+            request.method in ("GET", "HEAD", "OPTIONS")
+            or not current_app.config.get("WTF_CSRF_ENABLED", True)
+        ):
             return fn(*args, **kwargs)
         token_form = request.form.get("_csrf_token")
         token_sess = session.get("_csrf_token")
@@ -21,10 +24,10 @@ def csrf_protect(fn):
 
 def get_csrf_token():
     """Return a session CSRF token, creating one if necessary."""
-    token = session.get('_csrf_token')
+    token = session.get("_csrf_token")
     if not token:
         token = secrets.token_urlsafe(32)
-        session['_csrf_token'] = token
+        session["_csrf_token"] = token
     return token
 
 
@@ -37,6 +40,8 @@ def csrf_protect_api(fn):
     """API CSRF protection decorator using headers."""
     @wraps(fn)
     def wrapper(*args, **kwargs):
+        if not current_app.config.get("WTF_CSRF_ENABLED", True):
+            return fn(*args, **kwargs)
         token_req = get_csrf_from_header()
         token_sess = session.get("_csrf_token")
         if token_req and token_sess and token_req == token_sess:

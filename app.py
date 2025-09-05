@@ -243,7 +243,11 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(80), unique=True, nullable=False)
     nickname = db.Column(db.String(80), unique=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
+    password_hash = db.Column(
+        db.String(128),
+        nullable=False,
+        default=lambda: generate_password_hash(uuid.uuid4().hex),
+    )
     role = db.Column(db.String(20), default="User")
     status = db.Column(db.String(20), default="pending")
     requested_role = db.Column(db.String(20))
