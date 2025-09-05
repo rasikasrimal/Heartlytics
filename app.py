@@ -326,6 +326,9 @@ class Role(db.Model):
     permissions = db.Column(db.JSON, nullable=False, default=dict)
 
 
+# Expose model on app to avoid re-importing this module elsewhere
+app.Role = Role
+
 # Default system roles and their permissions. These can be extended in future
 # without schema changes thanks to the JSON column on :class:`Role`.
 DEFAULT_ROLE_PERMISSIONS = {
@@ -373,6 +376,9 @@ class Patient(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     entered_by = db.relationship("User", backref="patients")
+
+# Expose the model on the application instance for blueprint access
+app.Patient = Patient
 
 class Prediction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
