@@ -349,7 +349,6 @@ class Prediction(db.Model):
     age = db.Column(db.Integer, nullable=False)
     sex = db.Column(db.Integer, nullable=False)  # 0/1
     chest_pain_type = db.Column(db.String(50))
-    country = db.Column(db.String(50))  # optional (not used by the model)
     resting_bp = db.Column(db.Float)
     cholesterol = db.Column(db.Float)
     fasting_blood_sugar = db.Column(db.Integer)
@@ -372,7 +371,6 @@ class Prediction(db.Model):
             "age": self.age,
             "sex": self.sex,
             "chest_pain_type": self.chest_pain_type,
-            "country": self.country,
             "resting_blood_pressure": self.resting_bp,
             "cholesterol": self.cholesterol,
             "fasting_blood_sugar": self.fasting_blood_sugar,
@@ -818,7 +816,6 @@ def index():
         "age": 63,
         "sex": 1,
         "chest_pain_type": "typical_angina",
-        "country": "Cleveland",  # optional, for display/reporting only
         "resting_blood_pressure": 145.0,
         "cholesterol": 233.0,
         "fasting_blood_sugar": 1,
@@ -1717,8 +1714,7 @@ def build_eda_payload(df: pd.DataFrame) -> dict:
         gender_pie = {"labels": labels, "values": values}  # Plotly: go.Pie(labels, values, ...)
 
     # 2) Heatmap: Dataset × Gender Counts
-    # We treat "dataset" as your notebook’s name; in this app it’s "country" if present.
-    ds_col = "dataset" if "dataset" in df.columns else ("country" if "country" in df.columns else None)
+    ds_col = "dataset" if "dataset" in df.columns else None
     dataset_gender_heatmap = None
     if ds_col is not None and "sex" in df.columns:
         tmp = df[[ds_col, "sex"]].dropna()
@@ -1990,15 +1986,9 @@ def _apply_user_mapping(df: pd.DataFrame, mapping: dict) -> pd.DataFrame:
     new_df = pd.DataFrame({col: picked[col] for col in INPUT_COLUMNS})
 
     # --- add optional keep if present ---
-    # 1) if user explicitly mapped it (in case you add it to the UI later)
     for col in OPTIONAL_KEEP:
         if col in picked:
             new_df[col] = picked[col]
-    # 2) otherwise, auto-detect in the raw CSV via aliases (so 'dataset' or 'country' works)
-    if "country" not in new_df.columns:
-        raw_country = find_optional_in_raw(df, "country")
-        if raw_country:
-            new_df["country"] = df[raw_country]
 
     return new_df
 
@@ -2499,7 +2489,6 @@ def upload_predict(uid: str):
             age=int(row["age"]),
             sex=int(row["sex"]),
             chest_pain_type=str(row["chest_pain_type"]),
-            country=(str(row["country"]) if ("country" in df.columns and pd.notna(row.get("country"))) else None),
             resting_bp=float(row["resting_blood_pressure"]),
             cholesterol=float(row["cholesterol"]),
             fasting_blood_sugar=int(row["fasting_blood_sugar"]),
@@ -2637,7 +2626,6 @@ def upload_bulk_pdf(uid: str):
             f"Model Version: {model_name}",
             "",
             f"Age: {int(r['age'])}    Sex: {SEX_MAP.get(int(r['sex']), r['sex'])}",
-            f"Country: {str(r.get('country','')) or '-'}",
             f"Chest Pain Type: {str(r['chest_pain_type']).replace('_',' ')}    ST Slope: {str(r['st_slope_type']).replace('_',' ')}",
             f"Resting BP: {float(r['resting_blood_pressure']):.0f} mmHg    Cholesterol: {float(r['cholesterol']):.0f} mg/dL",
             f"FBS ≥120 mg/dL: {YESNO.get(int(r['fasting_blood_sugar']), r['fasting_blood_sugar'])}",

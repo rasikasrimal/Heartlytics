@@ -11,100 +11,144 @@ from services.auth import role_required
 from services.data import INPUT_COLUMNS
 
 from . import simulations_bp
-from .what_if import simulate_variable_sensitivity
-from .age_projection import age_risk_projection
+from .angina_curve import simulate_angina_sensitivity
 
 
-@simulations_bp.route("/")
+@simulations_bp.route("/", methods=["GET", "POST"])
 @login_required
 @role_required(["Doctor", "SuperAdmin"])
 def index():
     """Render simulations page with enabled modules."""
     model = current_app.model
-    features = current_app.config.get("SIMULATION_FEATURES", {})
 
-    # Collect full patient data (defaults provided)
-    baseline = {
-        "age": int(request.args.get("age", 50)),
-        "sex": int(request.args.get("sex", 1)),
-        "chest_pain_type": request.args.get("chest_pain_type", "non-anginal"),
-        "resting_blood_pressure": float(request.args.get("resting_blood_pressure", 120)),
-        "cholesterol": float(request.args.get("cholesterol", 200)),
-        "fasting_blood_sugar": int(request.args.get("fasting_blood_sugar", 0)),
-        "Restecg": request.args.get("Restecg", "normal"),
-        "max_heart_rate_achieved": float(request.args.get("max_heart_rate_achieved", 150)),
-        "exercise_induced_angina": int(request.args.get("exercise_induced_angina", 0)),
-        "st_depression": float(request.args.get("st_depression", 1.0)),
-        "st_slope_type": request.args.get("st_slope_type", "flat"),
-        "num_major_vessels": int(request.args.get("num_major_vessels", 0)),
-        "thalassemia_type": request.args.get("thalassemia_type", "normal"),
+    defaults = {
+        "age": 50,
+        "sex": 1,
+        "chest_pain_type": "non-anginal",
+        "resting_blood_pressure": 120.0,
+        "cholesterol": 200.0,
+        "fasting_blood_sugar": 100.0,
+        "Restecg": "normal",
+        "max_heart_rate_achieved": 150.0,
+        "exercise_induced_angina": 0,
+        "st_depression": 1.0,
+        "st_slope_type": "flat",
+        "num_major_vessels": 0,
+        "thalassemia_type": "normal",
     }
 
     results: dict = {}
     errors: dict = {}
     prediction = None
+    variable = "age"
 
-    # Baseline prediction with confidence
-    try:
-        X = pd.DataFrame([baseline], columns=INPUT_COLUMNS)
-        yhat = int(model.predict(X)[0])
-        pos_prob = (
-            float(model.predict_proba(X)[0][1])
-            if hasattr(model, "predict_proba")
-            else None
-        )
-        confidence = pos_prob if yhat == 1 else (1.0 - pos_prob) if pos_prob is not None else None
-        prediction = {
-            "label": "Heart Disease" if yhat == 1 else "No Heart Disease",
-            "risk_pct": round(pos_prob * 100.0, 1) if pos_prob is not None else None,
-            "confidence_pct": round(confidence * 100.0, 1) if confidence is not None else None,
+    if request.method == "POST":
+        form = request.form
+        baseline = {
+            "age": int(form.get("age", defaults["age"])),
+            "sex": int(form.get("sex", defaults["sex"])),
+            "chest_pain_type": form.get("chest_pain_type", defaults["chest_pain_type"]),
+            "resting_blood_pressure": float(
+                form.get("resting_blood_pressure", defaults["resting_blood_pressure"])
+            ),
+            "cholesterol": float(form.get("cholesterol", defaults["cholesterol"])),
+            "fasting_blood_sugar": float(
+                form.get("fasting_blood_sugar", defaults["fasting_blood_sugar"])
+            ),
+            "Restecg": form.get("Restecg", defaults["Restecg"]),
+            "max_heart_rate_achieved": float(
+                form.get("max_heart_rate_achieved", defaults["max_heart_rate_achieved"])
+            ),
+            "exercise_induced_angina": int(
+                form.get("exercise_induced_angina", defaults["exercise_induced_angina"])
+            ),
+            "st_depression": float(form.get("st_depression", defaults["st_depression"])),
+            "st_slope_type": form.get("st_slope_type", defaults["st_slope_type"]),
+            "num_major_vessels": int(
+                form.get("num_major_vessels", defaults["num_major_vessels"])
+            ),
+            "thalassemia_type": form.get("thalassemia_type", defaults["thalassemia_type"]),
         }
-    except Exception as e:  # pragma: no cover - defensive
-        errors["prediction"] = str(e)
 
-    if features.get("what_if"):
+        variable = form.get("variable", "age")
+
+        # Baseline prediction with confidence
         try:
-            variable = request.args.get("variable", "cholesterol")
-            ranges = {
-                "age": (0, 120),
-                "resting_blood_pressure": (80, 250),
-                "cholesterol": (100, 600),
-                "max_heart_rate_achieved": (60, 220),
-                "st_depression": (0, 10),
+            X = pd.DataFrame([baseline], columns=INPUT_COLUMNS)
+            yhat = int(model.predict(X)[0])
+            pos_prob = (
+                float(model.predict_proba(X)[0][1])
+                if hasattr(model, "predict_proba")
+                else None
+            )
+            confidence = (
+                pos_prob
+                if yhat == 1
+                else (1.0 - pos_prob)
+                if pos_prob is not None
+                else None
+            )
+            prediction = {
+                "label": "Heart Disease" if yhat == 1 else "No Heart Disease",
+                "risk_pct": round(pos_prob * 100.0, 1) if pos_prob is not None else None,
+                "confidence_pct": round(confidence * 100.0, 1)
+                if confidence is not None
+                else None,
             }
-            vmin, vmax = ranges.get(variable, (baseline.get(variable, 0) - 50, baseline.get(variable, 0) + 50))
+        except Exception as e:  # pragma: no cover - defensive
+            errors["prediction"] = str(e)
+
+        ranges = {
+            "age": (0, 120),
+            "resting_blood_pressure": (80, 250),
+            "cholesterol": (100, 600),
+            "fasting_blood_sugar": (60, 200),
+            "max_heart_rate_achieved": (60, 220),
+            "st_depression": (0, 10),
+        }
+
+        try:
+            vmin, vmax = ranges.get(
+                variable, (baseline.get(variable, 0) - 50, baseline.get(variable, 0) + 50)
+            )
             steps = 50
             step = (vmax - vmin) / steps
             values = [vmin + i * step for i in range(steps + 1)]
-            raw = simulate_variable_sensitivity(model, baseline, variable, values)
-            seg = {
-                "low": [r for r in raw if r["risk_pct"] < 30],
-                "mid": [r for r in raw if 30 <= r["risk_pct"] < 60],
-                "high": [r for r in raw if r["risk_pct"] >= 60],
+            curves = simulate_angina_sensitivity(model, baseline, variable, values)
+            labels = {
+                "age": "Age",
+                "cholesterol": "Cholesterol (mg/dL)",
+                "resting_blood_pressure": "Resting Blood Pressure (systolic mmHg)",
+                "fasting_blood_sugar": "Fasting Blood Sugar / Glucose (mg/dL)",
+                "max_heart_rate_achieved": "Max Heart Rate Achieved (bpm)",
             }
-            results["what_if"] = {"variable": variable, "segments": seg}
-        except Exception as e:  # pragma: no cover - defensive
-            errors["what_if"] = str(e)
-
-    if features.get("age_projection"):
-        try:
-            start = int(baseline["age"])
-            end = start + 20
-            raw = age_risk_projection(model, baseline, start, end)
-            seg = {
-                "low": [r for r in raw if r["risk_pct"] < 30],
-                "mid": [r for r in raw if 30 <= r["risk_pct"] < 60],
-                "high": [r for r in raw if r["risk_pct"] >= 60],
+            current = simulate_angina_sensitivity(
+                model, baseline, variable, [baseline[variable]]
+            )
+            current_key = "yes" if baseline["exercise_induced_angina"] else "no"
+            results["exercise_angina"] = {
+                "variable": variable,
+                "label": labels.get(variable, variable),
+                "vmin": vmin,
+                "vmax": vmax,
+                "no": curves["no"],
+                "yes": curves["yes"],
+                "current": {
+                    "value": baseline[variable],
+                    "risk_pct": current[current_key][0]["risk_pct"],
+                    "angina": baseline["exercise_induced_angina"],
+                },
             }
-            results["age_projection"] = seg
         except Exception as e:  # pragma: no cover - defensive
-            errors["age_projection"] = str(e)
+            errors["exercise_angina"] = str(e)
+    else:
+        baseline = defaults.copy()
 
     return render_template(
         "simulations/index.html",
-        features=features,
         baseline=baseline,
         prediction=prediction,
         results=results,
         errors=errors,
+        variable=variable,
     )
