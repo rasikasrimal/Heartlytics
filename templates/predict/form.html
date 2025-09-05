@@ -47,16 +47,6 @@
                 </select>
                 <label for="sex" class="required">Sex</label>
               </div>
-              <!-- country -->
-              <div class="col-12 form-floating">
-                {% set country = defaults.get('country', 'Cleveland') %}
-                <select class="form-select" name="country" id="country" required title="Dataset origin">
-                  {% for v in ['Cleveland','Hungary','Switzerland','Long_Beach'] %}
-                  <option value="{{ v }}" {{ 'selected' if country==v else '' }}>{{ v }}</option>
-                  {% endfor %}
-                </select>
-                <label for="country" class="required">Country</label>
-              </div>
             </div>
             </div>
           </div>
@@ -222,12 +212,12 @@
         </ul>
 
         <h3 class="subheading text-brand">Required CSV Columns</h3>
-        <pre class="code-box small mb-3">age, sex, chest_pain_type, country,
+        <pre class="code-box small mb-3">age, sex, chest_pain_type,
 resting_blood_pressure, cholesterol,
-fasting_blood_sugar, Restecg,
-max_heart_rate_achieved, exercise_induced_angina,
-st_depression, st_slope_type,
-num_major_vessels, thalassemia_type</pre>
+        fasting_blood_sugar, Restecg,
+        max_heart_rate_achieved, exercise_induced_angina,
+        st_depression, st_slope_type,
+        num_major_vessels, thalassemia_type</pre>
 
         <ul class="small mb-0">
           <li><em>You can also use common UCI aliases like <code>cp</code>, <code>trestbps</code>, <code>chol</code>, <code>thalach</code>, <code>exang</code>, <code>oldpeak</code>, <code>slope</code>, <code>ca</code>, <code>thal</code> — they’ll be auto-mapped.</em></li>

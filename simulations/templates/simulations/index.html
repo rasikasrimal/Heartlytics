@@ -5,7 +5,8 @@
 {% endblock %}
 {% block content %}
 <h1 class="mb-4">Simulations</h1>
-<form method="post" class="row g-3 mb-4">
+<form method="post" class="mb-4">
+  <div class="row g-3 mb-3">
   <div class="col-md-3">
     <label class="form-label">Age</label>
     <input type="number" class="form-control" name="age" value="{{ baseline.age }}">
@@ -23,15 +24,6 @@
       {% set cpt = baseline.chest_pain_type %}
       {% for v in ['typical_angina','atypical_angina','non-anginal','asymptomatic'] %}
       <option value="{{ v }}" {% if cpt==v %}selected{% endif %}>{{ v }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">Country</label>
-    <select class="form-select" name="country">
-      {% set country = request.form.get('country','Cleveland') %}
-      {% for v in ['Cleveland','Hungary','Switzerland','Long_Beach'] %}
-      <option value="{{ v }}" {% if country==v %}selected{% endif %}>{{ v }}</option>
       {% endfor %}
     </select>
   </div>
@@ -93,40 +85,46 @@
       {% endfor %}
     </select>
   </div>
-  <div class="col-md-3">
-    <label class="form-label">Variable</label>
-    <select class="form-select" name="variable">
-      <option value="age" {% if variable=='age' %}selected{% endif %}>Age</option>
-      <option value="cholesterol" {% if variable=='cholesterol' %}selected{% endif %}>Cholesterol (mg/dL)</option>
-      <option value="resting_blood_pressure" {% if variable=='resting_blood_pressure' %}selected{% endif %}>Resting Blood Pressure (systolic mmHg)</option>
-      <option value="fasting_blood_sugar" {% if variable=='fasting_blood_sugar' %}selected{% endif %}>Fasting Blood Sugar / Glucose (mg/dL)</option>
-      <option value="max_heart_rate_achieved" {% if variable=='max_heart_rate_achieved' %}selected{% endif %}>Max Heart Rate Achieved (bpm)</option>
-    </select>
   </div>
-  <div class="col-md-2 d-flex align-items-end">
-    <button class="btn btn-brand w-100" type="submit">Run</button>
+
+  {% if prediction %}
+  <div class="mb-4">
+    <h2>Prediction Result</h2>
+    <p><strong>{{ prediction.label }}</strong></p>
+    {% if prediction.risk_pct is not none %}
+    <div class="progress mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ prediction.risk_pct }}">
+      <div class="progress-bar bg-info" style="width: {{ prediction.risk_pct }}%">{{ prediction.risk_pct }}%</div>
+    </div>
+    {% endif %}
+    {% if prediction.confidence_pct is not none %}
+    <p class="mb-0">Model confidence: {{ prediction.confidence_pct }}%</p>
+    {% endif %}
   </div>
+  {% endif %}
+
+  <div class="row g-3 align-items-end mb-4">
+    <div class="col-md-3">
+      <label class="form-label">Variable</label>
+      <select class="form-select" name="variable">
+        <option value="age" {% if variable=='age' %}selected{% endif %}>Age</option>
+        <option value="cholesterol" {% if variable=='cholesterol' %}selected{% endif %}>Cholesterol (mg/dL)</option>
+        <option value="resting_blood_pressure" {% if variable=='resting_blood_pressure' %}selected{% endif %}>Resting Blood Pressure (systolic mmHg)</option>
+        <option value="fasting_blood_sugar" {% if variable=='fasting_blood_sugar' %}selected{% endif %}>Fasting Blood Sugar / Glucose (mg/dL)</option>
+        <option value="max_heart_rate_achieved" {% if variable=='max_heart_rate_achieved' %}selected{% endif %}>Max Heart Rate Achieved (bpm)</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-brand w-100" type="submit">Run</button>
+    </div>
+  </div>
+
+  {% if results.exercise_angina %}
+  <div class="mb-5">
+    <h2>Heart disease risk change with {{ results.exercise_angina.label }}</h2>
+    <div id="exercise-angina-chart" style="height:350px;"></div>
+  </div>
+  {% endif %}
 </form>
-{% if prediction %}
-<div class="mb-4">
-  <h2>Prediction Result</h2>
-  <p><strong>{{ prediction.label }}</strong></p>
-  {% if prediction.risk_pct is not none %}
-  <div class="progress mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ prediction.risk_pct }}">
-    <div class="progress-bar bg-info" style="width: {{ prediction.risk_pct }}%">{{ prediction.risk_pct }}%</div>
-  </div>
-  {% endif %}
-  {% if prediction.confidence_pct is not none %}
-  <p class="mb-0">Model confidence: {{ prediction.confidence_pct }}%</p>
-  {% endif %}
-</div>
-{% endif %}
-{% if results.exercise_angina %}
-<div class="mb-5">
-  <h2>Heart disease risk change with {{ results.exercise_angina.label }}</h2>
-  <div id="exercise-angina-chart" style="height:350px;"></div>
-</div>
-{% endif %}
 {% endblock %}
 {% block scripts %}
   {{ super() }}

@@ -27,7 +27,6 @@ def generate_prediction_pdf(pred, sex_map: Dict[int, str], yesno: Dict[int, str]
         "",
         f"Patient ID: {pred.id}",
         f"Age: {pred.age}    Sex: {sex_map.get(pred.sex, pred.sex)}",
-        f"Country: {pred.country or '-'}",
         f"Chest Pain Type: {pred.chest_pain_type}    ST Slope: {pred.st_slope}",
         f"Resting BP: {pred.resting_bp} mmHg    Cholesterol: {pred.cholesterol} mg/dL",
         f"FBS ≥120 mg/dL: {yesno.get(pred.fasting_blood_sugar, pred.fasting_blood_sugar)}    Max HR: {pred.max_heart_rate} bpm",
