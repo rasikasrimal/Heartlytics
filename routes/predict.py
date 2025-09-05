@@ -38,6 +38,7 @@ def predict_page():
         confidence_pct=None,
         confidence_pct_val=None,
         projection=None,
+        fbs_mgdl=None,
     )
 
 
@@ -88,7 +89,9 @@ def predict():
             flash(f"{f}: {msg}", "error")
         return redirect(url_for("index"))
 
+    fbs_val = float(cleaned["fasting_blood_sugar"])
     row = {col: cleaned[col] for col in INPUT_COLUMNS}
+    row["fasting_blood_sugar"] = int(fbs_val >= 120)
     X = pd.DataFrame([row], columns=INPUT_COLUMNS)
 
     try:
@@ -107,7 +110,7 @@ def predict():
         chest_pain_type=str(cleaned["chest_pain_type"]),
         resting_bp=float(cleaned["resting_blood_pressure"]),
         cholesterol=float(cleaned["cholesterol"]),
-        fasting_blood_sugar=int(cleaned["fasting_blood_sugar"]),
+        fasting_blood_sugar=int(fbs_val >= 120),
         resting_ecg=str(cleaned["Restecg"]),
         max_heart_rate=float(cleaned["max_heart_rate_achieved"]),
         exercise_angina=int(cleaned["exercise_induced_angina"]),
@@ -146,4 +149,5 @@ def predict():
         risk_pct=risk_pct,
         risk_pct_val=risk_pct_val,
         projection=projection,
+        fbs_mgdl=fbs_val,
     )

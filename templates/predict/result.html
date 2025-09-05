@@ -60,7 +60,7 @@
         <ul class="list-unstyled mb-0">
           <li class="mb-2"><span class="me-2">🩸</span>BP: {{ '%.0f'|format(pred.resting_bp) }} {{ UNITS['resting_bp'] }}</li>
           <li class="mb-2"><span class="me-2">🧬</span>Cholesterol: {{ '%.0f'|format(pred.cholesterol) }} {{ UNITS['cholesterol'] }}</li>
-          <li class="mb-2"><span class="me-2">🍬</span>FBS ≥ 120: {{ YESNO.get(pred.fasting_blood_sugar, pred.fasting_blood_sugar) }}</li>
+          <li class="mb-2"><span class="me-2">🍬</span>Fasting Blood Sugar: {{ '%.0f'|format(fbs_mgdl) }} mg/dL ({{ '≥120' if fbs_mgdl >= 120 else '<120' }})</li>
           <li><span class="me-2">💓</span>Max HR: {{ '%.0f'|format(pred.max_heart_rate) }} {{ UNITS['max_heart_rate'] }}</li>
         </ul>
         {% else %}
