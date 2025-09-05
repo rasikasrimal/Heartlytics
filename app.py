@@ -813,19 +813,19 @@ def api_delete_outliers():
 def index():
     defaults = {
         "patient_name": "Demo Patient",
-        "age": 63,
+        "age": 50,
         "sex": 1,
-        "chest_pain_type": "typical_angina",
-        "resting_blood_pressure": 145.0,
-        "cholesterol": 233.0,
-        "fasting_blood_sugar": 1,
-        "Restecg": "left_ventricular_hypertrophy",
+        "chest_pain_type": "non-anginal",
+        "resting_blood_pressure": 120.0,
+        "cholesterol": 200.0,
+        "fasting_blood_sugar": 100,
+        "Restecg": "normal",
         "max_heart_rate_achieved": 150.0,
         "exercise_induced_angina": 0,
-        "st_depression": 2.3,
-        "st_slope_type": "downsloping",
+        "st_depression": 1.0,
+        "st_slope_type": "flat",
         "num_major_vessels": 0,
-        "thalassemia_type": "fixed_defect",
+        "thalassemia_type": "normal",
     }
     return render_template("predict/form.html", defaults=defaults, model_name=model_name, theme="dark")
 

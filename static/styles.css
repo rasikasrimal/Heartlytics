@@ -198,6 +198,19 @@ footer {
   box-shadow: 0 0 0 .25rem rgba(22,163,74,.4);
 }
 
+.form-range::-webkit-slider-thumb {
+  background-color: var(--brand);
+}
+.form-range::-moz-range-thumb {
+  background-color: var(--brand);
+}
+.form-range:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 .25rem rgba(220,38,38,.4);
+}
+.form-range:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 .25rem rgba(220,38,38,.4);
+}
+
 .avatar {
   width: 32px;
   height: 32px;
