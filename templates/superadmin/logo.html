@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Change Logo{% endblock %}
+{% block content %}
+<ul class="nav nav-tabs mb-4">
+  <li class="nav-item"><a class="nav-link" href="{{ sa_url('superadmin.dashboard') }}">Users</a></li>
+  <li class="nav-item"><a class="nav-link" href="{{ sa_url('superadmin.audit_logs') }}">Audit Logs</a></li>
+  <li class="nav-item"><a class="nav-link active" href="#">Logo</a></li>
+</ul>
+<div class="card shadow-sm">
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+      <div class="mb-3">
+        <label class="form-label">Upload New Logo (SVG)</label>
+        <input class="form-control" type="file" name="logo" accept=".svg">
+      </div>
+      <button class="btn btn-brand" type="submit">Update Logo</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

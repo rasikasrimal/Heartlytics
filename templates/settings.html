@@ -2,50 +2,96 @@
 {% block title %}Settings{% endblock %}
 {% block content %}
 <h1 class="mb-4">Settings</h1>
-<div class="row">
-  <div class="col-md-6">
-    <form method="post" enctype="multipart/form-data" class="mb-4">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-      <div class="mb-3">
-        <label class="form-label">Username</label>
-        <input class="form-control" name="username" value="{{ current_user.username }}">
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header">Profile</div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input class="form-control" name="username" value="{{ current_user.username }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input class="form-control" type="email" name="email" value="{{ current_user.email }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Nickname</label>
+            <input class="form-control" name="nickname" value="{{ current_user.nickname }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Bio</label>
+            <textarea class="form-control" name="bio" rows="3">{{ current_user.bio or '' }}</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Profile Picture</label>
+            <input class="form-control" type="file" name="avatar" accept="image/*">
+          </div>
+          <button class="btn btn-brand" type="submit">Save Profile</button>
+        </form>
       </div>
-      <div class="mb-3">
-        <label class="form-label">Email</label>
-        <input class="form-control" type="email" name="email" value="{{ current_user.email }}">
+    </div>
+    <div class="card shadow-sm">
+      <div class="card-header">Change Password</div>
+      <div class="card-body">
+        <form method="post" autocomplete="off">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+            <label class="form-label" for="current_password">Current Password</label>
+            <input class="form-control" type="password" name="current_password" id="current_password" autocomplete="off">
+            <div class="valid-feedback">Password correct</div>
+            <div class="invalid-feedback">Incorrect password</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">New Password</label>
+            <input class="form-control" type="password" name="new_password" autocomplete="new-password">
+          </div>
+          <button class="btn btn-brand" type="submit">Change Password</button>
+        </form>
       </div>
-      <div class="mb-3">
-        <label class="form-label">Nickname</label>
-        <input class="form-control" name="nickname" value="{{ current_user.nickname }}">
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Avatar</label>
-        <input class="form-control" type="file" name="avatar">
-      </div>
-      <button class="btn btn-brand" type="submit">Save Profile</button>
-    </form>
-    <form method="post">
-      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-      <div class="mb-3">
-        <label class="form-label">Current Password</label>
-        <input class="form-control" type="password" name="current_password">
-      </div>
-      <div class="mb-3">
-        <label class="form-label">New Password</label>
-        <input class="form-control" type="password" name="new_password">
-      </div>
-      <button class="btn btn-brand" type="submit">Change Password</button>
-    </form>
+    </div>
   </div>
-  <div class="col-md-6">
-    <h5>Activity Log</h5>
-    <ul class="list-group">
-    {% for log in logs %}
-      <li class="list-group-item small">{{ log.timestamp }} - {{ log.action }}</li>
-    {% else %}
-      <li class="list-group-item small">No activity</li>
-    {% endfor %}
-    </ul>
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header">Recent Activity</div>
+      <ul class="list-group list-group-flush">
+        {% for log in logs %}
+        <li class="list-group-item small">{{ log.timestamp }} - {{ log.action }}</li>
+        {% else %}
+        <li class="list-group-item small">No activity</li>
+        {% endfor %}
+      </ul>
+    </div>
   </div>
 </div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script>
+const pwInput = document.getElementById('current_password');
+if (pwInput) {
+  pwInput.addEventListener('input', async () => {
+    const pw = pwInput.value;
+    if (!pw) { pwInput.classList.remove('is-valid','is-invalid'); return; }
+    const resp = await fetch('{{ url_for("settings.verify_password") }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      },
+      body: JSON.stringify({password: pw})
+    });
+    const data = await resp.json();
+    if (data.valid) {
+      pwInput.classList.add('is-valid');
+      pwInput.classList.remove('is-invalid');
+    } else {
+      pwInput.classList.add('is-invalid');
+      pwInput.classList.remove('is-valid');
+    }
+  });
+}
+</script>
 {% endblock %}

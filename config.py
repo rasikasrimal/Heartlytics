@@ -23,6 +23,8 @@ class Config:
     AVATAR_UPLOAD_FOLDER = os.environ.get(
         "AVATAR_UPLOAD_FOLDER", str(BASE_DIR / "static" / "avatars")
     )
+    # Cache-busting version for logo; updated when SuperAdmin changes the logo
+    LOGO_VERSION = os.environ.get("LOGO_VERSION", "1")
 
 class DevelopmentConfig(Config):
     DEBUG = True

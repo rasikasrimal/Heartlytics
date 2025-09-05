@@ -1,9 +1,18 @@
 from __future__ import annotations
 
 import os
-from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash
+from flask import (
+    Blueprint,
+    current_app,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    flash,
+    jsonify,
+)
 from flask_login import login_required, current_user
-from services.security import csrf_protect
+from services.security import csrf_protect, csrf_protect_api
 
 settings_bp = Blueprint("settings", __name__, url_prefix="/settings")
 
@@ -29,6 +38,7 @@ def settings():
             current_user.username = request.form.get("username", current_user.username)
             current_user.email = request.form.get("email", current_user.email)
             nickname = request.form.get("nickname", "").strip() or None
+            current_user.bio = request.form.get("bio", current_user.bio)
             if nickname and db.session.query(User).filter(User.nickname == nickname, User.id != current_user.id).first():
                 flash("Nickname already taken", "error")
             else:
@@ -52,3 +62,13 @@ def settings():
         .all()
     )
     return render_template("settings.html", logs=logs)
+
+
+@settings_bp.post("/verify_password")
+@login_required
+@csrf_protect_api
+def verify_password():
+    """AJAX endpoint to validate the user's current password."""
+    data = request.get_json(silent=True) or {}
+    valid = current_user.check_password(data.get("password", ""))
+    return jsonify({"valid": valid})

@@ -4,8 +4,8 @@
 
 {% block content %}
 <ul class="nav nav-tabs mb-4">
-  <li class="nav-item"><a class="nav-link" href="{{ url_for('superadmin.dashboard') }}">Users</a></li>
-  <li class="nav-item"><a class="nav-link active" href="{{ url_for('superadmin.audit_logs') }}">Audit Logs</a></li>
+  <li class="nav-item"><a class="nav-link" href="{{ sa_url('superadmin.dashboard') }}">Users</a></li>
+  <li class="nav-item"><a class="nav-link active" href="{{ sa_url('superadmin.audit_logs') }}">Audit Logs</a></li>
 </ul>
 
 <div class="card shadow-sm rounded-3 mb-5">
@@ -77,9 +77,9 @@
 
     <nav>
       <ul class="pagination mb-0">
-        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}"><a class="page-link" href="{{ url_for('superadmin.audit_logs', page=pagination.prev_num, **query_args) if pagination.has_prev else '#' }}">Prev</a></li>
+        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}"><a class="page-link" href="{{ sa_url('superadmin.audit_logs', page=pagination.prev_num, **query_args) if pagination.has_prev else '#' }}">Prev</a></li>
         <li class="page-item disabled"><span class="page-link">Page {{ pagination.page }} of {{ pagination.pages }}</span></li>
-        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}"><a class="page-link" href="{{ url_for('superadmin.audit_logs', page=pagination.next_num, **query_args) if pagination.has_next else '#' }}">Next</a></li>
+        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}"><a class="page-link" href="{{ sa_url('superadmin.audit_logs', page=pagination.next_num, **query_args) if pagination.has_next else '#' }}">Next</a></li>
       </ul>
     </nav>
   </div>

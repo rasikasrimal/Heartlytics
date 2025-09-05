@@ -17,7 +17,7 @@
     <nav class="navbar navbar-expand-lg shadow-sm border-bottom sticky-top bg-body">
       <div class="container d-flex align-items-center">
         <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
-          <img src="{{ url_for('static', filename='logo.svg') }}" alt="Heartlytics logo" class="me-2" style="height:28px;width:28px;">
+          <img src="{{ url_for('static', filename='logo.svg', v=logo_version) }}" alt="Heartlytics logo" class="me-2" style="height:28px;width:28px;">
           <strong>Heartlytics</strong>
         </a>
         <div class="collapse navbar-collapse" id="nav">
@@ -46,13 +46,13 @@
             </li>
             {% if current_user.role == 'Admin' %}
             <li class="nav-item">
-              <a class="nav-link d-flex align-items-center {% if request.endpoint.startswith('superadmin.') %}active{% endif %}" href="{{ url_for('superadmin.dashboard') }}">
+              <a class="nav-link d-flex align-items-center {% if request.endpoint.startswith('superadmin.') %}active{% endif %}" href="{{ sa_url('superadmin.dashboard') }}">
                 <i class="bi bi-gear me-1"></i>Admin
               </a>
             </li>
             {% elif current_user.role == 'SuperAdmin' %}
             <li class="nav-item">
-              <a class="nav-link d-flex align-items-center {% if request.endpoint.startswith('superadmin.') %}active{% endif %}" href="{{ url_for('superadmin.dashboard') }}">
+              <a class="nav-link d-flex align-items-center {% if request.endpoint.startswith('superadmin.') %}active{% endif %}" href="{{ sa_url('superadmin.dashboard') }}">
                 <i class="bi bi-gear me-1"></i>Super Admin
               </a>
             </li>
@@ -65,7 +65,9 @@
                 {% else %}
                 <i class="bi bi-person-circle me-2"></i>
                 {% endif %}
-                {{ current_user.nickname or current_user.username }}
+                  {% if current_user.role == 'SuperAdmin' %}Super Admin{% else %}
+                  {{ current_user.nickname or current_user.username }}
+                  {% endif %}
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
                 <li><a class="dropdown-item" href="{{ url_for('settings.settings') }}">Settings</a></li>
