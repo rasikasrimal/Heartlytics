@@ -13,6 +13,7 @@ from services.data import INPUT_COLUMNS
 from . import simulations_bp
 from .what_if import simulate_variable_sensitivity
 from .age_projection import age_risk_projection
+from .angina_curve import simulate_angina_sensitivity
 
 
 @simulations_bp.route("/")
@@ -30,7 +31,7 @@ def index():
         "chest_pain_type": request.args.get("chest_pain_type", "non-anginal"),
         "resting_blood_pressure": float(request.args.get("resting_blood_pressure", 120)),
         "cholesterol": float(request.args.get("cholesterol", 200)),
-        "fasting_blood_sugar": int(request.args.get("fasting_blood_sugar", 0)),
+        "fasting_blood_sugar": float(request.args.get("fasting_blood_sugar", 100)),
         "Restecg": request.args.get("Restecg", "normal"),
         "max_heart_rate_achieved": float(request.args.get("max_heart_rate_achieved", 150)),
         "exercise_induced_angina": int(request.args.get("exercise_induced_angina", 0)),
@@ -62,17 +63,21 @@ def index():
     except Exception as e:  # pragma: no cover - defensive
         errors["prediction"] = str(e)
 
+    variable = request.args.get("variable", "age")
+    ranges = {
+        "age": (0, 120),
+        "resting_blood_pressure": (80, 250),
+        "cholesterol": (100, 600),
+        "fasting_blood_sugar": (60, 200),
+        "max_heart_rate_achieved": (60, 220),
+        "st_depression": (0, 10),
+    }
+
     if features.get("what_if"):
         try:
-            variable = request.args.get("variable", "cholesterol")
-            ranges = {
-                "age": (0, 120),
-                "resting_blood_pressure": (80, 250),
-                "cholesterol": (100, 600),
-                "max_heart_rate_achieved": (60, 220),
-                "st_depression": (0, 10),
-            }
-            vmin, vmax = ranges.get(variable, (baseline.get(variable, 0) - 50, baseline.get(variable, 0) + 50))
+            vmin, vmax = ranges.get(
+                variable, (baseline.get(variable, 0) - 50, baseline.get(variable, 0) + 50)
+            )
             steps = 50
             step = (vmax - vmin) / steps
             values = [vmin + i * step for i in range(steps + 1)]
@@ -99,6 +104,30 @@ def index():
             results["age_projection"] = seg
         except Exception as e:  # pragma: no cover - defensive
             errors["age_projection"] = str(e)
+
+    try:
+        vmin, vmax = ranges.get(
+            variable, (baseline.get(variable, 0) - 50, baseline.get(variable, 0) + 50)
+        )
+        steps = 50
+        step = (vmax - vmin) / steps
+        values = [vmin + i * step for i in range(steps + 1)]
+        curves = simulate_angina_sensitivity(model, baseline, variable, values)
+        labels = {
+            "age": "Age",
+            "cholesterol": "Cholesterol (mg/dL)",
+            "resting_blood_pressure": "Resting Blood Pressure (systolic mmHg)",
+            "fasting_blood_sugar": "Fasting Blood Sugar / Glucose (mg/dL)",
+            "max_heart_rate_achieved": "Max Heart Rate Achieved (bpm)",
+        }
+        results["exercise_angina"] = {
+            "variable": variable,
+            "label": labels.get(variable, variable),
+            "no": curves["no"],
+            "yes": curves["yes"],
+        }
+    except Exception as e:  # pragma: no cover - defensive
+        errors["exercise_angina"] = str(e)
 
     return render_template(
         "simulations/index.html",

@@ -44,12 +44,8 @@
     <input type="number" class="form-control" name="cholesterol" value="{{ request.args.get('cholesterol',200) }}">
   </div>
   <div class="col-md-3">
-    <label class="form-label">Fasting Blood Sugar</label>
-    <select class="form-select" name="fasting_blood_sugar">
-      {% set fbs = request.args.get('fasting_blood_sugar','0') %}
-      <option value="0" {% if fbs=='0' %}selected{% endif %}>0</option>
-      <option value="1" {% if fbs=='1' %}selected{% endif %}>1</option>
-    </select>
+    <label class="form-label">Fasting Blood Sugar / Glucose (mg/dL)</label>
+    <input type="number" class="form-control" name="fasting_blood_sugar" value="{{ request.args.get('fasting_blood_sugar',100) }}">
   </div>
   <div class="col-md-3">
     <label class="form-label">Resting ECG</label>
@@ -101,12 +97,12 @@
   <div class="col-md-3">
     <label class="form-label">Variable</label>
     <select class="form-select" name="variable">
-      {% set variable = request.args.get('variable','cholesterol') %}
-      <option value="cholesterol" {% if variable=='cholesterol' %}selected{% endif %}>Cholesterol</option>
-      <option value="resting_blood_pressure" {% if variable=='resting_blood_pressure' %}selected{% endif %}>Blood Pressure</option>
+      {% set variable = request.args.get('variable','age') %}
       <option value="age" {% if variable=='age' %}selected{% endif %}>Age</option>
-      <option value="max_heart_rate_achieved" {% if variable=='max_heart_rate_achieved' %}selected{% endif %}>Max Heart Rate</option>
-      <option value="st_depression" {% if variable=='st_depression' %}selected{% endif %}>ST Depression</option>
+      <option value="cholesterol" {% if variable=='cholesterol' %}selected{% endif %}>Cholesterol (mg/dL)</option>
+      <option value="resting_blood_pressure" {% if variable=='resting_blood_pressure' %}selected{% endif %}>Resting Blood Pressure (systolic mmHg)</option>
+      <option value="fasting_blood_sugar" {% if variable=='fasting_blood_sugar' %}selected{% endif %}>Fasting Blood Sugar / Glucose (mg/dL)</option>
+      <option value="max_heart_rate_achieved" {% if variable=='max_heart_rate_achieved' %}selected{% endif %}>Max Heart Rate Achieved (bpm)</option>
     </select>
   </div>
   <div class="col-md-2 d-flex align-items-end">
@@ -125,6 +121,12 @@
   {% if prediction.confidence_pct is not none %}
   <p class="mb-0">Model confidence: {{ prediction.confidence_pct }}%</p>
   {% endif %}
+</div>
+{% endif %}
+{% if results.exercise_angina %}
+<div class="mb-5">
+  <h2>Exercise Angina Impact</h2>
+  <div id="exercise-angina-chart" style="height:350px;"></div>
 </div>
 {% endif %}
 {% if results.what_if %}
@@ -151,6 +153,16 @@
     if(seg.mid.length){ traces.push({x:seg.mid.map(r=>r.value), y:seg.mid.map(r=>r.risk_pct), mode:'lines', line:{color:'yellow'}}); }
     if(seg.high.length){ traces.push({x:seg.high.map(r=>r.value), y:seg.high.map(r=>r.risk_pct), mode:'lines', line:{color:'red'}}); }
     Plotly.newPlot('what-if-chart', traces, {xaxis:{title:'{{ results.what_if.variable }}'}, yaxis:{title:'Risk (%)', rangemode:'tozero'}, margin:{t:30}});
+  });
+  </script>
+  {% endif %}
+  {% if results.exercise_angina %}
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var res = {{ results.exercise_angina|tojson }};
+    var no = {x: res.no.map(r=>r.value), y: res.no.map(r=>r.risk_pct), mode:'lines', name:'No Angina', line:{color:'green'}};
+    var yes = {x: res.yes.map(r=>r.value), y: res.yes.map(r=>r.risk_pct), mode:'lines', name:'Yes Angina', line:{color:'red'}};
+    Plotly.newPlot('exercise-angina-chart', [no, yes], {xaxis:{title: res.label}, yaxis:{title:'Risk (%)', rangemode:'tozero'}, margin:{t:30}});
   });
   </script>
   {% endif %}
