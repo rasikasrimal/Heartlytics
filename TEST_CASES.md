@@ -90,3 +90,8 @@
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
 | --- | --- | --- | --- | --- | --- |
 | TC-051 | Batch prediction handles missing `num_major_vessels` values without error. | Batch Upload & EDA | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+
+## UI & Layout
+| Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
+| --- | --- | --- | --- | --- | --- |
+| TC-052 | Login page shows branding, helpful links, and responsive design. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
