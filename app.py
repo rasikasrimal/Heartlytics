@@ -2289,10 +2289,12 @@ def upload_predict(uid: str):
     for _, row in df.iterrows():
         prob1 = None if pd.isna(row["positive_probability"]) else float(row["positive_probability"])
         conf = prob1 if int(row["prediction"]) == 1 else (1.0 - prob1) if prob1 is not None else 0.5
-        nmv = row.get("num_major_vessels")
-        nmv = int(nmv) if pd.notna(nmv) else None
-        fbs = row.get("fasting_blood_sugar")
-        fbs = int(fbs) if pd.notna(fbs) else None
+        def _int_or_none(value):
+            return int(value) if pd.notna(value) else None
+
+        nmv = _int_or_none(row.get("num_major_vessels"))
+        fbs = _int_or_none(row.get("fasting_blood_sugar"))
+        exang = _int_or_none(row.get("exercise_induced_angina"))
         pred = Prediction(
             patient_name=None,
             age=int(row["age"]),
@@ -2303,7 +2305,7 @@ def upload_predict(uid: str):
             fasting_blood_sugar=fbs,
             resting_ecg=str(row["Restecg"]),
             max_heart_rate=float(row["max_heart_rate_achieved"]),
-            exercise_angina=int(row["exercise_induced_angina"]),
+            exercise_angina=exang,
             oldpeak=float(row["st_depression"]),
             st_slope=str(row["st_slope_type"]),
             num_major_vessels=nmv,
