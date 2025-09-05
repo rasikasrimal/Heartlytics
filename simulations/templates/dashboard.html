@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Simulations{% endblock %}
+
+{% block head %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Simulations</h1>
+<div id="what-if-section" class="mb-5">
+  <h2 class="h5">What-If Scenarios</h2>
+  <canvas id="whatIfChart"></canvas>
+</div>
+<div id="age-projection-section" class="mb-5">
+  <h2 class="h5">Future Risk Projection</h2>
+  <canvas id="ageProjectionChart"></canvas>
+</div>
+<div id="lifestyle-impact-section" class="mb-5">
+  <h2 class="h5">Lifestyle Impact Simulator</h2>
+  <canvas id="lifestyleImpactChart"></canvas>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='simulations/main.js') }}"></script>
+{% endblock %}

@@ -44,6 +44,13 @@
                 <i class="bi bi-journal-text me-1"></i>Research
               </a>
             </li>
+              {% if current_user.role in ['Doctor','SuperAdmin'] %}
+              <li class="nav-item">
+                <a class="nav-link d-flex align-items-center {% if request.endpoint.startswith('simulations.') %}active{% endif %}" href="{{ url_for('simulations.dashboard') }}">
+                  <i class="bi bi-graph-up me-1"></i>Simulations
+                </a>
+              </li>
+              {% endif %}
             {% if current_user.role == 'Admin' %}
             <li class="nav-item">
               <a class="nav-link d-flex align-items-center {% if request.endpoint.startswith('superadmin.') %}active{% endif %}" href="{{ sa_url('superadmin.dashboard') }}">

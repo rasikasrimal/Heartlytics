@@ -763,6 +763,7 @@ from superadmin import superadmin_bp
 from doctor import doctor_bp
 from user import user_bp
 from routes.settings import settings_bp
+from simulations import simulations_bp, register_simulations
 
 app.register_blueprint(predict_bp)
 app.register_blueprint(auth_bp)
@@ -770,6 +771,8 @@ app.register_blueprint(superadmin_bp)
 app.register_blueprint(doctor_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(settings_bp)
+register_simulations(app)
+app.register_blueprint(simulations_bp)
 
 
 @app.route("/admin/")

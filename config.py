@@ -25,6 +25,9 @@ class Config:
     )
     # Cache-busting version for logo; updated when SuperAdmin changes the logo
     LOGO_VERSION = os.environ.get("LOGO_VERSION", "1")
+    ENABLE_WHAT_IF = True
+    ENABLE_AGE_PROJECTION = True
+    ENABLE_LIFESTYLE_IMPACT = True
 
 class DevelopmentConfig(Config):
     DEBUG = True
