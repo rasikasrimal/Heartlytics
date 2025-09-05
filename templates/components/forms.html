@@ -1,19 +1,19 @@
-{% macro input(name, label, type='text', value='', attrs=None, error=None) %}
+{% macro input(name, label, type='text', value=None, attrs=None, error=None) %}
 {% set attrs = attrs or {} %}
 <div class="mb-3">
   <label class="form-label" for="{{ attrs.get('id', name) }}">{{ label }}</label>
-  <input class="form-control{% if error %} is-invalid{% endif %}" type="{{ type }}" name="{{ name }}" value="{{ value }}" {{ attrs|xmlattr }}>
+  <input class="form-control{% if error %} is-invalid{% endif %}" type="{{ type }}" name="{{ name }}"{% if value is not none and value != '' %} value="{{ value }}"{% endif %} {{ attrs|xmlattr }}>
   {% if error %}
   <div class="invalid-feedback">{{ error }}</div>
   {% endif %}
 </div>
 {% endmacro %}
 
-{% macro text_input(name, label, value='', attrs=None, error=None) %}
+{% macro text_input(name, label, value=None, attrs=None, error=None) %}
   {{ input(name, label, type='text', value=value, attrs=attrs, error=error) }}
 {% endmacro %}
 
-{% macro email_input(name, label, value='', attrs=None, error=None) %}
+{% macro email_input(name, label, value=None, attrs=None, error=None) %}
   {{ input(name, label, type='email', value=value, attrs=attrs, error=error) }}
 {% endmacro %}
 
