@@ -76,7 +76,7 @@ The project follows Design Science Research Methodology (DSRM)【Peffers2007】.
 HeartLytics uses a Python 3/Flask runtime with Jinja2 templates, SQLAlchemy ORM and a scikit‑learn Random Forest model (`ml/model.pkl`). SQLite is the default database, configurable via environment variables【ac6f4a†L15-L34】. Envelope encryption employs AES‑256‑GCM with per‑record data keys wrapped by a keyring service【5337ea†L3-L21】.
 
 ### Context Diagram
-![Context Diagram](docs/figures/context.png)
+
 ```mermaid
 flowchart LR
     User -->|HTTP(S)| FlaskApp
@@ -88,7 +88,7 @@ flowchart LR
 ```
 
 ### High-Level Architecture
-![High-Level Architecture](docs/figures/architecture.png)
+
 ```mermaid
 flowchart TB
     subgraph Client
@@ -109,7 +109,7 @@ RBAC governs access: SuperAdmin has full rights, Admin lacks Predict/Batch/Dashb
 
 ## Data Flow Diagrams
 ### Level-0 DFD
-![Level-0 DFD](docs/figures/dfd0.png)
+
 ```mermaid
 flowchart LR
     A[User] -->|Enter data/CSV| B[HeartLytics]
@@ -119,7 +119,7 @@ flowchart LR
 ```
 
 ### Level-1 DFD – Batch Upload
-![Level-1 DFD – Batch](docs/figures/dfd1-batch.png)
+
 ```mermaid
 flowchart LR
     U[Doctor/User]-->U1[Upload CSV]
@@ -133,7 +133,7 @@ flowchart LR
 ```
 
 ### Level-1 DFD – Predict
-![Level-1 DFD – Predict](docs/figures/dfd1-predict.png)
+
 ```mermaid
 flowchart LR
     U[User]-->F1[Prediction Form]
@@ -145,7 +145,7 @@ flowchart LR
 ```
 
 ## Data Model and Database Design
-![Entity Relationship Diagram](docs/figures/erd.png)
+
 ```mermaid
 erDiagram
     USER ||--o{ PATIENT : entered_by_user_id
@@ -175,7 +175,7 @@ The default theme is light; a `theme` cookie and `localStorage` entry persist us
 
 ## Key Execution Flows
 ### Login with Theme Persistence
-![Sequence – Login](docs/figures/seq-login.png)
+
 ```mermaid
 sequenceDiagram
     participant B as Browser
@@ -189,7 +189,7 @@ sequenceDiagram
 ```
 
 ### Data Upload to EDA
-![Sequence – Upload](docs/figures/seq-upload.png)
+
 ```mermaid
 sequenceDiagram
     participant U as User
@@ -202,7 +202,7 @@ sequenceDiagram
 ```
 
 ### Prediction Inference
-![Sequence – Predict](docs/figures/seq-predict.png)
+
 ```mermaid
 sequenceDiagram
     participant U as User
