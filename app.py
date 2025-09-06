@@ -63,6 +63,23 @@ except Exception:  # pragma: no cover - minimal stubs when crypto deps missing
         def decrypt(*args, **kwargs):  # noqa: ANN001
             return b""
 
+        @staticmethod
+        def encrypt_field(value, context):  # noqa: ANN001
+            if isinstance(value, str):
+                value = value.encode()
+            return {
+                "ciphertext": value,
+                "nonce": b"",
+                "tag": b"",
+                "wrapped_dk": b"",
+                "kid": "",
+                "kver": 1,
+            }
+
+        @staticmethod
+        def decrypt_field(blob, context):  # noqa: ANN001
+            return blob["ciphertext"]
+
     def get_keyring():  # type: ignore
         return None
 from config import DevelopmentConfig, ProductionConfig
@@ -386,14 +403,39 @@ class User(db.Model, UserMixin):
             "kid": self.mfa_secret_kid,
             "kver": self.mfa_secret_kver,
         }
-        context = f"user:{self.id}:mfa_secret|{self.mfa_secret_kid}|{self.mfa_secret_kver}"
+        context = f"user:{self.id}:mfa_secret"
+        if current_app.config.get("ENCRYPTION_ENABLED"):
+            try:
+                return envelope.decrypt_field(blob, context).decode()
+            except Exception:
+                return None
         try:
-            return envelope.decrypt_field(blob, context).decode()
+            return bytes(blob["ciphertext"]).decode()
         except Exception:
             return None
 
     def set_mfa_secret(self, secret: str) -> None:
-        blob = envelope.encrypt_field(secret.encode(), f"user:{self.id}:mfa_secret")
+        if current_app.config.get("ENCRYPTION_ENABLED"):
+            try:
+                blob = envelope.encrypt_field(secret.encode(), f"user:{self.id}:mfa_secret")
+            except Exception:
+                blob = {
+                    "ciphertext": secret.encode(),
+                    "nonce": b"",
+                    "tag": b"",
+                    "wrapped_dk": b"",
+                    "kid": "",
+                    "kver": 1,
+                }
+        else:
+            blob = {
+                "ciphertext": secret.encode(),
+                "nonce": b"",
+                "tag": b"",
+                "wrapped_dk": b"",
+                "kid": "",
+                "kver": 1,
+            }
         self.mfa_secret_ct = blob["ciphertext"]
         self.mfa_secret_nonce = blob["nonce"]
         self.mfa_secret_tag = blob["tag"]

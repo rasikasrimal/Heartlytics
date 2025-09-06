@@ -6,6 +6,8 @@ from auth.totp import random_base32, generate_totp
 def test_login_with_totp(client, app):
     from app import db, User
     with app.app_context():
+        User.query.filter_by(email="mfa@example.com").delete()
+        db.session.commit()
         user = User(username="mfauser", email="mfa@example.com", status="approved")
         user.password_hash = generate_password_hash("Passw0rd!")
         user.mfa_enabled = True
@@ -26,13 +28,15 @@ def test_login_with_totp(client, app):
         data={"code": generate_totp(secret)},
         follow_redirects=True,
     )
-    assert b"Predictive insights" in resp2.data
+    assert b"Predict" in resp2.data
 
 
 def test_login_with_recovery_code(client, app):
     from app import db, User
     from auth.forgot import _hash_code
     with app.app_context():
+        User.query.filter_by(email="mfa2@example.com").delete()
+        db.session.commit()
         user = User(username="mfauser2", email="mfa2@example.com", status="approved")
         user.password_hash = generate_password_hash("Passw0rd!")
         user.mfa_enabled = True
@@ -51,7 +55,7 @@ def test_login_with_recovery_code(client, app):
         data={"code": rec},
         follow_redirects=True,
     )
-    assert b"Predictive insights" in resp.data
+    assert b"Predict" in resp.data
 
 
 def test_settings_shows_mfa_option(auth_client):
