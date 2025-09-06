@@ -158,7 +158,6 @@ def test_login_with_email_code(monkeypatch, client, app):
         user.mfa_enabled = True
         secret = random_base32()
         user.set_mfa_secret(secret)
-        user.mfa_email_enabled = True
         db.session.add(user)
         db.session.commit()
     monkeypatch.setattr("auth.mfa.secrets.choice", lambda seq: seq[0])

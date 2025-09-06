@@ -356,7 +356,7 @@ class User(db.Model, UserMixin):
     last_login = db.Column(db.DateTime)
     avatar = db.Column(db.String(255))
     mfa_enabled = db.Column(db.Boolean, default=False)
-    mfa_email_enabled = db.Column(db.Boolean, default=False)
+    mfa_email_enabled = db.Column(db.Boolean, default=True)
     mfa_email_verified_at = db.Column(db.DateTime)
     mfa_secret_ct = db.Column(db.LargeBinary)
     mfa_secret_nonce = db.Column(db.LargeBinary)

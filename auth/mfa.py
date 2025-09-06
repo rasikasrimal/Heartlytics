@@ -208,61 +208,18 @@ def mfa_disable():
     return render_template("auth/mfa_disable.html", form=form)
 
 
-@auth_bp.route("/mfa/email/setup", methods=["GET", "POST"])
+@auth_bp.route("/mfa/email/setup", methods=["GET"])
 @login_required
 def mfa_email_setup():
-    if current_user.mfa_email_enabled:
-        flash("Email codes already enabled", "info")
-        return redirect(url_for("settings.settings"))
-    form = EmailCodeForm()
-    Challenge = current_app.MFAEmailChallenge
-    challenge = Challenge.query.filter_by(user_id=current_user.id, status="pending").first()
-    now = datetime.utcnow()
-    if request.method == "GET":
-        length = current_app.config.get("MFA_EMAIL_CODE_LENGTH", 6)
-        code = ''.join(secrets.choice('0123456789') for _ in range(length))
-        hashed = _hash_code(code)
-        ttl = current_app.config.get("MFA_EMAIL_TTL_MIN", 10)
-        if challenge:
-            challenge.code_hash = hashed
-            challenge.expires_at = now + timedelta(minutes=ttl)
-            challenge.attempts = 0
-            challenge.last_sent_at = now
-        else:
-            challenge = Challenge(
-                user_id=current_user.id,
-                code_hash=hashed,
-                expires_at=now + timedelta(minutes=ttl),
-                last_sent_at=now,
-                requester_ip=request.remote_addr,
-                user_agent=request.headers.get("User-Agent", ""),
-            )
-            current_app.db.session.add(challenge)
+    """Enable email codes without additional verification."""
+    if not current_user.mfa_email_enabled:
+        current_user.mfa_email_enabled = True
+        current_user.mfa_email_verified_at = datetime.utcnow()
         current_app.db.session.commit()
-        text = f"Your verification code is {code}\nIt expires in {ttl} minutes."
-        current_app.email_service.send_mail(
-            current_user.email,
-            "Your verification code",
-            text,
-            purpose="mfa.email.enable",
-        )
-    if form.validate_on_submit():
-        if not challenge or challenge.expires_at < now:
-            flash("Code expired", "error")
-        else:
-            code = re.sub(r"[^0-9A-Za-z]", "", form.code.data)
-            if _hash_code(code) == challenge.code_hash:
-                current_user.mfa_email_enabled = True
-                current_user.mfa_email_verified_at = now
-                challenge.status = "verified"
-                current_app.db.session.commit()
-                flash("Email codes enabled", "success")
-                return redirect(url_for("settings.settings"))
-            challenge.attempts += 1
-            current_app.db.session.commit()
-            flash("Invalid code", "error")
-    masked = _mask_email(current_user.email)
-    return render_template("auth/mfa_email_setup.html", form=form, email=masked)
+        flash("Email codes enabled", "success")
+    else:
+        flash("Email codes already enabled", "info")
+    return redirect(url_for("settings.settings"))
 
 
 @auth_bp.route("/mfa/email/disable", methods=["GET", "POST"])
