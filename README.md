@@ -31,7 +31,7 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 - 🔐 **Redesigned Login**: Clean layout without top navigation, centered branding and form, fields start empty with autofill disabled, password visibility toggle, hover animation on login button, and quick links.
 - 🔑 **Forgot Password Flow**: Email verification code with enumeration-safe messaging; after reset, users re-authenticate with the new password.
 - 🔐 **TOTP 2-Step Verification**: Optional authenticator app codes with one-time recovery codes.
-- ✉️ **Email MFA Codes**: Optional single-use codes sent to your email as a fallback during login.
+- ✉️ **Email MFA Codes**: Enabled by default and sent as single-use backups when authenticator codes aren't available.
 - 📌 **Sticky Footer**: Consistent footer on every page that stays at the bottom.
 - 🧭 **Responsive Navigation**: Evenly spaced top bar with RBAC-driven items, sticky elevation, and utility icons.
 - 🎞️ **Motion System**: Tokenized durations/easings applied across components with `prefers-reduced-motion` support.
