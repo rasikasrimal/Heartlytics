@@ -89,6 +89,9 @@
 | TC-041 | Simulations page loads without chart until variable selected. | Simulations | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-042 | Simulation shows risk curve after selecting a variable. | Simulations | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-043 | Selecting unsupported variable returns warning message. | Simulations | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-056 | Changing input triggers inline loader and update acknowledgment. | Simulations | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-057 | Rapid changes cancel previous simulation requests. | Simulations | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-058 | Failed simulation shows toast and keeps last result. | Simulations | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 
 ## Research Paper Viewer
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |

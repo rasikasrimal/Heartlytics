@@ -1,4 +1,3 @@
-
 # Prediction of Heart Disease Using Machine Learning Algorithms
 
 **Author:** HMRS Samaranayaka  

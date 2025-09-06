@@ -9,6 +9,8 @@ Recent theming updates (transparent charts and table header styling) do
 not introduce any new columns.
 Cleaning-log normalization and the auth-page theme toggle are handled
 in application logic and likewise require no schema changes.
+The new simulations auto-update loader and timestamped status also run
+entirely on the client and do not impact the database schema.
 
 ## audit_log
 

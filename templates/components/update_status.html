@@ -1,0 +1,4 @@
+{% macro status(id='sim-status') %}
+  <span id="{{ id }}" class="d-inline-flex align-items-center gap-1 small"></span>
+  <div id="{{ id }}-announcer" class="visually-hidden" role="status" aria-live="polite"></div>
+{% endmacro %}
