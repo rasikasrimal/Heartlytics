@@ -34,6 +34,18 @@
       </div>
     </div>
   </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header">Theme</div>
+      <div class="card-body">
+        <select id="theme-select" class="form-select" aria-label="Color theme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="system">System</option>
+        </select>
+      </div>
+    </div>
+  </div>
   {% if current_user.role == 'SuperAdmin' %}
   <div class="col-md-6">
     <div class="card shadow-sm">
@@ -91,6 +103,11 @@ document.addEventListener('DOMContentLoaded', function(){
   }
   np.addEventListener('input', check);
   cp.addEventListener('input', check);
+  const select = document.getElementById('theme-select');
+  if (select){
+    select.value = localStorage.getItem('theme') || 'light';
+    select.addEventListener('change', (e) => window.setTheme(e.target.value));
+  }
 });
 </script>
 {% endblock %}

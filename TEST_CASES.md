@@ -110,3 +110,9 @@
 | TC-053 | Password field eye icon toggles visibility on login page. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-054 | Identifier field on login page starts empty without displaying "None". | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-055 | Login form disables autofill so fields remain blank. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+
+## UI Theming
+| Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
+| --- | --- | --- | --- | --- | --- |
+| TC-060 | Theme toggle updates `data-bs-theme`, cookie, and `localStorage` consistently. | UI Theming | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-061 | Server-side rendering respects `theme` cookie to avoid flash of incorrect theme. | UI Theming | 🟡 Medium | 🧪 Functional | ⏳ Not Run |

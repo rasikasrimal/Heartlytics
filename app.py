@@ -71,6 +71,7 @@ from services.security import (
     get_csrf_token,
     csrf_protect_api,
 )
+from services.theme import init_theme
 
 from sqlalchemy import inspect, text
 
@@ -87,6 +88,9 @@ login_manager.login_view = "auth.login"
 
 password_hasher = PasswordHasher(time_cost=2, memory_cost=65536, parallelism=1, hash_len=32, salt_len=16)
 app.permanent_session_lifetime = timedelta(minutes=30)
+
+# Theme handling
+init_theme(app)
 
 # Ensure instance dir
 os.makedirs(app.instance_path, exist_ok=True)
@@ -897,6 +901,7 @@ from doctor import doctor_bp
 from user import user_bp
 from routes.settings import settings_bp
 from simulations import simulations_bp
+from routes.debug import debug_bp
 
 app.register_blueprint(predict_bp)
 app.register_blueprint(auth_bp)
@@ -905,6 +910,7 @@ app.register_blueprint(doctor_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(settings_bp)
 app.register_blueprint(simulations_bp)
+app.register_blueprint(debug_bp)
 
 
 @app.route("/admin/")
@@ -997,7 +1003,7 @@ def index():
         "num_major_vessels": 0,
         "thalassemia_type": "normal",
     }
-    return render_template("predict/form.html", defaults=defaults, model_name=model_name, theme="dark")
+    return render_template("predict/form.html", defaults=defaults, model_name=model_name)
 
 
 # ---------------------------
