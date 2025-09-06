@@ -31,6 +31,32 @@ def test_login_with_totp(client, app):
     assert b"Predict" in resp2.data
 
 
+def test_login_with_totp_spaces(client, app):
+    from app import db, User
+    with app.app_context():
+        User.query.filter_by(email="mfa3@example.com").delete()
+        db.session.commit()
+        user = User(username="mfauser3", email="mfa3@example.com", status="approved")
+        user.password_hash = generate_password_hash("Passw0rd!")
+        user.mfa_enabled = True
+        secret = random_base32()
+        user.set_mfa_secret(secret)
+        db.session.add(user)
+        db.session.commit()
+    client.post(
+        "/auth/login",
+        data={"identifier": "mfa3@example.com", "password": "Passw0rd!"},
+    )
+    code = generate_totp(secret)
+    spaced = code[:3] + " " + code[3:]
+    resp = client.post(
+        "/auth/mfa/verify",
+        data={"code": spaced},
+        follow_redirects=True,
+    )
+    assert b"Predict" in resp.data
+
+
 def test_login_with_recovery_code(client, app):
     from app import db, User
     from auth.forgot import _hash_code
