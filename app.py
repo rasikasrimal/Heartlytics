@@ -604,6 +604,37 @@ with app.app_context():
         db.session.execute(text("ALTER TABLE prediction ADD COLUMN cluster_id INTEGER"))
         db.session.commit()
 
+    # ensure encrypted patient_name columns exist for older databases
+    for col, coltype in [
+        ("patient_name_ct", "BLOB"),
+        ("patient_name_nonce", "BLOB"),
+        ("patient_name_tag", "BLOB"),
+        ("patient_name_wrapped_dk", "BLOB"),
+        ("patient_name_kid", "VARCHAR(64)"),
+        ("patient_name_kver", "INTEGER"),
+    ]:
+        if col not in pred_cols:
+            db.session.execute(
+                text(f"ALTER TABLE prediction ADD COLUMN {col} {coltype}")
+            )
+            db.session.commit()
+
+    # ensure encrypted patient_data columns exist for older databases
+    patient_cols = [c["name"] for c in insp.get_columns("patient")]
+    for col, coltype in [
+        ("patient_data_ct", "BLOB"),
+        ("patient_data_nonce", "BLOB"),
+        ("patient_data_tag", "BLOB"),
+        ("patient_data_wrapped_dk", "BLOB"),
+        ("patient_data_kid", "VARCHAR(64)"),
+        ("patient_data_kver", "INTEGER"),
+    ]:
+        if col not in patient_cols:
+            db.session.execute(
+                text(f"ALTER TABLE patient ADD COLUMN {col} {coltype}")
+            )
+            db.session.commit()
+
     # ensure uid, requested_role and updated_at columns exist for existing user tables
     user_cols = [c["name"] for c in insp.get_columns("user")]
     if "requested_role" not in user_cols:
