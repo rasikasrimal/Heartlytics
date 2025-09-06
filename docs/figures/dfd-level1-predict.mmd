@@ -1,0 +1,15 @@
+dataflow "Predict Workflow" {
+  Ingress: User
+  Process InputForm {
+    flows {
+      User -> Form
+      Form -> Validate
+      Validate -> "Encrypt"
+      "Encrypt" -> Model
+      Model -> Response
+      Response -> User
+    }
+  }
+  Store DB
+  Model -> DB
+}

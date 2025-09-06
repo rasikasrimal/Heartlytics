@@ -1,0 +1,9 @@
+sequenceDiagram
+    participant U as User
+    participant B as Browser
+    participant S as Server
+    U->>B: Upload CSV
+    B->>S: POST /upload
+    S-->>B: Cleaning log
+    B->>S: POST /upload/<uid>/predict
+    S-->>B: Prediction results

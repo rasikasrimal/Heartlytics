@@ -1,0 +1,7 @@
+erDiagram
+    USER ||--o{ PATIENT : "entered_by"
+    USER ||--o{ AUDIT_LOG : "acts_on"
+    USER ||--o{ PREDICTION : "makes"
+    ROLE ||--o{ USER_ROLES : "assigned"
+    USER ||--o{ USER_ROLES : "has"
+    PREDICTION }o--|| CLUSTER_SUMMARY : "cluster"

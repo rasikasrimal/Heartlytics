@@ -1,0 +1,10 @@
+flowchart LR
+    User((User))
+    Doctor((Doctor))
+    Admin((Admin))
+    SuperAdmin((SuperAdmin))
+    System[HeartLytics System]
+    User -->|Predict| System
+    Doctor -->|Predict & Dashboard| System
+    Admin -->|Management| System
+    SuperAdmin -->|Full Access| System

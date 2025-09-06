@@ -1,0 +1,8 @@
+sequenceDiagram
+    participant U as User
+    participant B as Browser
+    participant S as Server
+    U->>B: Submit credentials
+    B->>S: POST /auth/login
+    S-->>B: Set session + theme cookie
+    B-->>U: Redirect to dashboard

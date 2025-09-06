@@ -1,0 +1,12 @@
+dataflow "Level 0" {
+  Ingress: User
+  Process Predict {
+    flows {
+      User -> "Enter Data"
+      "Enter Data" -> "Model"
+      "Model" -> "Results"
+    }
+  }
+  Store Database
+  "Results" -> Database
+}

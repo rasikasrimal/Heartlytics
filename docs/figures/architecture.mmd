@@ -1,0 +1,6 @@
+flowchart TD
+    Browser-->FlaskApp
+    FlaskApp-->Services
+    Services-->Database[(SQLite DB)]
+    Services-->KMS[(Keyring)]
+    FlaskApp-->Static[Static Assets]

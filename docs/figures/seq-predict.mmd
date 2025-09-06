@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant U as User
+    participant B as Browser
+    participant S as Server
+    U->>B: Submit form data
+    B->>S: POST /predict
+    S->>S: Validate & Encrypt
+    S->>Model: Score
+    Model-->>S: Prediction
+    S-->>B: JSON result
+    B-->>U: Render outcome
