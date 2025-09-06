@@ -33,7 +33,24 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
   - Security headers (no-sniff, frame denial, no referrer, no FLoC)
   - Login rate limiting and session timeouts
   - 🗄 **Persistence**: SQLite database via SQLAlchemy, storing predictions with metadata.
-  - 🔐 **Application-level encryption** for patient data and patient names with envelope encryption and Argon2id password hashing.
+- 🔐 **Application-level encryption** for patient data and patient names with envelope encryption and Argon2id password hashing.
+
+## Role Policy Matrix
+
+| Role       | Predict | Batch | Dashboard | Research |
+|------------|:------:|:-----:|:--------:|:--------:|
+| SuperAdmin |   ✔    |   ✔   |     ✔    |    ✔     |
+| Admin      |   ✖    |   ✖   |     ✖    |    ✖     |
+| Doctor     |   ✔    |   ✔   |     ✔    |    ✔     |
+| User       |   ✔    |   ✖   |     ✖    |    ✖     |
+
+Use the Flask CLI to manage roles:
+
+```bash
+flask roles set <email> <ROLE>
+```
+
+Roles are one of `SuperAdmin`, `Admin`, `Doctor`, or `User`.
 
 ---
 

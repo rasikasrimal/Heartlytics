@@ -16,7 +16,7 @@ from sqlalchemy import func, or_
 from datetime import datetime, timedelta
 import secrets
 
-from services.auth import role_required
+from auth.decorators import require_roles
 from services.security import csrf_protect
 
 superadmin_bp = Blueprint("superadmin", __name__, url_prefix="/superadmin")
@@ -24,7 +24,7 @@ superadmin_bp = Blueprint("superadmin", __name__, url_prefix="/superadmin")
 
 @superadmin_bp.route("/")
 @login_required
-@role_required(["SuperAdmin", "Admin"])
+@require_roles("SuperAdmin", "Admin")
 def dashboard():
     """Display user management dashboard with search/sort/pagination."""
     db = current_app.db
@@ -97,7 +97,7 @@ def dashboard():
 
 @superadmin_bp.post("/users/<int:user_id>/approve")
 @login_required
-@role_required(["SuperAdmin", "Admin"])
+@require_roles("SuperAdmin", "Admin")
 @csrf_protect
 def approve_user(user_id: int):
     db = current_app.db
@@ -125,7 +125,7 @@ def approve_user(user_id: int):
 
 @superadmin_bp.post("/users/<int:user_id>/reject")
 @login_required
-@role_required(["SuperAdmin", "Admin"])
+@require_roles("SuperAdmin", "Admin")
 @csrf_protect
 def reject_user(user_id: int):
     db = current_app.db
@@ -153,7 +153,7 @@ def reject_user(user_id: int):
 
 @superadmin_bp.post("/users/<int:user_id>/promote")
 @login_required
-@role_required(["SuperAdmin"])
+@require_roles("SuperAdmin")
 @csrf_protect
 def promote_user(user_id: int):
     db = current_app.db
@@ -180,7 +180,7 @@ def promote_user(user_id: int):
 
 @superadmin_bp.post("/users/<int:user_id>/role")
 @login_required
-@role_required(["SuperAdmin", "Admin"])
+@require_roles("SuperAdmin", "Admin")
 @csrf_protect
 def update_role(user_id: int):
     """Update a user's role among User, Doctor or Admin."""
@@ -219,7 +219,7 @@ def update_role(user_id: int):
 
 @superadmin_bp.post("/users/<int:user_id>/status")
 @login_required
-@role_required(["SuperAdmin", "Admin"])
+@require_roles("SuperAdmin", "Admin")
 @csrf_protect
 def toggle_status(user_id: int):
     """Suspend or unsuspend an approved user."""
@@ -253,7 +253,7 @@ def toggle_status(user_id: int):
 
 @superadmin_bp.post("/users/<int:user_id>/reset_password")
 @login_required
-@role_required(["SuperAdmin", "Admin"])
+@require_roles("SuperAdmin", "Admin")
 @csrf_protect
 def reset_password(user_id: int):
     """Set a temporary password for a user."""
@@ -281,7 +281,7 @@ def reset_password(user_id: int):
 
 @superadmin_bp.route("/audit")
 @login_required
-@role_required(["SuperAdmin", "Admin"])
+@require_roles("SuperAdmin", "Admin")
 def audit_logs():
     """Display audit trail of administrative actions with filtering."""
     AuditLog = current_app.AuditLog

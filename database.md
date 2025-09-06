@@ -121,7 +121,7 @@ DESC user;
 | nickname | VARCHAR(80) |  |  |
 | email | VARCHAR(120) |  |  |
 | password_hash | VARCHAR(128) |  |  |
-| role | VARCHAR(20) |  |  |
+| role | VARCHAR(20) |  | SuperAdmin/Admin/Doctor/User |
 | status | VARCHAR(20) |  |  |
 | requested_role | VARCHAR(20) |  |  |
 | created_at | DATETIME |  |  |
@@ -130,6 +130,7 @@ DESC user;
 | avatar | VARCHAR(255) |  |  |
 
 Note: Users can log in using either the `username` or `email` field. The `last_login` column stores the timestamp of the most recent successful login. Login credentials are never persisted; the form clears identifier and password fields after each request.
+The `role` column drives RBAC enforcement with allowed values `SuperAdmin`, `Admin`, `Doctor`, and `User`.
 
 ## user_roles
 
