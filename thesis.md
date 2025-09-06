@@ -165,7 +165,7 @@ Security controls include:
 * **Audit Logging** – Administrative actions recorded in `audit_log` with acting and target users【69cf44†L8-L20】【aa345d†L12-L18】.
 
 ## UI/UX and Theming
-The default theme is light; a `theme` cookie and `localStorage` entry persist user preference. Server‑side hooks expose the theme before rendering to avoid flashes of incorrect color【5269c0†L1-L15】. Client scripts toggle modes and update the cookie, meta theme color and chart libraries; dark mode uses transparent chart backgrounds for seamless integration【10dec7†L1-L42】【f25d16†L1-L64】.
+The default theme is light; a `theme` cookie and `localStorage` entry persist user preference. Server‑side hooks expose the theme before rendering to avoid flashes of incorrect color【5269c0†L1-L15】. Client scripts toggle modes and update the cookie, meta theme color and chart libraries; dark mode uses transparent chart backgrounds for seamless integration【10dec7†L1-L42】【f25d16†L1-L64】. A new evenly spaced navigation bar surfaces only permitted modules per role and shares motion tokens with buttons, dropdowns and tables, all honoring `prefers-reduced-motion`.
 
 ## Key Execution Flows
 ### Login with Theme Persistence

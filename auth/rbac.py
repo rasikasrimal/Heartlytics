@@ -17,6 +17,8 @@ POLICY = {
     "Batch": {Role.SUPERADMIN, Role.DOCTOR},
     "Dashboard": {Role.SUPERADMIN, Role.DOCTOR},
     "Research": {Role.SUPERADMIN, Role.DOCTOR},
+    "Simulations": {Role.SUPERADMIN},
+    "Admin": {Role.SUPERADMIN, Role.ADMIN},
 }
 
 

@@ -16,6 +16,7 @@ This document summarizes the security controls implemented in the HeartLytics we
   - **User** – Predict only
 - Server-side decorators enforce checks before any sensitive processing.
 - `RBAC_STRICT` environment flag (default `1`) ensures checks are always active.
+- Top navigation reads the policy to hide unauthorized links before a request is made.
 
 ## Password Storage
 - Passwords are hashed using `argon2-cffi` with the Argon2id algorithm.

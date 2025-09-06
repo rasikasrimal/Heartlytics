@@ -30,6 +30,8 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 - 🧹 **Normalized Cleaning Logs**: Blank lines are stripped server-side for compact output; batch predictions surface a concise inline notice.
 - 🔐 **Redesigned Login**: Clean layout without top navigation, centered branding and form, fields start empty with autofill disabled, password visibility toggle, hover animation on login button, and quick links.
 - 📌 **Sticky Footer**: Consistent footer on every page that stays at the bottom.
+- 🧭 **Responsive Navigation**: Evenly spaced top bar with RBAC-driven items, sticky elevation, and utility icons.
+- 🎞️ **Motion System**: Tokenized durations/easings applied across components with `prefers-reduced-motion` support.
 - 🔒 **Safe by design**:
   - CSRF tokens for forms and API
   - Security headers (no-sniff, frame denial, no referrer, no FLoC)
@@ -74,6 +76,12 @@ correct mode with no flash. Plotly and Chart.js visualizations automatically
 adapt — in dark mode charts render on transparent backgrounds with updated text
 and grid colors. See [`docs/ui-theming.md`](docs/ui-theming.md) for guidance on
 extending theming.
+
+## 🎬 Motion Guidelines
+
+Utilities like `.animate-fade` and `.animate-slide` add subtle entrance effects.
+Limit movements to 12px and avoid bouncy easings. The token set automatically
+honors `prefers-reduced-motion` for accessibility.
 
 ---
 

@@ -5,25 +5,33 @@ body {
 }
 
 body, .navbar, .card, .card-section, .table, .form-control, .form-select, .btn, .code-box, .file-area, .drop-zone {
-  transition: background-color .3s, color .3s, border-color .3s, box-shadow .3s;
+  transition: background-color var(--motion-medium) var(--ease-out), color var(--motion-medium) var(--ease-out), border-color var(--motion-medium) var(--ease-out), box-shadow var(--motion-medium) var(--ease-out);
 }
 
 .navbar {
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   border-bottom: 1px solid var(--bs-border-color);
+  transition: box-shadow var(--motion-medium) var(--ease-out);
+  height: var(--nav-height);
+}
+
+.nav-elevated {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
 }
 
 .navbar-nav .nav-link {
   position: relative;
-  padding: 0.5rem 1rem;
-  transition: background-color .2s, color .2s, transform .2s;
+  padding: 0.5rem var(--space-4);
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
 }
 
-.navbar-nav .nav-link:hover {
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link:focus {
   background-color: var(--bs-tertiary-bg);
   border-radius: 0.5rem;
   color: var(--brand);
   transform: translateY(-2px);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
 }
 
 .navbar-nav .nav-link::after {
@@ -34,7 +42,7 @@ body, .navbar, .card, .card-section, .table, .form-control, .form-select, .btn, 
   height: 2px;
   width: 0;
   background: var(--brand);
-  transition: width .2s;
+  transition: width var(--motion-fast) var(--ease-out);
 }
 
 .navbar-nav .nav-link:hover::after,
@@ -45,6 +53,17 @@ body, .navbar, .card, .card-section, .table, .form-control, .form-select, .btn, 
 .navbar-nav .nav-link.active {
   color: var(--brand);
   font-weight: 600;
+}
+
+.dropdown-menu {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .card {
@@ -73,45 +92,45 @@ body, .navbar, .card, .card-section, .table, .form-control, .form-select, .btn, 
   font-weight: 600;
 }
 
-.btn-brand {
-  background-color: var(--brand);
-  color: #fff;
-  transition: background-color .2s, transform .2s;
-  position: relative;
-  overflow: hidden;
-}
-.btn-brand::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  height: 2px;
-  width: 0;
-  background: var(--brand-dark);
-  transition: width .2s;
-}
-.btn-brand:hover {
-  background-color: var(--brand-dark);
-  color: #fff;
-  transform: translateY(-2px);
-}
-.btn-brand:hover::after {
-  width: 100%;
-}
+ .btn-brand {
+   background-color: var(--brand);
+   color: #fff;
+   transition: background-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+   position: relative;
+   overflow: hidden;
+ }
+ .btn-brand::after {
+   content: "";
+   position: absolute;
+   left: 0;
+   bottom: 0;
+   height: 2px;
+   width: 0;
+   background: var(--brand-dark);
+   transition: width var(--motion-fast) var(--ease-out);
+ }
+ .btn-brand:hover {
+   background-color: var(--brand-dark);
+   color: #fff;
+   transform: translateY(-2px);
+ }
+ .btn-brand:hover::after {
+   width: 100%;
+ }
 
-.btn-success {
-  transition: background-color .2s, transform .2s;
-}
-.btn-success:hover {
-  transform: translateY(-2px);
-}
+ .btn-success {
+   transition: background-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+ }
+ .btn-success:hover {
+   transform: translateY(-2px);
+ }
 
-.btn-transition {
-  transition: background-color .2s, transform .2s;
-}
-.btn-transition:hover {
-  transform: translateY(-2px);
-}
+ .btn-transition {
+   transition: background-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+ }
+ .btn-transition:hover {
+   transform: translateY(-2px);
+ }
 
 .bg-gradient-primary {
   background: linear-gradient(135deg, var(--brand), var(--brand-accent));
@@ -220,6 +239,10 @@ footer {
   font-weight: 600;
 }
 
+.table-hover tbody tr {
+  transition: background-color var(--motion-fast) var(--ease-out);
+}
+
 #recent-table th {
   white-space: nowrap;
 }
@@ -229,11 +252,7 @@ footer {
 }
 /* Hover glow for progress bars */
 .progress-hover {
-  transition: box-shadow .2s;
-}
-
-.progress-hover:hover {
-  box-shadow: 0 0 0.5rem rgba(0,0,0,0.2);
+  transition: box-shadow var(--motion-fast) var(--ease-out);
 }
 
 .progress-hover:hover {
@@ -260,7 +279,7 @@ footer {
   border: 1px solid var(--bs-border-color);
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  transition: box-shadow .2s, transform .2s;
+  transition: box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
 }
 
 .card-section:hover {

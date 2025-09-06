@@ -159,3 +159,6 @@ DESC user_roles;
 - `prediction.cluster_id` → `cluster_summary.cluster_id`
 - `user_roles.user_id` → `user.id`
 - `user_roles.role_id` → `role.id`
+
+### Notes
+- UI navigation and motion system refinements do not require schema changes.
