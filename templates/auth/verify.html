@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Enter verification code{% endblock %}
+{% from 'components/forms.html' import text_input %}
+{% block content %}
+<div class="container py-5">
+  <h1>Enter verification code</h1>
+  <p>We've sent a 6-digit code to your email. Enter it below.</p>
+  <form method="post" autocomplete="off">
+    {{ form.hidden_tag() }}
+    {{ text_input('code', 'Code', attrs={'required': '', 'pattern': '\\d{6}', 'inputmode': 'numeric'}, error=form.code.errors[0] if form.code.errors else None) }}
+    <button type="submit" class="btn btn-brand">Continue</button>
+  </form>
+  <form method="post" action="{{ url_for('auth.resend_code') }}" class="mt-2">
+    <button type="submit" class="btn btn-link">Resend code</button>
+  </form>
+  <a href="{{ url_for('auth.forgot') }}" class="small">Change email</a>
+</div>
+{% endblock %}

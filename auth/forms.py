@@ -47,3 +47,37 @@ class SignupForm(FlaskForm):
     )
     submit = SubmitField("Submit")
 
+
+class ForgotPasswordForm(FlaskForm):
+    """Step 1: identify account by email or username."""
+
+    identifier = StringField(
+        "Email or Username", validators=[DataRequired(), Length(max=120)]
+    )
+    submit = SubmitField("Search")
+
+
+class VerifyCodeForm(FlaskForm):
+    """Step 2: enter verification code."""
+
+    code = StringField("Verification Code", validators=[DataRequired(), Length(min=6, max=6)])
+    submit = SubmitField("Continue")
+
+
+class ResetPasswordForm(FlaskForm):
+    """Step 3: choose a new password."""
+
+    password = PasswordField(
+        "New Password",
+        validators=[
+            DataRequired(),
+            Length(min=8),
+            Regexp(
+                r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).+$",
+                message="Password must include upper, lower, number and special character",
+            ),
+        ],
+    )
+    confirm = PasswordField("Repeat New Password", validators=[DataRequired(), EqualTo("password")])
+    submit = SubmitField("Update Password")
+

@@ -12,6 +12,8 @@ in application logic and likewise require no schema changes.
 The new simulations auto-update loader and timestamped status also run
 entirely on the client and do not impact the database schema.
 
+The password reset feature introduces a `password_reset_request` table storing short-lived verification codes.
+
 ## audit_log
 
 ```sql
@@ -47,6 +49,26 @@ DESC cluster_summary;
 | pct_female | FLOAT |  |  |
 | common_chest_pain_type | VARCHAR(50) |  |  |
 | common_thalassemia_type | VARCHAR(50) |  |  |
+
+## password_reset_request
+
+```sql
+DESC password_reset_request;
+```
+
+| Column | Type | Key | References |
+| --- | --- | --- | --- |
+| id | INTEGER | PK | - |
+| request_id | VARCHAR(36) | UNIQUE | - |
+| user_id | INTEGER | FK | user.id |
+| hashed_code | VARCHAR(64) |  |  |
+| expires_at | DATETIME |  |  |
+| attempts | INTEGER |  |  |
+| resend_count | INTEGER |  |  |
+| last_sent_at | DATETIME |  |  |
+| status | VARCHAR(20) |  |  |
+| requester_ip | VARCHAR(45) |  |  |
+| user_agent | VARCHAR(200) |  |  |
 
 ## patient
 

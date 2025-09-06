@@ -148,3 +148,7 @@ def logout():
         flash("Logged out", "success")
     return redirect(url_for("auth.login"))
 
+
+# Register additional auth routes
+from . import forgot  # noqa: E402,F401
+
