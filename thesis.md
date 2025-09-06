@@ -7,7 +7,7 @@
 **Date:** 2025-08-01
 
 ## Abstract
-HeartLytics is a full‑stack Python/Flask platform that predicts heart disease risk while enforcing strict security, encryption and user experience guarantees. The system ingests single records or CSV batches, cleans and analyzes data, executes a trained Random Forest model, and surfaces results through role‑aware dashboards and PDF reports. Application‑level envelope encryption protects patient identifiers, while Bootstrap 5 theming enables accessible light and dark modes. Extensive tests and a phased project plan demonstrate the feasibility of deploying HeartLytics as a secure clinical decision‑support prototype.
+HeartLytics is a full‑stack Python/Flask platform that predicts heart disease risk while enforcing strict security, encryption and user experience guarantees. The system ingests single records or CSV batches, cleans and analyzes data, executes a trained Random Forest model, and surfaces results through role‑aware dashboards and PDF reports. Application‑level envelope encryption protects patient identifiers, while Bootstrap 5 theming enables accessible light and dark modes. Comprehensive multi‑factor authentication, e‑mail backup codes, and recovery flows ensure that only verified users can access protected resources. Extensive tests and a phased project plan demonstrate the feasibility of deploying HeartLytics as a secure clinical decision‑support prototype.
 
 ## Table of Contents
 - [Working Topic](#working-topic)
@@ -22,13 +22,20 @@ HeartLytics is a full‑stack Python/Flask platform that predicts heart disease 
   - [Level-0 DFD](#level-0-dfd)
   - [Level-1 DFD – Batch Upload](#level-1-dfd--batch-upload)
   - [Level-1 DFD – Predict](#level-1-dfd--predict)
+  - [Level-1 DFD – MFA Enrollment](#level-1-dfd--mfa-enrollment)
+  - [Level-1 DFD – Login with MFA Options](#level-1-dfd--login-with-mfa-options)
+  - [Level-1 DFD – Patient Record Encryption Path](#level-1-dfd--patient-record-encryption-path)
 - [Data Model and Database Design](#data-model-and-database-design)
 - [Security Architecture](#security-architecture)
+  - [Multi-factor Authentication](#multi-factor-authentication)
+  - [Data Encryption and Key Management](#data-encryption-and-key-management)
 - [UI/UX and Theming](#uiux-and-theming)
 - [Key Execution Flows](#key-execution-flows)
   - [Login with Theme Persistence](#login-with-theme-persistence)
   - [Data Upload to EDA](#data-upload-to-eda)
   - [Prediction Inference](#prediction-inference)
+  - [MFA Login with Step-Up Enforcement](#mfa-login-with-step-up-enforcement)
+  - [Encrypted Write and Read](#encrypted-write-and-read)
 - [Implementation Details and Configuration](#implementation-details-and-configuration)
 - [Testing and Evaluation](#testing-and-evaluation)
 - [Timeline and Project Management](#timeline-and-project-management)
@@ -51,14 +58,14 @@ HeartLytics situates itself in this landscape by providing:
 * **Secure data entry and prediction** – single patients and CSV batches.
 * **Exploratory Data Analysis (EDA)** – cleaning logs, summary statistics, correlation heatmaps and outlier detection using IQR, Isolation Forest, Z‑Score, LOF and DBSCAN algorithms【cdb8b2†L1-L76】.
 * **Role‑aware dashboards** – Doctors review their own patients; SuperAdmins manage users and audit logs.
-* **Envelope encryption** for patient data and names, storing ciphertext, nonce, tag and wrapped data keys with key identifiers【5337ea†L9-L21】.
+* **Envelope encryption** for patient data and patient names, storing ciphertext, nonce, tag and wrapped data keys with key identifiers【ce27a6†L7-L24】.
 * **Accessible theming** – default light mode, persistent theme cookie and chart patches for dark mode transparency【82b3da†L1-L13】【f25d16†L1-L64】.
-* **PDF reporting** – per‑patient summaries via ReportLab【e82694†L1-L36】.
+* **Comprehensive MFA** – TOTP secrets, email one‑time codes and recovery codes managed through hashed and encrypted stores.
 
-Functional objectives include accurate prediction, reliable batch processing, and intuitive dashboards. Non‑functional objectives target security (RBAC, CSRF, encryption), usability (theme persistence, responsive UI), and maintainability (tested services, modular blueprints).
+Functional objectives include accurate prediction, reliable batch processing, and intuitive dashboards. Non‑functional objectives target security (RBAC, CSRF, encryption, MFA), usability (theme persistence, responsive UI), and maintainability (tested services, modular blueprints).
 
 ## Research Gap
-Existing ML pipelines often emphasize predictive accuracy but neglect operational concerns such as secure storage, role separation and accessible visualization. Prior work shows strong model performance【92cebb†L55-L57】, yet integration into a secure web platform with envelope encryption and comprehensive RBAC is less explored. HeartLytics addresses this gap by combining industry‑grade security controls【69cf44†L1-L32】 with robust data handling and theming, bridging machine learning outputs and clinical workflows.
+Existing ML pipelines often emphasize predictive accuracy but neglect operational concerns such as secure storage, role separation and accessible visualization. Prior work shows strong model performance【92cebb†L55-L57】, yet integration into a secure web platform with envelope encryption and comprehensive RBAC is less explored. HeartLytics addresses this gap by combining industry‑grade security controls【7cf6d3†L1-L54】 with robust data handling and theming, bridging machine learning outputs and clinical workflows.
 
 ## Research Problem / Questions
 The central problem is how to deploy heart disease prediction in a manner that is secure, role‑aware and user friendly. Key research questions include:
@@ -70,10 +77,10 @@ The central problem is how to deploy heart disease prediction in a manner that i
 5. How can the system be evaluated for security and functional correctness?
 
 ## Research Strategy and Research Method
-The project follows Design Science Research Methodology (DSRM)【Peffers2007】. Artefacts include the Flask application, encryption utilities and theming modules. Iterative development cycles gathered requirements, implemented prototypes, and evaluated functionality through automated tests and user feedback. Data originates from the UCI Heart Disease repository【92cebb†L69-L71】; model analysis leverages Random Forest and XGBoost comparisons.【92cebb†L178-L187】 Logs and test outcomes form the basis of evaluation.
+The project follows Design Science Research Methodology (DSRM)【Peffers2007】. Artefacts include the Flask application, encryption utilities, MFA modules and theming components. Iterative development cycles gathered requirements, implemented prototypes, and evaluated functionality through automated tests and user feedback. Data originates from the UCI Heart Disease repository【92cebb†L69-L71】; model analysis leverages Random Forest and XGBoost comparisons【92cebb†L178-L187】. Logs and test outcomes form the basis of evaluation.
 
 ## System Overview and Architecture
-HeartLytics uses a Python 3/Flask runtime with Jinja2 templates, SQLAlchemy ORM and a scikit‑learn Random Forest model (`ml/model.pkl`). SQLite is the default database, configurable via environment variables【ac6f4a†L15-L34】. Envelope encryption employs AES‑256‑GCM with per‑record data keys wrapped by a keyring service【5337ea†L3-L21】.
+HeartLytics uses a Python 3/Flask runtime with Jinja2 templates, SQLAlchemy ORM and a scikit‑learn Random Forest model (`ml/model.pkl`). SQLite is the default database, configurable via environment variables【6182c6†L32-L42】. Envelope encryption employs AES‑256‑GCM with per‑record data keys wrapped by a keyring service【ce27a6†L7-L24】 and blind indexes to enable equality lookup without revealing plaintext.
 
 ### Context Diagram
 ```mermaid
@@ -103,7 +110,7 @@ flowchart TB
     DB-->Storage[(Encrypted Disk)]
 ```
 
-RBAC governs access: SuperAdmin has full rights, Admin lacks Predict/Batch/Dashboard/Research, Doctors see all modules, Users access Predict only【69cf44†L8-L20】.
+RBAC governs access: SuperAdmin has full rights, Admin lacks Predict/Batch/Dashboard/Research, Doctors see all modules, Users access Predict only【7cf6d3†L14-L32】.
 
 ## Data Flow Diagrams
 ### Level-0 DFD
@@ -139,10 +146,64 @@ flowchart LR
     R2-->U
 ```
 
+### Level-1 DFD – MFA Enrollment
+```mermaid
+flowchart LR
+    Settings[User Settings]-->Gen[Generate TOTP Secret]
+    Gen-->QR[Display QR Code]
+    User-->QR
+    User-->|TOTP code| Verify[Verify Code]
+    Verify-->|Success| Enable[Enable MFA Flag]
+    Enable-->Recov[Generate Recovery Codes]
+    Recov-->Store[Hash Codes & Encrypt Secret]
+    Store-->UserTable[(user)]
+```
+The MFA enrollment flow begins when an authenticated user navigates to the **Settings** page. The server generates a random TOTP secret and passes it to the browser as a base32 string rendered in a QR code. The user scans the QR with an authenticator app, which seeds the app’s OATH-TOTP algorithm. The user then submits a six‑digit code back to the **Verify** process. Verification strips non‑numeric characters and calls `verify_totp`, accepting codes that fall within a ±30‑second window to accommodate device clock skew. Upon success the **Enable** step flips the `mfa_enabled` flag and persists the secret. Before storage the secret is envelope‑encrypted with AES‑256‑GCM; the resulting ciphertext, nonce, tag, wrapped data key, key identifier and key version populate the `mfa_secret_*` columns in the `user` table【b9b100†L396-L446】. Ten random recovery codes are generated, SHA‑256 hashed with a server-side pepper, and stored in `mfa_recovery_hashes`. The hashed recovery codes and encrypted secret are written to the **UserTable** along with the enablement flag. The application returns a dedicated page displaying the one-time recovery codes, instructing the user to store them securely offline. This Level‑1 view omits lower-level crypto operations yet underscores trust boundaries: secrets never leave the server unencrypted, codes are hashed before persistence, and all user actions traverse CSRF‑protected forms. Potential failure paths include invalid code submission, database errors, or duplicate enablement attempts; each is mitigated through form validation, transactional commits and idempotent checks. Rate-limiting guards in the parent login flow ensure that an attacker cannot brute force enrollment codes or flood email channels. Together these processes transform a basic password login into a phishing-resistant MFA setup while preserving usability via QR provisioning and printable recovery codes.
+
+### Level-1 DFD – Login with MFA Options
+```mermaid
+flowchart LR
+    L[Login Form]-->Cred[Verify Credentials]
+    Cred-->|MFA required| Challenge[Present MFA Options]
+    Challenge-->|TOTP code| TOTP[Verify TOTP]
+    Challenge-->|Email code| Email[Send & Verify]
+    Challenge-->|Recovery code| Recovery[Validate Hash]
+    TOTP-->Sess[Create Session]
+    Email-->Sess
+    Recovery-->Sess
+    Sess-->Dash[User Dashboard]
+    Cred-->|No MFA| Dash
+```
+The login Level‑1 DFD captures both password verification and subsequent MFA challenges. Users submit identifiers and passwords to **Cred**, which consults the `user` table. Successful authentication checks `mfa_enabled` and `mfa_email_enabled` flags to determine whether additional factors are required【b9b100†L396-L446】. If no MFA is needed, the process continues directly to **Dash**. When MFA is required, control passes to **Challenge**, which renders options based on user enrollment. Selecting the TOTP path posts a code to **TOTP**, where the server retrieves the encrypted secret, decrypts it with the envelope scheme, and verifies the code using `verify_totp`. Choosing the email path triggers **Email**, which looks up a pending `mfa_email_challenge` row or creates one with a hashed code, expiry and resend counters【673e5b†L486-L500】. The challenge is sent through the email service, and the user returns the code for verification. The recovery path hashes the submitted token and compares it against remaining hashes in `mfa_recovery_hashes`, pruning matches after one use. All three verification sub-processes funnel into **Sess** upon success, where the application records `mfa_last_enforced_at` and issues a session cookie. Failure paths increment attempt counters, enforce per-IP and per-identifier rate limits, and return the user to **Challenge** with an error message. The diagram highlights how single sign-on events can branch into multiple second-factor mechanisms, each with distinct data stores (user table, `mfa_email_challenge`, session). It also shows how fallback paths such as recovery codes and email codes maintain access when authenticator devices are unavailable, while the main TOTP path offers stronger assurance. Ultimately the session creation unifies the flows, allowing normal navigation to the dashboard.
+
+### Level-1 DFD – Patient Record Encryption Path
+```mermaid
+flowchart LR
+    Submit[Patient Form]-->Validate[Sanitize Input]
+    Validate-->GenDK[Generate Data Key]
+    GenDK-->Encrypt[AES-256-GCM Encrypt]
+    Encrypt-->Store[Persist CT+Nonce+Tag]
+    GenDK-->Wrap[Wrap Data Key]
+    Wrap-->KMS[(KMS/Keyring)]
+    KMS-->Wrap
+    Wrap-->Store
+    Store-->PatientTable[(patient)]
+    PatientTable-->|Read| Fetch[Retrieve CT+Metadata]
+    Fetch-->Unwrap[Unwrap Data Key]
+    Unwrap-->KMS
+    KMS-->Unwrap
+    Unwrap-->Decrypt[Decrypt via AEAD]
+    Decrypt-->App[Return Plaintext]
+```
+When a clinician submits a patient form, the **Submit** process first passes through **Validate**, which enforces schema and range checks to prevent malformed data. The sanitized payload is serialized to JSON and handed to **GenDK**, which derives a fresh 256‑bit data key for that record. **Encrypt** applies AES‑256‑GCM to the payload, yielding ciphertext, a 96‑bit nonce, and a 128‑bit authentication tag. The table name, column and key metadata (`table:column|kid|kver`) flow in as associated data so the ciphertext is cryptographically bound to its storage context, blocking copy‑paste attacks across fields. In parallel, **Wrap** sends the plaintext data key to the external **KMS/Keyring**; in development the `DevKeyring` performs an AES wrap with a locally provisioned key, whereas production deployments invoke cloud KMS APIs over mutually authenticated channels. The KMS returns a wrapped data key and key identifier, which **Wrap** passes back. **Store** persists the ciphertext, nonce, tag, wrapped key, key id and key version to the `patient` table columns suffixed `_ct`, `_nonce`, `_tag`, `_wrapped_dk`, `_kid` and `_kver` respectively【99bcea†L586-L604】【ea2abb†L656-L688】. During reads, the application retrieves the encrypted columns (**Fetch**) and forwards the wrapped key to **Unwrap**, which again calls the KMS to recover the plaintext data key. **Decrypt** feeds the key, nonce and tag into AES‑GCM to reconstruct the original patient payload, and **App** returns it to upstream services. This Level‑1 view underscores several controls: unique data keys and nonces per record thwart AES‑GCM reuse; associated data ties ciphertext to its origin; envelope wrapping facilitates cryptographic erasure if a master key is revoked; and any failure to unwrap or authenticate results in safe null values. Role‑based checks and audit logging can intercede before encryption to ensure only authorized clinicians store data and after decryption to record access. The diagram demonstrates the separation of duties—application code manages validation and AEAD primitives, while the external KMS maintains master keys, enforces key usage via RBAC, and supports rotation workflows.
+Key rotation introduces a maintenance branch not shown in the patient request path. Operations staff provision a new master key, update the `KMS_KEY_ID` configuration and run a rewrap job that walks through **Fetch**, **Unwrap** and **Wrap** for every encrypted row, incrementing `kver` on success. Each batch logs progress to `audit_log`, capturing acting user, affected tables and row counts so anomalies can trigger rollbacks. Because data keys are unique per record, partially completed rotations do not jeopardize remaining rows; unrotated entries continue decrypting with the previous key until rewrapped. If the database were exfiltrated without KMS credentials, attackers would find only ciphertext and wrapped keys they cannot unwrap. Conversely, disabling or deleting the master key performs cryptographic erasure, fulfilling right‑to‑be‑forgotten requests without touching individual rows. KMS itself enforces strict IAM policies so only the application role can call `Encrypt` and `Decrypt`, while administrators use separate, audited roles for rotation operations. Together these controls ensure envelope encryption integrates smoothly with operational procedures and keeps the data path clear and auditable from user submission through KMS interaction back to the user interface.
+
 ## Data Model and Database Design
 ```mermaid
 erDiagram
     USER ||--o{ PATIENT : entered_by_user_id
+    USER ||--o{ MFA_EMAIL_CHALLENGE : user_id
+    USER ||--o{ PASSWORD_RESET_REQUEST : user_id
     USER ||--o{ AUDIT_LOG : acting_user_id
     USER ||--o{ AUDIT_LOG : target_user_id
     USER ||--o{ USER_ROLE : user_id
@@ -151,24 +212,32 @@ erDiagram
     CLUSTER_SUMMARY ||--o{ PREDICTION : cluster_id
 ```
 
-Tables `patient` and `prediction` store encrypted fields (`*_ct`, `_nonce`, `_tag`, `_wrapped_dk`, `_kid`, `_kver`) alongside legacy plaintext columns while `READ_LEGACY_PLAINTEXT` remains true【aa345d†L19-L55】. Primary and foreign keys align with database.md relations.
+The `user` table stores authentication and MFA state: `mfa_enabled`, `mfa_email_enabled`, `mfa_email_verified_at`, envelope‑encrypted TOTP secrets (`mfa_secret_ct`, `_nonce`, `_tag`, `_wrapped_dk`, `_kid`, `_kver`), hashed recovery codes (`mfa_recovery_hashes`) and a `mfa_last_enforced_at` timestamp to drive step‑up policies【b9b100†L396-L446】. The `mfa_email_challenge` table tracks single-use email codes with hashed values, expiry timestamps, attempt counters, resend counts, requester IPs and user agents【673e5b†L486-L500】. `password_reset_request` mirrors this structure for password recovery. The `patient` table holds envelope-encrypted `patient_data` and `patient_name` fields using the same metadata columns【99bcea†L586-L604】【ea2abb†L656-L688】. Storing `kid` and `kver` enables rewrap migrations when rotating master keys. Blind indexes computed via HMAC-SHA256 permit equality searches without leaking plaintext values. Relationships among tables enforce referential integrity while keeping MFA artefacts and encryption metadata tightly bound to their parent records.
 
 ## Security Architecture
-Security controls include:
+HeartLytics layers defense-in-depth controls:
 
-* **Authentication** – Flask‑Login sessions with rate limiting on login attempts【c1e841†L14-L44】.
-* **Authorization** – Decorators enforce role and module access before route execution【afe6fc†L1-L46】.
-* **Password Storage** – Argon2id hashing with transparent PBKDF2 upgrades【c1e841†L40-L56】【4088a1†L25-L48】.
-* **Password Reset** – Email-based one-time codes hashed with SHA-256, five-attempt limit and 10-minute expiry; password changes require re-login and send confirmation mail.
-* **Multi-factor Authentication** – Optional TOTP codes with one-time recovery codes and fallback email one-time codes; secrets are envelope-encrypted.
-* **CSRF Protection** – Form and API decorators verify tokens stored in session【2dc86b†L1-L27】.
-* **Security Headers and Cookies** – Configured to limit sniffing, framing and track theme preference only【69cf44†L1-L32】.
-* **Encryption** – Envelope scheme with AES‑256‑GCM; key rotation and cryptographic erasure follow docs/encryption.md guidelines【5337ea†L1-L33】.
-* **Audit Logging** – Administrative actions recorded in `audit_log` with acting and target users【69cf44†L8-L20】【aa345d†L12-L18】.
+* **Authentication** – Session-based logins use Flask-Login with rate limits of five attempts per 15 minutes and permanent sessions subject to server-side timeouts【7cf6d3†L7-L14】.
+* **Authorization** – Role decorators enforce module access, with `RBAC_STRICT` ensuring policies are always active【7cf6d3†L14-L27】.
+* **Password Storage** – Argon2id hashing with automatic rehashing of legacy PBKDF2 credentials provides strong resistance to offline attacks.
+* **CSRF Protection** – All modifying requests carry session-bound CSRF tokens.
+* **Security Headers** – `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` and `Permissions-Policy` reduce attack surface.
+* **Audit Logging** – Administrative actions are recorded in `audit_log` with acting and target users.
+
+### Multi-factor Authentication
+Multi-factor authentication combines three mechanisms:
+
+1. **TOTP (Authenticator Apps)** – Users enroll by scanning a QR code produced from a random base32 secret. Secrets are envelope-encrypted with AES-256-GCM and wrapped data keys, never stored in plaintext【b9b100†L396-L446】. Verification accepts spaces or hyphens to improve usability, normalizes input, and tolerates ±30 seconds of drift.
+2. **Email One-Time Codes** – Users with `mfa_email_enabled` can request a fallback code. Each request either reuses an existing pending `mfa_email_challenge` row or creates a new one with a SHA-256 hash, 10‑minute TTL, attempt counter and resend throttle enforced by `MFA_EMAIL_RESEND_COOLDOWN_SEC`【df3a07†L63-L74】. Codes are sent via the configured SMTP provider and verified by hashing input and comparing to the stored hash. Status fields prevent reuse, while daily caps (`MFA_EMAIL_DAILY_CAP_PER_USER`) thwart enumeration.
+3. **Recovery Codes** – Ten random 16‑hex‑character tokens are generated at enrollment, hashed and stored. Each code is single-use: upon successful login the matching hash is pruned, and users can regenerate a fresh set in settings.
+
+A **step-up policy** tracks `mfa_last_enforced_at`. High-risk operations compare the timestamp against trust windows (`MFA_TRUST_WINDOW_DAYS_TOTP`, `MFA_TRUST_WINDOW_DAYS_EMAIL`) and require re-authentication if the window has lapsed. If `MFA_STEPUP_REQUIRE_TOTP` is true, only TOTP satisfies step-up; email codes are allowed solely for initial login or when a TOTP device is lost. Rate limits (`RATE_LIMIT_PER_IP`, `RATE_LIMIT_PER_ID`) and attempt counters on `mfa_email_challenge` defend against brute force and enumeration. All MFA routes sanitize codes with regexes, employ CSRF tokens, and log critical events.
+
+### Data Encryption and Key Management
+Envelope encryption protects sensitive columns. Each write operation generates a unique 256-bit data key and 96-bit nonce, encrypts data with AES-256-GCM, and wraps the data key with the active KMS provider. Development uses an environment-provisioned `DevKeyring`; production may plug into AWS KMS, Google Cloud KMS, or Azure Key Vault via the `KMS_PROVIDER` and `KMS_KEY_ID` settings【6182c6†L32-L42】. Associated data binds the ciphertext to its table, column, key identifier and version (`table:column|kid|kver`), preventing cross-field substitution. Key rotation follows a runbook: provision a new KMS key, update `KMS_KEY_ID`, rewrap existing data keys, bump `kver`, and deploy【ce27a6†L27-L34】. Blind indexes derived from a separate HMAC key (`IDX_KEY_ID`) allow case-insensitive searches without exposing plaintext. Cryptographic erasure is achieved by disabling or deleting the master key—wrapped data keys become undecipherable, rendering ciphertext useless【ce27a6†L34-L38】. Role-based enforcement restricts key operations to the application service account; only database columns flagged as encrypted invoke the keyring. Flags `ENCRYPTION_ENABLED` and `READ_LEGACY_PLAINTEXT` control rollout and backward compatibility, allowing gradual migration from plaintext columns to encrypted ones.【6182c6†L32-L39】
 
 ## UI/UX and Theming
-The default theme is light; a `theme` cookie and `localStorage` entry persist user preference. Server‑side hooks expose the theme before rendering to avoid flashes of incorrect color【5269c0†L1-L15】. Client scripts toggle modes and update the cookie, meta theme color and chart libraries; dark mode uses transparent chart backgrounds for seamless integration【10dec7†L1-L42】【f25d16†L1-L64】. A new evenly spaced navigation bar surfaces only permitted modules per role and shares motion tokens with buttons, dropdowns and tables, all honoring `prefers-reduced-motion`.
-Recent iterations add inline loading indicators to the simulations page that debounce input changes, cancel stale requests and announce when fresh results are available.
+The default theme is light; a `theme` cookie and `localStorage` entry persist user preference. Server-side hooks expose the theme before rendering to avoid flashes of incorrect color【5269c0†L1-L15】. Client scripts toggle modes and update the cookie, meta theme color and chart libraries; dark mode uses transparent chart backgrounds for seamless integration【10dec7†L1-L42】【f25d16†L1-L64】. A navigation bar surfaces only permitted modules per role and shares motion tokens with buttons, dropdowns and tables, all honoring `prefers-reduced-motion`. Inline loading indicators on the simulations page debounce input changes, cancel stale requests and announce when fresh results are available.
 
 ## Key Execution Flows
 ### Login with Theme Persistence
@@ -209,20 +278,305 @@ sequenceDiagram
     S->>U: Render result & risk band
 ```
 
+### MFA Login with Step-Up Enforcement
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant S as Server
+    participant E as EmailService
+    U->>S: POST /auth/login (identifier, password)
+    S->>S: Verify credentials & check mfa_enabled
+    alt MFA required
+        S->>U: 302 /auth/mfa/verify
+        U->>S: GET /auth/mfa/verify
+        alt TOTP available
+            U->>S: POST code
+            S->>S: decrypt secret & verify_totp
+        else Email fallback
+            U->>S: GET /auth/mfa/email
+            S->>E: send_mail(code)
+            E-->>U: deliver code
+            U->>S: POST code
+            S->>S: hash compare & update
+        else Recovery code
+            U->>S: POST recovery code
+            S->>S: hash lookup & prune
+        end
+        S->>S: update mfa_last_enforced_at & session
+        S-->>U: redirect to requested page
+    else no MFA
+        S-->>U: redirect to requested page
+    end
+```
+The sequence begins with the user submitting credentials. The server verifies them and consults `mfa_enabled` and `mfa_email_enabled` flags. If MFA is required, the user is redirected to the verification endpoint. The TOTP branch decrypts the secret, ensures the code is timely, and upon success records `mfa_last_enforced_at` and issues the session. The email branch generates or updates an `mfa_email_challenge` row, sends the code via SMTP, and verifies by hashing the user’s input. The recovery branch hashes the submitted code and compares it against the stored list, removing matches to enforce single use. Step-up enforcement compares the new timestamp against trust windows; if the login was triggered by a sensitive action and `MFA_STEPUP_REQUIRE_TOTP` is enabled, only the TOTP branch can satisfy the challenge, forcing a stronger factor. All branches end with session creation and optional “remember device” cookies that suppress prompts until the trust window expires. Failure in any branch increments counters and may lock the challenge record or rate-limit the IP. This flow illustrates how the system gracefully degrades from the preferred TOTP factor to email and recovery codes while maintaining audit trails and enforcing modern MFA expectations.
+
+### Encrypted Write and Read
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant A as Application
+    participant K as Keyring
+    participant DB as Database
+    U->>A: Submit patient data
+    A->>A: Validate & serialize
+    A->>A: Generate 256-bit data key & nonce
+    A->>A: AES-256-GCM encrypt (AAD=table:column|kid|kver)
+    A->>K: Wrap data key
+    K-->>A: Wrapped key + kid
+    A->>DB: Store ciphertext, nonce, tag, wrapped key, kid, kver
+    U->>A: Later request record
+    A->>DB: Retrieve encrypted fields
+    A->>K: Unwrap data key using kid
+    K-->>A: Data key
+    A->>A: Decrypt with AES-256-GCM
+    A-->>U: Return plaintext
+```
+This sequence expands on the previous DFD by detailing temporal ordering and actor responsibilities. The application first serializes validated patient data and generates a random data key and nonce. AES‑256‑GCM encrypts the payload using associated data that ties the ciphertext to the table and column, thwarting relocation attacks. The plaintext data key is sent to the keyring—either a development key loaded from `DEV_KMS_MASTER_KEY` or an external KMS provider—where it is wrapped and tagged with a key identifier. The application persists the ciphertext, nonce, tag, wrapped key, key identifier and version in dedicated columns, enabling later decryption and rotation. On read, the process reverses: fields are fetched, the keyring unwraps the data key, and AES‑GCM decrypts the ciphertext, verifying the authentication tag before returning plaintext. Any discrepancy in tag or unwrapping triggers an exception, causing the property accessor to return `None`. The diagram demonstrates envelope encryption’s separation of concerns: the keyring never sees plaintext data, and the database never stores unwrapped keys. It also shows how key rotation can be achieved by rewrapping stored data keys with a new master key and updating the key version without touching ciphertext. This approach supports cryptographic erasure, complies with defense-in-depth requirements, and integrates seamlessly with the ORM property accessors that hide complexity from higher-level application code.
+
 ## Implementation Details and Configuration
-Configuration resides in `config.py` with environment variables for database URI, model path, encryption flags, KMS provider and role strictness【ac6f4a†L15-L44】. Theme features read `SIMULATION_FEATURES` flags, while encryption toggles (`ENCRYPTION_ENABLED`, `READ_LEGACY_PLAINTEXT`) govern patient data handling. Gmail SMTP variables (`SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `MAIL_FROM`) enable TLS email delivery for password resets, and OTP settings (`OTP_TTL_MIN`, `OTP_MAX_ATTEMPTS`) harden the flow. A CLI (`flask roles`) manages user roles and can be extended for key rotation (`manage_keys.py`).
+Configuration resides in `config.py` with environment variables for database URI, model path, encryption flags, KMS provider and role strictness【6182c6†L32-L47】. Theme features read `SIMULATION_FEATURES` flags, while encryption toggles (`ENCRYPTION_ENABLED`, `READ_LEGACY_PLAINTEXT`) govern patient data handling. Gmail SMTP variables enable TLS email delivery for password resets and MFA codes. OTP settings (`OTP_TTL_MIN`, `OTP_MAX_ATTEMPTS`) harden the reset flow, while MFA settings (`MFA_EMAIL_CODE_LENGTH`, `MFA_EMAIL_TTL_MIN`, trust windows, resend cooldowns) tune second-factor behavior. A CLI (`flask roles`) manages user roles and can be extended for key rotation via `manage_keys.py`.
 
 ## Testing and Evaluation
-Automated tests cover authentication, RBAC, predictions, EDA payload, dashboard, encryption and theming (e.g., `tests/test_theme.py`) ensuring functional and security requirements. TEST_CASES.md enumerates manual and automated scenarios across modules, including CSRF, rate limiting, and theme persistence【02abce†L1-L126】. Running `pytest` executes unit and integration suites.
+Automated tests cover authentication, RBAC, predictions, EDA payload, dashboard, encryption, theming and MFA. Selected cases relevant to MFA and encryption are embedded below:
+
+```python
+# tests/test_crypto.py
+import pytest
+pytest.importorskip("cryptography")
+from services.crypto import envelope
+
+
+def test_encrypt_round_trip(app):
+    blob = envelope.encrypt_field(b"secret", "t:c|kid|1")
+    assert envelope.decrypt_field(blob, "t:c|kid|1") == b"secret"
+
+
+def test_tamper_detection(app):
+    blob = envelope.encrypt_field(b"secret", "t:c|kid|1")
+    blob["ciphertext"] = blob["ciphertext"][:-1] + b"x"
+    with pytest.raises(Exception):
+        envelope.decrypt_field(blob, "t:c|kid|1")
+
+
+def test_nonce_uniqueness(app):
+    nonces = set()
+    for _ in range(50):
+        blob = envelope.encrypt_field(b"data", "t:c|kid|1")
+        assert blob["nonce"] not in nonces
+        nonces.add(blob["nonce"])
+```
+
+```python
+# tests/test_encrypted_fields.py
+from app import db, Patient, User
+
+
+def test_patient_encryption_round_trip(app):
+    app.config["ENCRYPTION_ENABLED"] = True
+    with app.app_context():
+        user = User(username="u1", email="u1@example.com", role="Doctor", status="approved")
+        db.session.add(user)
+        db.session.commit()
+        p = Patient(entered_by_user_id=user.id)
+        p.patient_data = {"foo": "bar"}
+        db.session.add(p)
+        db.session.commit()
+        assert p.patient_data_ct is not None
+        assert p.patient_data == {"foo": "bar"}
+        app.config["ENCRYPTION_ENABLED"] = False
+        app.config["READ_LEGACY_PLAINTEXT"] = True
+        assert p.patient_data == {"foo": "bar"}
+```
+
+```python
+# tests/test_mfa.py
+import secrets
+from werkzeug.security import generate_password_hash
+from auth.totp import random_base32, generate_totp
+
+
+def test_login_with_totp(client, app):
+    from app import db, User
+    with app.app_context():
+        User.query.filter_by(email="mfa@example.com").delete()
+        db.session.commit()
+        user = User(username="mfauser", email="mfa@example.com", status="approved")
+        user.password_hash = generate_password_hash("Passw0rd!")
+        user.mfa_enabled = True
+        secret = random_base32()
+        user.set_mfa_secret(secret)
+        code = secrets.token_hex(8)
+        from auth.forgot import _hash_code
+        user.mfa_recovery_hashes = [_hash_code(code)]
+        db.session.add(user)
+        db.session.commit()
+    resp = client.post(
+        "/auth/login",
+        data={"identifier": "mfa@example.com", "password": "Passw0rd!"},
+    )
+    assert resp.status_code == 302 and resp.headers["Location"].endswith("/auth/mfa/verify")
+    resp2 = client.post(
+        "/auth/mfa/verify",
+        data={"code": generate_totp(secret)},
+        follow_redirects=True,
+    )
+    assert b"Predict" in resp2.data
+
+
+def test_login_with_totp_spaces(client, app):
+    from app import db, User
+    with app.app_context():
+        User.query.filter_by(email="mfa3@example.com").delete()
+        db.session.commit()
+        user = User(username="mfauser3", email="mfa3@example.com", status="approved")
+        user.password_hash = generate_password_hash("Passw0rd!")
+        user.mfa_enabled = True
+        secret = random_base32()
+        user.set_mfa_secret(secret)
+        db.session.add(user)
+        db.session.commit()
+    client.post(
+        "/auth/login",
+        data={"identifier": "mfa3@example.com", "password": "Passw0rd!"},
+    )
+    code = generate_totp(secret)
+    spaced = code[:3] + " " + code[3:]
+    resp = client.post(
+        "/auth/mfa/verify",
+        data={"code": spaced},
+        follow_redirects=True,
+    )
+    assert b"Predict" in resp.data
+
+
+def test_login_with_totp_hyphen(client, app):
+    from app import db, User
+    with app.app_context():
+        User.query.filter_by(email="mfa4@example.com").delete()
+        db.session.commit()
+        user = User(username="mfauser4", email="mfa4@example.com", status="approved")
+        user.password_hash = generate_password_hash("Passw0rd!")
+        user.mfa_enabled = True
+        secret = random_base32()
+        user.set_mfa_secret(secret)
+        db.session.add(user)
+        db.session.commit()
+    client.post(
+        "/auth/login",
+        data={"identifier": "mfa4@example.com", "password": "Passw0rd!"},
+    )
+    code = generate_totp(secret)
+    dashed = code[:3] + "-" + code[3:]
+    resp = client.post(
+        "/auth/mfa/verify",
+        data={"code": dashed},
+        follow_redirects=True,
+    )
+    assert b"Predict" in resp.data
+
+
+def test_login_with_recovery_code(client, app):
+    from app import db, User
+    from auth.forgot import _hash_code
+    with app.app_context():
+        User.query.filter_by(email="mfa2@example.com").delete()
+        db.session.commit()
+        user = User(username="mfauser2", email="mfa2@example.com", status="approved")
+        user.password_hash = generate_password_hash("Passw0rd!")
+        user.mfa_enabled = True
+        secret = random_base32()
+        user.set_mfa_secret(secret)
+        rec = secrets.token_hex(8)
+        user.mfa_recovery_hashes = [_hash_code(rec)]
+        db.session.add(user)
+        db.session.commit()
+    client.post(
+        "/auth/login",
+        data={"identifier": "mfa2@example.com", "password": "Passw0rd!"},
+    )
+    resp = client.post(
+        "/auth/mfa/verify",
+        data={"code": rec},
+        follow_redirects=True,
+    )
+    assert b"Predict" in resp.data
+
+
+def test_disable_mfa_with_hyphen(client, app):
+    from app import db, User
+    with app.app_context():
+        User.query.filter_by(email="mfa5@example.com").delete()
+        db.session.commit()
+        user = User(username="mfauser5", email="mfa5@example.com", status="approved")
+        user.password_hash = generate_password_hash("Passw0rd!")
+        user.mfa_enabled = True
+        secret = random_base32()
+        user.set_mfa_secret(secret)
+        db.session.add(user)
+        db.session.commit()
+    client.post(
+        "/auth/login",
+        data={"identifier": "mfa5@example.com", "password": "Passw0rd!"},
+    )
+    client.post(
+        "/auth/mfa/verify",
+        data={"code": generate_totp(secret)},
+        follow_redirects=True,
+    )
+    code = generate_totp(secret)
+    dashed = code[:3] + "-" + code[3:]
+    resp = client.post(
+        "/auth/mfa/disable",
+        data={"password": "Passw0rd!", "code": dashed},
+        follow_redirects=True,
+    )
+    assert b"Two-step verification disabled" in resp.data
+
+
+def test_settings_shows_mfa_option(auth_client):
+    resp = auth_client.get("/settings/")
+    assert b"Two-Step Verification" in resp.data
+    assert b"/auth/mfa/setup" in resp.data
+
+
+def test_login_with_email_code(monkeypatch, client, app):
+    from app import db, User
+    from auth.totp import random_base32
+    with app.app_context():
+        User.query.filter_by(email="mfaemail@example.com").delete()
+        db.session.commit()
+        user = User(username="mfaemail", email="mfaemail@example.com", status="approved")
+        user.password_hash = generate_password_hash("Passw0rd!")
+        user.mfa_enabled = True
+        secret = random_base32()
+        user.set_mfa_secret(secret)
+        db.session.add(user)
+        db.session.commit()
+    monkeypatch.setattr("auth.mfa.secrets.choice", lambda seq: seq[0])
+    monkeypatch.setattr("services.email.EmailService.send_mail", lambda self, *args, **kwargs: None)
+    client.post(
+        "/auth/login",
+        data={"identifier": "mfaemail@example.com", "password": "Passw0rd!"},
+    )
+    client.get("/auth/mfa/email")
+    resp = client.post(
+        "/auth/mfa/email",
+        data={"code": "000000"},
+        follow_redirects=True,
+    )
+    assert b"Predict" in resp.data
+```
+
+Running `pytest` executes these tests to confirm encryption integrity, MFA verification, recovery code handling and email fallback functionality.
 
 ## Timeline and Project Management
-The project followed a structured Gantt plan spanning planning, development, testing and deployment phases with milestones such as Security & Encryption, RBAC Hardening and UI Theming【dccd76†L5-L27】. Post‑deployment monitoring extends into maintenance.
+The project followed a structured Gantt plan spanning planning, development, testing and deployment phases with milestones such as Security & Encryption, RBAC Hardening, MFA rollout and UI Theming. Post‑deployment monitoring extends into maintenance.
 
 ## Ethics, Privacy, and Compliance
-HeartLytics minimizes data retention and encrypts sensitive fields. Cookies store only non‑sensitive theme preferences; sessions timeout to reduce exposure. The system adheres to OWASP guidelines and enables cryptographic erasure via KMS key deletion【69cf44†L33-L48】【5337ea†L29-L33】. Deployments targeting EU residents must ensure GDPR compliance, user consent and breach notification procedures【69cf44†L33-L48】.
+HeartLytics minimizes data retention and encrypts sensitive fields. Cookies store only non‑sensitive theme preferences; sessions timeout to reduce exposure. The system adheres to OWASP guidelines and enables cryptographic erasure via KMS key deletion【ce27a6†L34-L38】. Deployments targeting EU residents must ensure GDPR compliance, user consent and breach notification procedures.
 
 ## Results, Discussion, and Conclusion
-The implemented system validates the feasibility of delivering secure, role‑aware heart disease predictions through a themed web interface. Envelope encryption and RBAC address confidentiality and access control gaps identified in prior literature, while batch EDA and simulations foster transparency. Future work includes larger datasets, threshold tuning, fairness audits and integration with clinical information systems【76743a†L1-L7】.
+The implemented system validates the feasibility of delivering secure, role‑aware heart disease predictions through a themed web interface. Envelope encryption, blind indexes and MFA address confidentiality and access control gaps identified in prior literature, while batch EDA and simulations foster transparency. Future work includes larger datasets, threshold tuning, fairness audits and integration with clinical information systems.
 
 ## References
 - Breiman, L. (2001). Random forests. *Machine Learning*, 45(1), 5–32.
@@ -254,4 +608,4 @@ The implemented system validates the feasibility of delivering secure, role‑aw
 | `/superadmin/` | GET | SuperAdmin dashboard |
 
 ### Extended Test Cases
-See `TEST_CASES.md` for the full suite covering authentication, prediction, batch processing, encryption, RBAC, dashboards, settings, simulations, research viewer, security, regression, UI layout and theming scenarios【02abce†L1-L126】.
+See `TEST_CASES.md` for the full suite covering authentication, prediction, batch processing, encryption, MFA, RBAC, dashboards, settings, simulations, research viewer, security, regression, UI layout and theming scenarios.
