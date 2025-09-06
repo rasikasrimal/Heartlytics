@@ -338,6 +338,15 @@ class User(db.Model, UserMixin):
     )
     last_login = db.Column(db.DateTime)
     avatar = db.Column(db.String(255))
+    mfa_enabled = db.Column(db.Boolean, default=False)
+    mfa_secret_ct = db.Column(db.LargeBinary)
+    mfa_secret_nonce = db.Column(db.LargeBinary)
+    mfa_secret_tag = db.Column(db.LargeBinary)
+    mfa_secret_wrapped_dk = db.Column(db.LargeBinary)
+    mfa_secret_kid = db.Column(db.String(64))
+    mfa_secret_kver = db.Column(db.Integer)
+    mfa_recovery_hashes = db.Column(db.JSON)
+    mfa_last_enforced_at = db.Column(db.DateTime)
 
     def set_password(self, password: str) -> None:
         """Hash and store the given password using Argon2id."""
@@ -364,6 +373,33 @@ class User(db.Model, UserMixin):
             self.password_hash = password_hasher.hash(password)
             return True
         return False
+
+    @property
+    def mfa_secret(self) -> str | None:
+        if not self.mfa_secret_ct:
+            return None
+        blob = {
+            "ciphertext": self.mfa_secret_ct,
+            "nonce": self.mfa_secret_nonce,
+            "tag": self.mfa_secret_tag,
+            "wrapped_dk": self.mfa_secret_wrapped_dk,
+            "kid": self.mfa_secret_kid,
+            "kver": self.mfa_secret_kver,
+        }
+        context = f"user:{self.id}:mfa_secret|{self.mfa_secret_kid}|{self.mfa_secret_kver}"
+        try:
+            return envelope.decrypt_field(blob, context).decode()
+        except Exception:
+            return None
+
+    def set_mfa_secret(self, secret: str) -> None:
+        blob = envelope.encrypt_field(secret.encode(), f"user:{self.id}:mfa_secret")
+        self.mfa_secret_ct = blob["ciphertext"]
+        self.mfa_secret_nonce = blob["nonce"]
+        self.mfa_secret_tag = blob["tag"]
+        self.mfa_secret_wrapped_dk = blob["wrapped_dk"]
+        self.mfa_secret_kid = blob["kid"]
+        self.mfa_secret_kver = blob["kver"]
 
 
 class AuditLog(db.Model):

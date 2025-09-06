@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Two-Step Verification{% endblock %}
+{% from 'components/forms.html' import text_input %}
+{% block content %}
+<h1 class="mb-3">Enter authentication code</h1>
+<form method="post" autocomplete="off">
+  {{ form.hidden_tag() }}
+  {{ text_input('code', '6-digit code', attrs={'required': '', 'autocomplete': 'one-time-code'}, error=form.code.errors[0] if form.code.errors else None) }}
+  <button type="submit" class="btn btn-brand">Verify</button>
+</form>
+{% endblock %}

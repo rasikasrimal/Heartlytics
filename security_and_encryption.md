@@ -6,6 +6,8 @@ This document summarizes the security controls implemented in the HeartLytics we
 - Session-based authentication powered by **Flask-Login**.
 - Login attempts are rate limited to five per 15 minutes to mitigate brute-force attacks.
 - Sessions are marked as permanent and respect server-side timeouts.
+- Optional TOTP-based two-step verification with one-time recovery codes; secrets are envelope-encrypted at rest.
+- Password resets end with a forced login using the new password and trigger a notification email.
 
 ## Authorization
 - Strict role-based access control with roles **User**, **Doctor**, **Admin**, and **SuperAdmin**.

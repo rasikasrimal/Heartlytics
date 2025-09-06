@@ -81,3 +81,21 @@ class ResetPasswordForm(FlaskForm):
     confirm = PasswordField("Repeat New Password", validators=[DataRequired(), EqualTo("password")])
     submit = SubmitField("Update Password")
 
+
+class TOTPSetupForm(FlaskForm):
+    code = StringField("Authentication Code", validators=[DataRequired(), Length(min=6, max=6)])
+    submit = SubmitField("Enable")
+
+
+class TOTPVerifyForm(FlaskForm):
+    code = StringField("Authentication Code", validators=[DataRequired(), Length(min=6, max=10)])
+    submit = SubmitField("Verify")
+
+
+class MFADisableForm(FlaskForm):
+    password = PasswordField("Current Password", validators=[DataRequired()])
+    code = StringField(
+        "Authentication or Recovery Code", validators=[DataRequired(), Length(min=6, max=10)]
+    )
+    submit = SubmitField("Disable")
+

@@ -159,7 +159,8 @@ Security controls include:
 * **Authentication** – Flask‑Login sessions with rate limiting on login attempts【c1e841†L14-L44】.
 * **Authorization** – Decorators enforce role and module access before route execution【afe6fc†L1-L46】.
 * **Password Storage** – Argon2id hashing with transparent PBKDF2 upgrades【c1e841†L40-L56】【4088a1†L25-L48】.
-* **Password Reset** – Email-based one-time codes hashed with SHA-256, five-attempt limit and 10-minute expiry.
+* **Password Reset** – Email-based one-time codes hashed with SHA-256, five-attempt limit and 10-minute expiry; password changes require re-login and send confirmation mail.
+* **Multi-factor Authentication** – Optional TOTP codes with one-time recovery codes; secrets are envelope-encrypted.
 * **CSRF Protection** – Form and API decorators verify tokens stored in session【2dc86b†L1-L27】.
 * **Security Headers and Cookies** – Configured to limit sniffing, framing and track theme preference only【69cf44†L1-L32】.
 * **Encryption** – Envelope scheme with AES‑256‑GCM; key rotation and cryptographic erasure follow docs/encryption.md guidelines【5337ea†L1-L33】.
