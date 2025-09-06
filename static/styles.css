@@ -7,6 +7,7 @@
   --bs-secondary: #1e3a8a;
   --bs-body-bg: #f8fafc;
   --bs-body-color: #1f2937;
+  --bs-secondary-color: #64748b;
   --bs-link-color: var(--bs-secondary);
   --bs-link-hover-color: #1d4ed8;
   --bs-font-sans-serif: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
@@ -19,11 +20,17 @@
   --bs-border-color: #e5e7eb;
   --bs-card-bg: #fff;
   --bs-tertiary-bg: #f8f9fa;
+  --bs-success: #16a34a;
+  --bs-danger: #dc2626;
+  --bs-warning: #f59e0b;
+  --bs-info: #0ea5e9;
+  --border-subtle: #e2e8f0;
 }
 
 [data-bs-theme="dark"] {
   --bs-body-bg: #0f172a;
   --bs-body-color: #f1f5f9;
+  --bs-secondary-color: #94a3b8;
   --bs-link-color: #93c5fd;
   --bs-link-hover-color: #bfdbfe;
   --bs-border-color: #334155;
@@ -31,6 +38,11 @@
   --bs-tertiary-bg: #27303f;
   --bs-light: #374151;
   --brand-light: #450a0a;
+  --bs-success: #22c55e;
+  --bs-danger: #ef4444;
+  --bs-warning: #fbbf24;
+  --bs-info: #38bdf8;
+  --border-subtle: #475569;
 
 }
 

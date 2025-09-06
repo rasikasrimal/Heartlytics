@@ -28,6 +28,11 @@ This document summarizes the security controls implemented in the HeartLytics we
 ## Security Headers
 - Responses include headers like `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, and `Permissions-Policy` to reduce attack surface.
 
+## Cookies
+- A `theme` preference cookie is stored for UI purposes only. It contains no
+  sensitive data and is sent with every request so the server can render the
+  correct color scheme.
+
 ## Encryption
 - HTTPS/TLS should be enforced in production to encrypt data in transit.
 - Sensitive configuration such as `SECRET_KEY` and database credentials are loaded from environment variables.
