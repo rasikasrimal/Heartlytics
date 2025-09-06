@@ -12,6 +12,7 @@
 | TC-007 | Unauthenticated user is redirected to login when accessing dashboard. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-008 | Signup rejects duplicate email addresses. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-009 | Password must include upper, lower, number and special character. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-040 | Legacy password hashes upgrade to Argon2id on login. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 
 ## Prediction
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
@@ -33,6 +34,24 @@
 | TC-020 | EDA payload groups by string target values. | Batch Upload & EDA | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-021 | EDA payload handles dataset without target column. | Batch Upload & EDA | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-022 | Dashboard export creates PDF with KPIs and charts. | Batch Upload & EDA | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+
+## Encryption
+| Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
+| --- | --- | --- | --- | --- | --- |
+| TC-041 | Patient data encrypted with envelope scheme when enabled. | Encryption | 🔴 High | 🔒 Security | ⏳ Not Run |
+
+## RBAC
+| Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
+| --- | --- | --- | --- | --- | --- |
+| TC-050 | Admin role is forbidden from Predict, Batch, Dashboard, Research modules. | RBAC | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-051 | SuperAdmin bypasses all module restrictions. | RBAC | 🔴 High | 🔒 Security | ⏳ Not Run |
+
+## Navigation & Motion
+| Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
+| --- | --- | --- | --- | --- | --- |
+| TC-060 | Nav shows only permitted items for each role. | Navigation | 🔴 High | 🧪 Functional | ⏳ Not Run |
+| TC-061 | Theme toggle and user menu remain keyboard accessible after redesign. | Navigation | 🟡 Medium | 🧪 Accessibility | ⏳ Not Run |
+| TC-062 | Animations disable when `prefers-reduced-motion` is set. | Motion | 🟡 Medium | 🧪 Accessibility | ⏳ Not Run |
 
 ## Doctor Dashboard
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
@@ -98,3 +117,12 @@
 | TC-053 | Password field eye icon toggles visibility on login page. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-054 | Identifier field on login page starts empty without displaying "None". | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-055 | Login form disables autofill so fields remain blank. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+
+## UI Theming
+| Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
+| --- | --- | --- | --- | --- | --- |
+| TC-060 | Theme toggle updates `data-bs-theme`, cookie, and `localStorage` consistently. | UI Theming | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-061 | Server-side rendering respects `theme` cookie to avoid flash of incorrect theme. | UI Theming | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-062 | Charts and table headers render without white backgrounds in dark mode. | UI Theming | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-063 | Cleaning log output removes blank or whitespace-only lines for compact display. | UI Theming | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-064 | Login and signup pages expose a persistent theme toggle with no flash on first paint. | UI Theming | 🟡 Medium | 🧪 Functional | ⏳ Not Run |

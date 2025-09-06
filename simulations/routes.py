@@ -7,7 +7,7 @@ from flask_login import login_required
 
 import pandas as pd
 
-from services.auth import role_required
+from auth.decorators import require_roles
 from services.data import INPUT_COLUMNS
 
 from . import simulations_bp
@@ -126,7 +126,7 @@ def _run_simulation(form: dict, defaults: dict):
 
 @simulations_bp.route("/", methods=["GET"])
 @login_required
-@role_required(["Doctor", "SuperAdmin"])
+@require_roles("Doctor", "SuperAdmin")
 def index():
     """Render simulations page with enabled modules."""
     defaults = {
@@ -150,7 +150,7 @@ def index():
 
 @simulations_bp.route("/run", methods=["POST"])
 @login_required
-@role_required(["Doctor", "SuperAdmin"])
+@require_roles("Doctor", "SuperAdmin")
 def run():
     """Run simulation and return JSON data."""
     defaults = {

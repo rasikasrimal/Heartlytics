@@ -1,12 +1,28 @@
 {% extends "base.html" %}
-{% block title %}Predict | Heart Disease Risk{% endblock %}
+{% block title %}Predict{% endblock %}
 
 {% block content %}
-<div class="bg-dark text-light border rounded-4 p-5 text-center mb-4 shadow-sm">
-  <h1 class="display-6 fw-bold mb-2">Heart Disease Risk</h1>
-  <p class="helper-text mb-0">Single prediction & batch CSV analysis</p>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+  <h1 class="h3 mb-0">Predict</h1>
+  <div class="d-flex align-items-center flex-wrap gap-2">
+    <div class="btn-group btn-group-sm" role="group" aria-label="Prediction mode">
+      <a href="{{ url_for('index') }}" class="btn btn-outline-secondary active" aria-current="page">Single</a>
+      <a href="{{ url_for('upload_form') }}" class="btn btn-outline-secondary">Batch</a>
+    </div>
+    <small class="text-muted">Run a single prediction or upload a CSV batch.</small>
+    <span class="badge text-bg-secondary">Model {{ model_name }} · {{ model_date }}</span>
+  </div>
 </div>
 
+<div id="predict-tip" class="alert alert-info alert-dismissible fade show small" role="alert">
+  <strong>Quick Start:</strong>
+  <ol class="mb-0">
+    <li>Enter patient data.</li>
+    <li>Submit to predict.</li>
+    <li>Export results.</li>
+  </ol>
+  <button type="button" class="btn-close" aria-label="Close"></button>
+</div>
 
 <div class="row g-4">
   <!-- Left: single patient form -->
@@ -185,7 +201,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  tooltipTriggerList.map(t => new bootstrap.Tooltip(t));
-});
+    tooltipTriggerList.map(t => new bootstrap.Tooltip(t));
+
+    const tip = document.getElementById('predict-tip');
+    if (tip) {
+      const hidden = localStorage.getItem('predictTipDismissed');
+      if (hidden === '1') {
+        tip.remove();
+      } else {
+        const btn = tip.querySelector('.btn-close');
+        btn.addEventListener('click', () => {
+          tip.remove();
+          localStorage.setItem('predictTipDismissed', '1');
+        });
+      }
+    }
+  });
 </script>
 {% endblock %}

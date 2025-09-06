@@ -1,6 +1,8 @@
 import sys
 import types
 import pytest
+import os
+import base64
 
 # Provide a minimal stub for `python-dotenv` if the package isn't installed.
 # This avoids import errors during tests when the optional dependency is missing.
@@ -19,6 +21,8 @@ except Exception:
 @pytest.fixture
 def app():
     """Create and configure a Flask app for tests."""
+    os.environ.setdefault("DEV_KMS_MASTER_KEY", base64.b64encode(os.urandom(32)).decode())
+    os.environ.setdefault("DEV_KMS_IDX_KEY", base64.b64encode(os.urandom(32)).decode())
     try:
         from app import create_app  # type: ignore
     except Exception:

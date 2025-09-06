@@ -16,6 +16,9 @@ gantt
     Backend Implementation          :active,  back, 2024-02-01,2024-03-15
     Frontend Integration            :         front, after back, 30d
     Machine Learning Model          :         ml,   2024-02-15,2024-03-15
+    Security & Encryption           :         sec,  2024-03-05,2024-03-25
+    RBAC Hardening                  :         rbac, 2024-03-26,2024-04-05
+    UI Theming                     :done,   theme, 2024-04-06,2024-04-15
 
     section Testing
     Unit & Integration Tests        :         test, 2024-03-16,2024-03-31
@@ -30,8 +33,10 @@ gantt
 
 ## Summary
 - **Planning** ensures clear requirements and feasibility.
-- **Development** covers backend, frontend, and model building.
+- **Development** covers backend, frontend, model building, and UI theming (light/dark with transparent charts).
 - **Testing** verifies functionality and user satisfaction.
 - **Deployment** marks the production release.
 - **Post-Deployment** includes monitoring and ongoing maintenance.
+- Recent iteration adds cleaning-log normalization, a compact batch prediction notice, and a theme toggle on auth pages.
+- Latest update introduces a spaced, role-aware navigation bar and a shared motion token system.
 

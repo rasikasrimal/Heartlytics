@@ -2,6 +2,14 @@
 
 This document lists the tables in the application's database and includes `DESC` commands to inspect each table. Key columns are annotated to highlight primary keys (PK) and foreign keys (FK) linking related tables.
 
+User interface theme preferences are stored in client-side cookies and
+`localStorage`; no database tables persist this information.
+
+Recent theming updates (transparent charts and table header styling) do
+not introduce any new columns.
+Cleaning-log normalization and the auth-page theme toggle are handled
+in application logic and likewise require no schema changes.
+
 ## audit_log
 
 ```sql
@@ -48,7 +56,13 @@ DESC patient;
 | --- | --- | --- | --- |
 | id | INTEGER | PK | - |
 | entered_by_user_id | INTEGER | FK | user.id |
-| patient_data | JSON |  |  |
+| patient_data | JSON (legacy) |  |  |
+| patient_data_ct | BLOB |  |  |
+| patient_data_nonce | BLOB |  |  |
+| patient_data_tag | BLOB |  |  |
+| patient_data_wrapped_dk | BLOB |  |  |
+| patient_data_kid | VARCHAR(64) |  |  |
+| patient_data_kver | INTEGER |  |  |
 | prediction_result | VARCHAR(50) |  |  |
 | created_at | DATETIME |  |  |
 
@@ -62,7 +76,13 @@ DESC prediction;
 | --- | --- | --- | --- |
 | id | INTEGER | PK | - |
 | created_at | DATETIME |  |  |
-| patient_name | VARCHAR(120) |  |  |
+| patient_name | VARCHAR(120) (legacy) |  |  |
+| patient_name_ct | BLOB |  |  |
+| patient_name_nonce | BLOB |  |  |
+| patient_name_tag | BLOB |  |  |
+| patient_name_wrapped_dk | BLOB |  |  |
+| patient_name_kid | VARCHAR(64) |  |  |
+| patient_name_kver | INTEGER |  |  |
 | age | INTEGER |  |  |
 | sex | INTEGER |  |  |
 | chest_pain_type | VARCHAR(50) |  |  |
@@ -109,7 +129,7 @@ DESC user;
 | nickname | VARCHAR(80) |  |  |
 | email | VARCHAR(120) |  |  |
 | password_hash | VARCHAR(128) |  |  |
-| role | VARCHAR(20) |  |  |
+| role | VARCHAR(20) |  | SuperAdmin/Admin/Doctor/User |
 | status | VARCHAR(20) |  |  |
 | requested_role | VARCHAR(20) |  |  |
 | created_at | DATETIME |  |  |
@@ -118,6 +138,7 @@ DESC user;
 | avatar | VARCHAR(255) |  |  |
 
 Note: Users can log in using either the `username` or `email` field. The `last_login` column stores the timestamp of the most recent successful login. Login credentials are never persisted; the form clears identifier and password fields after each request.
+The `role` column drives RBAC enforcement with allowed values `SuperAdmin`, `Admin`, `Doctor`, and `User`.
 
 ## user_roles
 
@@ -138,3 +159,6 @@ DESC user_roles;
 - `prediction.cluster_id` → `cluster_summary.cluster_id`
 - `user_roles.user_id` → `user.id`
 - `user_roles.role_id` → `role.id`
+
+### Notes
+- UI navigation and motion system refinements do not require schema changes.

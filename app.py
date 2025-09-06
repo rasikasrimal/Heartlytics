@@ -13,6 +13,7 @@ import pickle
 import math
 from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo
+import click
 
 import numpy as np
 import pandas as pd
@@ -24,8 +25,13 @@ from flask import (
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, current_user, logout_user, login_required
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
+from services.crypto import envelope
+from services.crypto import get_keyring
 from config import DevelopmentConfig, ProductionConfig
+from navigation import get_nav_items
 
 # ML imputation helpers
 from sklearn.metrics import (
@@ -41,7 +47,8 @@ from outlier_detection import (
     run_outlier_methods,
 )
 
-from services.auth import role_required
+from auth.decorators import require_module_access, require_roles
+from auth.rbac import Role, rbac_can, is_superadmin
 from services.pdf import generate_prediction_pdf
 from services.data import (
     INPUT_COLUMNS,
@@ -55,6 +62,7 @@ from services.data import (
     BINARY_FEATURES,
     CATEGORICAL_FEATURES,
     group_cleaning_log,
+    normalize_log,
     clean_dataframe,
     find_optional_in_raw,
     normalize_columns,
@@ -65,6 +73,7 @@ from services.security import (
     get_csrf_token,
     csrf_protect_api,
 )
+from services.theme import init_theme
 
 from sqlalchemy import inspect, text
 
@@ -78,7 +87,12 @@ app.config.from_object(DevelopmentConfig if env == "development" else Production
 # Session configuration
 login_manager = LoginManager(app)
 login_manager.login_view = "auth.login"
+
+password_hasher = PasswordHasher(time_cost=2, memory_cost=65536, parallelism=1, hash_len=32, salt_len=16)
 app.permanent_session_lifetime = timedelta(minutes=30)
+
+# Theme handling
+init_theme(app)
 
 # Ensure instance dir
 os.makedirs(app.instance_path, exist_ok=True)
@@ -114,6 +128,19 @@ def inject_branding():
         "app_logo": current_app.config.get("APP_LOGO", "logo.svg"),
     }
 
+
+@app.context_processor
+def inject_rbac_helpers():
+    return {
+        "can": lambda module: current_user.is_authenticated and rbac_can(current_user, module),
+        "is_superadmin": lambda: current_user.is_authenticated and is_superadmin(current_user),
+    }
+
+
+@app.context_processor
+def inject_nav():
+    return {"nav_items": get_nav_items(current_user)}
+
 # Security headers
 @app.after_request
 def set_security_headers(resp):
@@ -123,19 +150,13 @@ def set_security_headers(resp):
     resp.headers['Permissions-Policy'] = 'interest-cohort=()'
     return resp
 
-# Restrict regular users to prediction functionality only
-@app.before_request
-def limit_user_pages():
-    if current_user.is_authenticated and getattr(current_user, "role", None) == "User":
-        allowed = {
-            "index",
-            "predict.predict_page",
-            "predict.predict",
-            "auth.logout",
-            "settings.settings",
-        }
-        if request.endpoint not in allowed and not (request.endpoint or "").startswith("static"):
-            return abort(403)
+
+@app.errorhandler(403)
+def handle_forbidden(e):
+    if request.accept_mimetypes.accept_json and not request.accept_mimetypes.accept_html:
+        return jsonify({"error": "forbidden"}), 403
+    return render_template("errors/403.html"), 403
+
 
 # Jinja helpers
 app.jinja_env.globals.update(zip=zip)
@@ -265,7 +286,7 @@ class User(db.Model, UserMixin):
     nickname = db.Column(db.String(80), unique=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False, default="")
-    role = db.Column(db.String(20), default="User")
+    role = db.Column(db.String(20), default=Role.USER.value, nullable=False)
     status = db.Column(db.String(20), default="pending")
     requested_role = db.Column(db.String(20))
     # Relationship to support many-to-many roles in future-proof design
@@ -282,12 +303,30 @@ class User(db.Model, UserMixin):
     avatar = db.Column(db.String(255))
 
     def set_password(self, password: str) -> None:
-        """Hash and store the given password."""
-        self.password_hash = generate_password_hash(password)
+        """Hash and store the given password using Argon2id."""
+        self.password_hash = password_hasher.hash(password)
 
     def check_password(self, password: str) -> bool:
-        """Return ``True`` if ``password`` matches the stored hash."""
-        return check_password_hash(self.password_hash, password)
+        """Return ``True`` if ``password`` matches the stored hash.
+
+        Supports legacy Werkzeug PBKDF2 hashes and transparently upgrades
+        them to Argon2id upon successful verification.
+        """
+
+        if self.password_hash.startswith("$argon2id$"):
+            try:
+                password_hasher.verify(self.password_hash, password)
+            except VerifyMismatchError:
+                return False
+            if password_hasher.check_needs_rehash(self.password_hash):
+                self.password_hash = password_hasher.hash(password)
+            return True
+
+        # Legacy Werkzeug hash
+        if check_password_hash(self.password_hash, password):
+            self.password_hash = password_hasher.hash(password)
+            return True
+        return False
 
 
 class AuditLog(db.Model):
@@ -357,16 +396,68 @@ class Patient(db.Model):
     entered_by_user_id = db.Column(
         db.Integer, db.ForeignKey("user.id"), nullable=False
     )
-    patient_data = db.Column(db.JSON, nullable=False)
+    patient_data_legacy = db.Column("patient_data", db.JSON)
+    patient_data_ct = db.Column(db.LargeBinary)
+    patient_data_nonce = db.Column(db.LargeBinary)
+    patient_data_tag = db.Column(db.LargeBinary)
+    patient_data_wrapped_dk = db.Column(db.LargeBinary)
+    patient_data_kid = db.Column(db.String(64))
+    patient_data_kver = db.Column(db.Integer)
     prediction_result = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     entered_by = db.relationship("User", backref="patients")
 
+    @property
+    def patient_data(self):
+        if self.patient_data_ct:
+            blob = {
+                "ciphertext": self.patient_data_ct,
+                "nonce": self.patient_data_nonce,
+                "tag": self.patient_data_tag,
+                "wrapped_dk": self.patient_data_wrapped_dk,
+                "kid": self.patient_data_kid,
+                "kver": self.patient_data_kver,
+            }
+            context = f"{self.__tablename__}:patient_data|{self.patient_data_kid}|{self.patient_data_kver}"
+            try:
+                data = envelope.decrypt_field(blob, context)
+                return json.loads(data.decode())
+            except Exception:
+                return None
+        if current_app.config.get("READ_LEGACY_PLAINTEXT"):
+            return self.patient_data_legacy
+        return None
+
+    @patient_data.setter
+    def patient_data(self, value):
+        if current_app.config.get("ENCRYPTION_ENABLED") and value is not None:
+            data = json.dumps(value).encode()
+            blob = envelope.encrypt_field(
+                data,
+                f"{self.__tablename__}:patient_data|{get_keyring().current_kid()}|1",
+            )
+            self.patient_data_ct = blob["ciphertext"]
+            self.patient_data_nonce = blob["nonce"]
+            self.patient_data_tag = blob["tag"]
+            self.patient_data_wrapped_dk = blob["wrapped_dk"]
+            self.patient_data_kid = blob["kid"]
+            self.patient_data_kver = blob["kver"]
+            if current_app.config.get("READ_LEGACY_PLAINTEXT"):
+                self.patient_data_legacy = value
+        else:
+            self.patient_data_legacy = value
+
 class Prediction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    patient_name = db.Column(db.String(120))
+    patient_name_legacy = db.Column("patient_name", db.String(120))
+    patient_name_ct = db.Column(db.LargeBinary)
+    patient_name_nonce = db.Column(db.LargeBinary)
+    patient_name_tag = db.Column(db.LargeBinary)
+    patient_name_wrapped_dk = db.Column(db.LargeBinary)
+    patient_name_kid = db.Column(db.String(64))
+    patient_name_kver = db.Column(db.Integer)
     age = db.Column(db.Integer, nullable=False)
     sex = db.Column(db.Integer, nullable=False)  # 0/1
     chest_pain_type = db.Column(db.String(50))
@@ -407,6 +498,44 @@ class Prediction(db.Model):
             "model_version": self.model_version,
             "cluster_id": self.cluster_id,
         }
+
+    @property
+    def patient_name(self):
+        if self.patient_name_ct:
+            blob = {
+                "ciphertext": self.patient_name_ct,
+                "nonce": self.patient_name_nonce,
+                "tag": self.patient_name_tag,
+                "wrapped_dk": self.patient_name_wrapped_dk,
+                "kid": self.patient_name_kid,
+                "kver": self.patient_name_kver,
+            }
+            context = f"{self.__tablename__}:patient_name|{self.patient_name_kid}|{self.patient_name_kver}"
+            try:
+                return envelope.decrypt_field(blob, context).decode()
+            except Exception:
+                return None
+        if current_app.config.get("READ_LEGACY_PLAINTEXT"):
+            return self.patient_name_legacy
+        return None
+
+    @patient_name.setter
+    def patient_name(self, value):
+        if current_app.config.get("ENCRYPTION_ENABLED") and value is not None:
+            blob = envelope.encrypt_field(
+                value.encode(),
+                f"{self.__tablename__}:patient_name|{get_keyring().current_kid()}|1",
+            )
+            self.patient_name_ct = blob["ciphertext"]
+            self.patient_name_nonce = blob["nonce"]
+            self.patient_name_tag = blob["tag"]
+            self.patient_name_wrapped_dk = blob["wrapped_dk"]
+            self.patient_name_kid = blob["kid"]
+            self.patient_name_kver = blob["kver"]
+            if current_app.config.get("READ_LEGACY_PLAINTEXT"):
+                self.patient_name_legacy = value
+        else:
+            self.patient_name_legacy = value
 
 # Summary stats for clusters
 class ClusterSummary(db.Model):
@@ -489,6 +618,37 @@ with app.app_context():
     if "cluster_id" not in pred_cols:
         db.session.execute(text("ALTER TABLE prediction ADD COLUMN cluster_id INTEGER"))
         db.session.commit()
+
+    # ensure encrypted patient_name columns exist for older databases
+    for col, coltype in [
+        ("patient_name_ct", "BLOB"),
+        ("patient_name_nonce", "BLOB"),
+        ("patient_name_tag", "BLOB"),
+        ("patient_name_wrapped_dk", "BLOB"),
+        ("patient_name_kid", "VARCHAR(64)"),
+        ("patient_name_kver", "INTEGER"),
+    ]:
+        if col not in pred_cols:
+            db.session.execute(
+                text(f"ALTER TABLE prediction ADD COLUMN {col} {coltype}")
+            )
+            db.session.commit()
+
+    # ensure encrypted patient_data columns exist for older databases
+    patient_cols = [c["name"] for c in insp.get_columns("patient")]
+    for col, coltype in [
+        ("patient_data_ct", "BLOB"),
+        ("patient_data_nonce", "BLOB"),
+        ("patient_data_tag", "BLOB"),
+        ("patient_data_wrapped_dk", "BLOB"),
+        ("patient_data_kid", "VARCHAR(64)"),
+        ("patient_data_kver", "INTEGER"),
+    ]:
+        if col not in patient_cols:
+            db.session.execute(
+                text(f"ALTER TABLE patient ADD COLUMN {col} {coltype}")
+            )
+            db.session.commit()
 
     # ensure uid, requested_role and updated_at columns exist for existing user tables
     user_cols = [c["name"] for c in insp.get_columns("user")]
@@ -728,10 +888,12 @@ def load_model(path: str):
 
 model = load_model(MODEL_PATH) if os.path.exists(MODEL_PATH) else None
 model_name = os.path.basename(MODEL_PATH)
+model_date = datetime.fromtimestamp(os.path.getmtime(MODEL_PATH)).date().isoformat() if os.path.exists(MODEL_PATH) else ""
 # Expose model info on the app for blueprint access without importing
 # this module again.
 app.model = model
 app.model_name = model_name
+app.model_date = model_date
 
 # ---------------------------
 # Training Schema (exact columns used by model)
@@ -748,6 +910,7 @@ from doctor import doctor_bp
 from user import user_bp
 from routes.settings import settings_bp
 from simulations import simulations_bp
+from routes.debug import debug_bp
 
 app.register_blueprint(predict_bp)
 app.register_blueprint(auth_bp)
@@ -756,11 +919,12 @@ app.register_blueprint(doctor_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(settings_bp)
 app.register_blueprint(simulations_bp)
+app.register_blueprint(debug_bp)
 
 
 @app.route("/admin/")
 @login_required
-@role_required(["Admin", "SuperAdmin"])
+@require_roles("Admin", "SuperAdmin")
 def admin_dashboard_alias():
     """Redirect legacy /admin/ path to unified dashboard."""
     return redirect(url_for("superadmin.dashboard"))
@@ -848,7 +1012,7 @@ def index():
         "num_major_vessels": 0,
         "thalassemia_type": "normal",
     }
-    return render_template("predict/form.html", defaults=defaults, model_name=model_name, theme="dark")
+    return render_template("predict/form.html", defaults=defaults, model_name=model_name, model_date=app.model_date)
 
 
 # ---------------------------
@@ -856,6 +1020,7 @@ def index():
 # ---------------------------
 @app.get("/dashboard")
 @login_required
+@require_module_access("Dashboard")
 def dashboard():
     rows = Prediction.query.order_by(Prediction.created_at.asc()).all()
     data = [r.to_dict() for r in rows]
@@ -868,6 +1033,7 @@ def dashboard():
 
 @app.route("/outliers", methods=["GET", "POST"])
 @login_required
+@require_module_access("Dashboard")
 def outlier_handling():
     """Interactive page to run and compare multiple outlier detectors."""
     rows = Prediction.query.order_by(Prediction.created_at.asc()).all()
@@ -891,6 +1057,7 @@ def outlier_handling():
 
 @app.get("/dashboard/pdf")
 @login_required
+@require_module_access("Dashboard")
 def dashboard_pdf():
     """Render PDF generation options page with preview data."""
     rows = Prediction.query.order_by(Prediction.created_at.asc()).all()
@@ -919,6 +1086,7 @@ def dashboard_pdf():
 
 @app.post("/dashboard/pdf")
 @login_required
+@require_module_access("Dashboard")
 def dashboard_pdf_generate():
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import A4, landscape
@@ -1400,6 +1568,7 @@ def dashboard_pdf_generate():
 
 @app.get("/dashboard/csv")
 @login_required
+@require_module_access("Dashboard")
 def dashboard_csv():
     import csv
 
@@ -1431,6 +1600,7 @@ def dashboard_csv():
 
 @app.get("/dashboard/clean-csv")
 @login_required
+@require_module_access("Dashboard")
 def dashboard_clean_csv():
     rows = Prediction.query.order_by(Prediction.created_at.asc()).all()
     data = [r.to_dict() for r in rows]
@@ -1450,6 +1620,7 @@ def dashboard_clean_csv():
 
 @app.get("/research")
 @login_required
+@require_module_access("Research")
 def research_paper():
     paper = load_research_paper()
     return render_template("research/index.html", paper=paper)
@@ -1803,6 +1974,7 @@ def _apply_user_mapping(df: pd.DataFrame, mapping: dict) -> pd.DataFrame:
 # ============================
 @app.get("/upload")
 @login_required
+@require_module_access("Batch")
 def upload_form():
     return render_template("uploads/form.html",
                            required_cols=sorted(list(REQUIRED_INTERNAL_COLUMNS)),
@@ -1810,6 +1982,7 @@ def upload_form():
 
 @app.post("/upload")
 @login_required
+@require_module_access("Batch")
 @csrf_protect
 def upload_post():
     file = request.files.get("file")
@@ -1861,6 +2034,7 @@ def upload_post():
 
 @app.get("/upload/<uid>/columns")
 @login_required
+@require_module_access("Batch")
 def upload_columns_map(uid: str):
     p = _paths(uid)
     if not os.path.exists(p["raw"]):
@@ -1921,6 +2095,7 @@ def upload_columns_map(uid: str):
 
 @app.post("/upload/<uid>/columns")
 @login_required
+@require_module_access("Batch")
 @csrf_protect
 def upload_columns_map_submit(uid: str):
     p = _paths(uid)
@@ -2155,12 +2330,10 @@ def upload_eda(uid: str):
 
         has_results = os.path.exists(p["results"])
         raw_log = payload.get("log", [])
-        log = []
-        for item in raw_log:
-            if isinstance(item, dict):
-                log.append(item)
-            else:
-                log.append({"text": item})
+        log = normalize_log(raw_log)
+        predict_notice = None
+        if len(log) == 1 and log[0].get("text", "").startswith("Predictions added"):
+            predict_notice = log[0]["text"]
         groups = group_cleaning_log(log)
 
         return render_template(
@@ -2174,6 +2347,7 @@ def upload_eda(uid: str):
             outliers_json=json.dumps(payload.get("outliers", [])),
             has_results=has_results,
             banner=None,
+            predict_notice=predict_notice,
         )
 
     csv_path = p["results"] if os.path.exists(p["results"]) else p["clean"]
@@ -2198,7 +2372,11 @@ def upload_eda(uid: str):
         .replace({np.nan: None})
         .to_dict(orient="records")
     )
-    cleaning_log = [{"text": "Loaded results dataset" if os.path.exists(p["results"]) else "Loaded cleaned dataset"}, {"text": f"Rows: {len(df)}"}]
+    cleaning_log = [
+        {"text": "Loaded results dataset" if os.path.exists(p["results"]) else "Loaded cleaned dataset"},
+        {"text": f"Rows: {len(df)}"},
+    ]
+    cleaning_log = normalize_log(cleaning_log)
     groups = group_cleaning_log(cleaning_log)
 
     to_save = {"log": cleaning_log, "eda": eda_payload, "preview": preview}
@@ -2368,7 +2546,8 @@ def upload_predict(uid: str):
         .replace({np.nan: None})
         .to_dict(orient="records")
     )
-    log = [{"text": f"Predictions added: {len(df)} rows"}]
+    log = normalize_log([{"text": f"Predictions added: {len(df)} rows"}])
+    notice = log[0]["text"] if log else None
     to_save = {"log": log, "eda": eda_payload, "preview": preview, "outliers": outliers}
     try:
         with open(p["eda_json"], "w", encoding="utf-8") as f:
@@ -2382,11 +2561,11 @@ def upload_predict(uid: str):
         cleaning_log=log,
         cleaning_groups=groups,
         cleaning_log_json=json.dumps(log),
-
         preview_json=json.dumps(preview),
         eda_json=json.dumps(eda_payload),
         outliers_json=json.dumps(outliers),
         has_results=True,
+        predict_notice=notice,
         banner=f"Batch prediction complete: {len(df)} rows saved.",
         outliers=outliers,
     )
@@ -2457,6 +2636,36 @@ def upload_bulk_pdf(uid: str):
     c.save()
     buf.seek(0)
     return send_file(buf, as_attachment=True, download_name=f"batch_report_{uid}.pdf", mimetype="application/pdf")
+
+
+# ---------------------------
+# CLI role management
+# ---------------------------
+
+@app.cli.group()
+def roles():
+    """Manage user roles."""
+
+
+@roles.command("set")
+@click.argument("email")
+@click.argument("role")
+def roles_set(email: str, role: str) -> None:
+    """Set ``email`` user to ``role``."""
+    from click import echo
+
+    with app.app_context():
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            echo("User not found")
+            return
+        try:
+            user.role = Role(role).value
+        except ValueError:
+            echo("Invalid role")
+            return
+        db.session.commit()
+        echo(f"Updated {email} to {user.role}")
 
 
 # ---------------------------

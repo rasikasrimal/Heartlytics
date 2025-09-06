@@ -8,12 +8,19 @@ This document summarizes the security controls implemented in the HeartLytics we
 - Sessions are marked as permanent and respect server-side timeouts.
 
 ## Authorization
-- Role-based access control with roles such as **User**, **Doctor**, **Admin**, and **SuperAdmin**.
-- Route-level restrictions ensure users only access permitted views.
+- Strict role-based access control with roles **User**, **Doctor**, **Admin**, and **SuperAdmin**.
+- Policy matrix:
+  - **SuperAdmin** – full access
+  - **Admin** – no access to Predict, Batch, Dashboard, Research modules
+  - **Doctor** – access to all modules
+  - **User** – Predict only
+- Server-side decorators enforce checks before any sensitive processing.
+- `RBAC_STRICT` environment flag (default `1`) ensures checks are always active.
+- Top navigation reads the policy to hide unauthorized links before a request is made.
 
 ## Password Storage
-- Passwords are hashed using Werkzeug's `generate_password_hash` (PBKDF2 + SHA256).
-- `check_password_hash` is used for verification without exposing plaintext passwords.
+- Passwords are hashed using `argon2-cffi` with the Argon2id algorithm.
+- Legacy PBKDF2 hashes are accepted and upgraded to Argon2id on successful login.
 
 ## CSRF Protection
 - Forms and API routes include CSRF tokens verified on every non-GET request.
@@ -22,10 +29,17 @@ This document summarizes the security controls implemented in the HeartLytics we
 ## Security Headers
 - Responses include headers like `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, and `Permissions-Policy` to reduce attack surface.
 
+## Cookies
+- A `theme` preference cookie is stored for UI purposes only. It contains no
+  sensitive data and is sent with every request so the server can render the
+  correct color scheme.
+
 ## Encryption
 - HTTPS/TLS should be enforced in production to encrypt data in transit.
 - Sensitive configuration such as `SECRET_KEY` and database credentials are loaded from environment variables.
 - Database files and backups should reside on encrypted storage.
+- Selected fields (patient data and patient names) are encrypted at the application layer
+  using AES-256-GCM with per-record data keys wrapped by a keyring.
 
 ## Data Protection & Compliance
 - Collect only necessary personal data and retain it for the minimum time required.
