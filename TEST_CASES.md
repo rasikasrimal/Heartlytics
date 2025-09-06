@@ -20,6 +20,10 @@
 | TC-074 | Password reset requires re-login; no automatic session. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-075 | User with TOTP enabled must enter valid code after password. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-076 | Recovery codes allow login without authenticator app. | Authentication & Roles | 🟡 Medium | 🔒 Security | ⏳ Not Run |
+| TC-077 | User can enable email MFA after TOTP challenge. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-078 | Login fallback via email code succeeds. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-079 | Email code resend blocked during 30s cooldown. | Authentication & Roles | 🟡 Medium | 🔒 Security | ⏳ Not Run |
+| TC-080 | Disabling email codes requires password and TOTP. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 
 ## Prediction
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |

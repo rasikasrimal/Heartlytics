@@ -163,6 +163,8 @@ DESC user;
 | last_login | DATETIME |  |  |
 | avatar | VARCHAR(255) |  |  |
 | mfa_enabled | BOOLEAN |  |  |
+| mfa_email_enabled | BOOLEAN |  |  |
+| mfa_email_verified_at | DATETIME |  |  |
 | mfa_secret_ct | BLOB |  |  |
 | mfa_secret_nonce | BLOB |  |  |
 | mfa_secret_tag | BLOB |  |  |
@@ -174,7 +176,22 @@ DESC user;
 
 Note: Users can log in using either the `username` or `email` field. The `last_login` column stores the timestamp of the most recent successful login. Login credentials are never persisted; the form clears identifier and password fields after each request.
 The `role` column drives RBAC enforcement with allowed values `SuperAdmin`, `Admin`, `Doctor`, and `User`.
-TOTP multi-factor authentication uses the `mfa_*` columns to hold an encrypted secret, recovery code hashes, and enforcement timestamps.
+TOTP multi-factor authentication uses the `mfa_*` columns to hold an encrypted secret, recovery code hashes, and enforcement timestamps. Email MFA stores its enablement and verification time in `mfa_email_*` fields.
+
+## mfa_email_challenge
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| id | INTEGER | Primary key |
+| user_id | INTEGER | FK to user.id |
+| code_hash | VARCHAR(64) | Hashed one-time code |
+| expires_at | DATETIME | Expiration time |
+| attempts | INTEGER | Attempt counter |
+| resend_count | INTEGER | Number of sends |
+| last_sent_at | DATETIME | Last send timestamp |
+| status | VARCHAR(20) | pending/verified/expired |
+| requester_ip | VARCHAR(45) |  |
+| user_agent | VARCHAR(200) |  |
 
 ## user_roles
 

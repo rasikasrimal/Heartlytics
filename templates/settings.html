@@ -64,6 +64,20 @@
       </div>
     </div>
   </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header">Email Codes</div>
+      <div class="card-body">
+        {% if current_user.mfa_email_enabled %}
+          <p>Email codes are enabled.</p>
+          <a class="btn btn-danger me-2" href="{{ url_for('auth.mfa_email_disable') }}">Disable</a>
+        {% else %}
+          <p>Receive one-time codes by email during login.</p>
+          <a class="btn btn-brand" href="{{ url_for('auth.mfa_email_setup') }}">Enable</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
   {% if current_user.role == 'SuperAdmin' %}
   <div class="col-md-6">
     <div class="card shadow-sm">
