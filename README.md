@@ -33,6 +33,7 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
   - Security headers (no-sniff, frame denial, no referrer, no FLoC)
   - Login rate limiting and session timeouts
   - 🗄 **Persistence**: SQLite database via SQLAlchemy, storing predictions with metadata.
+  - 🔐 **Application-level encryption** for patient data and patient names with envelope encryption and Argon2id password hashing.
 
 ---
 
@@ -144,6 +145,11 @@ The application reads configuration from environment variables (see `.env.exampl
 | `DATABASE_URI` | Database connection string                | `sqlite:///instance/app.db` |
 | `MODEL_PATH`   | Path to the trained model file            | `ml/model.pkl`              |
 | `FLASK_ENV`    | `development` loads `DevelopmentConfig`   | `production`                |
+| `ENCRYPTION_ENABLED` | Enable envelope encryption on writes | `0` |
+| `READ_LEGACY_PLAINTEXT` | Read plaintext columns if ciphertext missing | `1` |
+| `KMS_PROVIDER` | `dev` uses local keyring                  | `dev` |
+| `DEV_KMS_MASTER_KEY` | base64 master key for dev keyring    | _none_ |
+| `DEV_KMS_IDX_KEY` | base64 key for blind indexes           | _none_ |
 
 ## 📈 Example Workflow
 

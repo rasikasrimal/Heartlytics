@@ -12,6 +12,7 @@
 | TC-007 | Unauthenticated user is redirected to login when accessing dashboard. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-008 | Signup rejects duplicate email addresses. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-009 | Password must include upper, lower, number and special character. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-040 | Legacy password hashes upgrade to Argon2id on login. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 
 ## Prediction
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
@@ -33,6 +34,11 @@
 | TC-020 | EDA payload groups by string target values. | Batch Upload & EDA | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-021 | EDA payload handles dataset without target column. | Batch Upload & EDA | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-022 | Dashboard export creates PDF with KPIs and charts. | Batch Upload & EDA | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+
+## Encryption
+| Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
+| --- | --- | --- | --- | --- | --- |
+| TC-041 | Patient data encrypted with envelope scheme when enabled. | Encryption | 🔴 High | 🔒 Security | ⏳ Not Run |
 
 ## Doctor Dashboard
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |

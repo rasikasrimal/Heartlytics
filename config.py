@@ -29,6 +29,21 @@ class Config:
         not in {"0", "false"},
     }
 
+    # Encryption/KMS flags
+    ENCRYPTION_ENABLED = os.environ.get("ENCRYPTION_ENABLED", "0").lower() in {
+        "1",
+        "true",
+    }
+    READ_LEGACY_PLAINTEXT = os.environ.get(
+        "READ_LEGACY_PLAINTEXT", "1"
+    ).lower() in {"1", "true"}
+    KMS_PROVIDER = os.environ.get("KMS_PROVIDER", "dev")
+    KMS_KEY_ID = os.environ.get("KMS_KEY_ID", "dev-master")
+    IDX_KEY_ID = os.environ.get("IDX_KEY_ID", "dev-idx")
+    PEPPER = os.environ.get("PEPPER")
+    DEV_KMS_MASTER_KEY = os.environ.get("DEV_KMS_MASTER_KEY")
+    DEV_KMS_IDX_KEY = os.environ.get("DEV_KMS_IDX_KEY")
+
 class DevelopmentConfig(Config):
     DEBUG = True
 
