@@ -129,3 +129,6 @@ Future work includes: (i) larger, more diverse cohorts; (ii) threshold tuning fo
 **XGBoost:** `n_estimators ∈ {100,150,200}`, `learning_rate ∈ {0.01,0.05,0.1}`, `max_depth ∈ {3,4,5}`, `subsample ∈ {0.6,0.8,1.0}`, `colsample_bytree ∈ {0.6,0.8,1.0}`, `γ ∈ {0,0.1,0.5}`.
 
 © 2025 IEEE.
+
+## Security Update
+The web application now provides a secure forgotten password flow using short-lived verification codes hashed at rest to protect user accounts.

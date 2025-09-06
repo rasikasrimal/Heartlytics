@@ -29,6 +29,7 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 - 🧾 **Themed Tables & Logs**: Cleaning logs and patient record tables match the active theme for consistent readability.
 - 🧹 **Normalized Cleaning Logs**: Blank lines are stripped server-side for compact output; batch predictions surface a concise inline notice.
 - 🔐 **Redesigned Login**: Clean layout without top navigation, centered branding and form, fields start empty with autofill disabled, password visibility toggle, hover animation on login button, and quick links.
+- 🔑 **Forgot Password Flow**: Email verification code with enumeration-safe messaging and optional auto-login after reset.
 - 📌 **Sticky Footer**: Consistent footer on every page that stays at the bottom.
 - 🧭 **Responsive Navigation**: Evenly spaced top bar with RBAC-driven items, sticky elevation, and utility icons.
 - 🎞️ **Motion System**: Tokenized durations/easings applied across components with `prefers-reduced-motion` support.

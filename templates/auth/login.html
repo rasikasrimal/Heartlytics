@@ -25,7 +25,7 @@
           {{ password_input('password', 'Password', attrs={'required': '', 'autocomplete': 'off'}, error=form.password.errors[0] if form.password.errors else None) }}
           <button type="submit" class="btn btn-brand w-100 mb-3">Login</button>
           <div class="d-flex justify-content-between">
-            <a href="#" class="small">Forgotten password?</a>
+            <a href="{{ url_for('auth.forgot') }}" class="small">Forgot password?</a>
             <a href="{{ url_for('auth.signup') }}" class="small">Create new account</a>
           </div>
         </form>

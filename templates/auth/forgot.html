@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Find Your Account{% endblock %}
+{% from 'components/forms.html' import text_input %}
+{% block content %}
+<div class="container py-5">
+  <h1>Find Your Account</h1>
+  <p>Please enter your email address or username to search for your account.</p>
+  <form method="post" autocomplete="off">
+    {{ form.hidden_tag() }}
+    {{ text_input('identifier', 'Email or Username', attrs={'required': ''}, error=form.identifier.errors[0] if form.identifier.errors else None) }}
+    <button type="submit" class="btn btn-brand">Search</button>
+    <a href="{{ url_for('auth.login') }}" class="btn btn-secondary ms-2">Cancel</a>
+  </form>
+</div>
+{% endblock %}
