@@ -88,14 +88,18 @@ class TOTPSetupForm(FlaskForm):
 
 
 class TOTPVerifyForm(FlaskForm):
-    code = StringField("Authentication Code", validators=[DataRequired(), Length(min=6, max=10)])
+    code = StringField(
+        "Authentication Code",
+        validators=[DataRequired(), Length(min=6, max=16)],
+    )
     submit = SubmitField("Verify")
 
 
 class MFADisableForm(FlaskForm):
     password = PasswordField("Current Password", validators=[DataRequired()])
     code = StringField(
-        "Authentication or Recovery Code", validators=[DataRequired(), Length(min=6, max=10)]
+        "Authentication or Recovery Code",
+        validators=[DataRequired(), Length(min=6, max=16)],
     )
     submit = SubmitField("Disable")
 
