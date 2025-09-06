@@ -1,19 +1,49 @@
 <nav class="navbar navbar-expand-lg bg-body border-bottom sticky-top" id="topNav">
-  <div class="container-fluid px-4">
-    <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('index') }}">
+  <!-- Use the same container width your page body uses -->
+  <div class="container-xxl">
+    <!-- Left group: brand + toggler -->
+    <a class="navbar-brand d-flex align-items-center gap-2 me-2" href="{{ url_for('index') }}">
       <img src="{{ url_for('static', filename=app_logo) }}" alt="{{ app_name }} logo" height="28" width="28">
       <span class="fw-semibold">{{ app_name }}</span>
     </a>
-    <div class="d-flex align-items-center ms-auto gap-3 order-lg-3">
+
+    <!-- Put the hamburger next to the brand (left) -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+            aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Main nav: grows from the left group; me-auto pushes utilities to the right -->
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-3 me-auto gap-3 mt-3 mt-lg-0">
+        {% for item in nav_items %}
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-1 {% if request.endpoint == item.endpoint %}active{% endif %}"
+             href="{{ url_for(item.endpoint) }}"
+             {% if request.endpoint == item.endpoint %}aria-current="page"{% endif %}>
+            <i class="{{ item.icon }}"></i>
+            <span class="d-none d-sm-inline">{{ item.label }}</span>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Right-side utilities: help, theme toggle, auth/profile -->
+    <div class="d-flex align-items-center ms-3 gap-3">
       <a href="https://example.com/help" target="_blank" rel="noopener" class="btn btn-link p-0" aria-label="Help">
         <i class="bi bi-question-circle"></i>
       </a>
+
       {% include 'components/theme_toggle.html' %}
+
       {% if current_user.is_authenticated %}
-      <div class="dropdown ms-2">
-        <button class="btn btn-link p-0 d-flex align-items-center dropdown-toggle" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+      <div class="dropdown">
+        <button class="btn btn-link p-0 d-flex align-items-center dropdown-toggle" id="userMenu"
+                data-bs-toggle="dropdown" aria-expanded="false">
           {% if current_user.avatar %}
-          <img src="{{ url_for('static', filename='avatars/' ~ current_user.avatar) }}" class="avatar me-1" alt="{{ current_user.nickname or current_user.username }} avatar">
+          <img src="{{ url_for('static', filename='avatars/' ~ current_user.avatar) }}"
+               class="avatar me-1" alt="{{ current_user.nickname or current_user.username }} avatar">
           {% else %}
           <i class="bi bi-person-circle me-1"></i>
           {% endif %}
@@ -29,21 +59,6 @@
       <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
       <a class="nav-link" href="{{ url_for('auth.signup') }}">Sign Up</a>
       {% endif %}
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    </div>
-    <div class="collapse navbar-collapse order-lg-2" id="mainNav">
-      <ul class="navbar-nav ms-lg-4 me-auto gap-3 mt-3 mt-lg-0">
-        {% for item in nav_items %}
-        <li class="nav-item">
-          <a class="nav-link d-flex align-items-center gap-1 {% if request.endpoint == item.endpoint %}active{% endif %}" href="{{ url_for(item.endpoint) }}" {% if request.endpoint == item.endpoint %}aria-current="page"{% endif %}>
-            <i class="{{ item.icon }}"></i>
-            <span class="d-none d-sm-inline">{{ item.label }}</span>
-          </a>
-        </li>
-        {% endfor %}
-      </ul>
     </div>
   </div>
 </nav>
