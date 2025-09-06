@@ -6,6 +6,7 @@
 {% endblock %}
 {% block content %}
 <h1 class="mb-4">Simulations</h1>
+{% from 'components/update_status.html' import status as update_status %}
 <div class="row">
   <div class="col-lg-4 col-md-5 mb-4">
     <form id="sim-form">
@@ -110,11 +111,15 @@
   </div>
   <div class="col-lg-8 col-md-7">
     <div class="card mb-3">
-      <div class="card-body" id="prediction"></div>
+      <div class="card-header d-flex align-items-center">
+        <h2 class="h5 mb-0 flex-grow-1">Prediction Result</h2>
+        {{ update_status() }}
+      </div>
+      <div class="card-body" id="prediction" aria-busy="false"></div>
     </div>
     <div class="card">
       <div class="card-body">
-        <div id="exercise-angina-chart" style="height:350px;"></div>
+        <div id="exercise-angina-chart" style="height:350px;" aria-busy="false"></div>
       </div>
     </div>
     <div class="card mt-3">

@@ -47,3 +47,66 @@ class SignupForm(FlaskForm):
     )
     submit = SubmitField("Submit")
 
+
+class ForgotPasswordForm(FlaskForm):
+    """Step 1: identify account by email or username."""
+
+    identifier = StringField(
+        "Email or Username", validators=[DataRequired(), Length(max=120)]
+    )
+    submit = SubmitField("Search")
+
+
+class VerifyCodeForm(FlaskForm):
+    """Step 2: enter verification code."""
+
+    code = StringField("Verification Code", validators=[DataRequired(), Length(min=6, max=6)])
+    submit = SubmitField("Continue")
+
+
+class EmailCodeForm(FlaskForm):
+    """Form for entering an email one-time code."""
+
+    code = StringField("Verification Code", validators=[DataRequired(), Length(min=6, max=8)])
+    submit = SubmitField("Verify")
+
+
+class ResetPasswordForm(FlaskForm):
+    """Step 3: choose a new password."""
+
+    password = PasswordField(
+        "New Password",
+        validators=[
+            DataRequired(),
+            Length(min=8),
+            Regexp(
+                r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).+$",
+                message="Password must include upper, lower, number and special character",
+            ),
+        ],
+    )
+    confirm = PasswordField("Repeat New Password", validators=[DataRequired(), EqualTo("password")])
+    submit = SubmitField("Update Password")
+
+
+class TOTPSetupForm(FlaskForm):
+    code = StringField("Authentication Code", validators=[DataRequired(), Length(min=6, max=6)])
+    submit = SubmitField("Enable")
+
+
+class TOTPVerifyForm(FlaskForm):
+    code = StringField(
+        "Authentication Code",
+        validators=[DataRequired(), Length(min=6, max=16)],
+    )
+    submit = SubmitField("Verify")
+
+
+class MFADisableForm(FlaskForm):
+    password = PasswordField("Current Password", validators=[DataRequired()])
+    code = StringField(
+        "Authentication or Recovery Code",
+        validators=[DataRequired(), Length(min=6, max=16)],
+    )
+    submit = SubmitField("Disable")
+

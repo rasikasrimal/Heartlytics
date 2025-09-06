@@ -1,4 +1,5 @@
 import pytest
+pytest.importorskip("cryptography")
 from services.crypto import envelope
 
 

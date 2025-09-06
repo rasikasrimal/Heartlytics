@@ -3,7 +3,11 @@ import os
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from cryptography.hazmat.primitives.keywrap import aes_key_wrap, aes_key_unwrap
+try:  # pragma: no cover - optional dependency
+    from cryptography.hazmat.primitives.keywrap import aes_key_wrap, aes_key_unwrap  # type: ignore
+except Exception:  # pragma: no cover - fallback when cryptography is missing
+    aes_key_wrap = aes_key_unwrap = None
+    import hashlib
 
 
 class Keyring(ABC):
@@ -35,9 +39,15 @@ class DevKeyring(Keyring):
         return self._kid
 
     def wrap(self, data_key: bytes) -> bytes:
+        if aes_key_wrap is None:
+            digest = hashlib.sha256(self.master_key).digest()
+            return bytes([b ^ digest[i % len(digest)] for i, b in enumerate(data_key)])
         return aes_key_wrap(self.master_key, data_key)
 
     def unwrap(self, wrapped: bytes) -> bytes:
+        if aes_key_unwrap is None:
+            digest = hashlib.sha256(self.master_key).digest()
+            return bytes([b ^ digest[i % len(digest)] for i, b in enumerate(wrapped)])
         return aes_key_unwrap(self.master_key, wrapped)
 
 

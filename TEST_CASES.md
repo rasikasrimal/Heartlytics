@@ -13,6 +13,17 @@
 | TC-008 | Signup rejects duplicate email addresses. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-009 | Password must include upper, lower, number and special character. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-040 | Legacy password hashes upgrade to Argon2id on login. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-070 | Forgot password flow resets account password via emailed code. | Authentication & Roles | 🔴 High | 🧪 Functional | ⏳ Not Run |
+| TC-071 | Resend is blocked during 30s cooldown. | Authentication & Roles | 🟡 Medium | 🔒 Security | ⏳ Not Run |
+| TC-072 | Verification code expires after 10 minutes. | Authentication & Roles | 🟡 Medium | 🔒 Security | ⏳ Not Run |
+| TC-073 | `/debug/mail` sends test email and lists recent events. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-074 | Password reset requires re-login; no automatic session. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-075 | User with TOTP enabled must enter valid code after password. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-076 | Recovery codes allow login without authenticator app. | Authentication & Roles | 🟡 Medium | 🔒 Security | ⏳ Not Run |
+| TC-077 | User can enable email MFA after TOTP challenge. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-078 | Login fallback via email code succeeds. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-079 | Email code resend blocked during 30s cooldown. | Authentication & Roles | 🟡 Medium | 🔒 Security | ⏳ Not Run |
+| TC-080 | Disabling email codes requires password and TOTP. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 
 ## Prediction
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
@@ -89,6 +100,9 @@
 | TC-041 | Simulations page loads without chart until variable selected. | Simulations | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-042 | Simulation shows risk curve after selecting a variable. | Simulations | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-043 | Selecting unsupported variable returns warning message. | Simulations | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-056 | Changing input triggers inline loader and update acknowledgment. | Simulations | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-057 | Rapid changes cancel previous simulation requests. | Simulations | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-058 | Failed simulation shows toast and keeps last result. | Simulations | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 
 ## Research Paper Viewer
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |

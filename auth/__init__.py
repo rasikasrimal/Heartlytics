@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 
-from flask import Blueprint, current_app, flash, redirect, render_template, session, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, session, url_for, request
 from flask_login import login_user, logout_user, current_user
 from sqlalchemy import or_
 
@@ -33,6 +33,8 @@ def login():
     """Authenticate a user and start a session."""
 
     form = LoginForm()
+    if request.method == "GET" and request.args.get("identifier"):
+        form.identifier.data = request.args.get("identifier")
     if form.validate_on_submit():
         if _too_many_attempts():
             flash("Too many login attempts. Please try again later.", "error")
@@ -56,6 +58,15 @@ def login():
                 flash(msg, "error")
                 return render_template("auth/login.html", form=form)
 
+            if not user.mfa_email_enabled:
+                user.mfa_email_enabled = True
+                user.mfa_email_verified_at = datetime.utcnow()
+                db.session.commit()
+
+            if user.mfa_enabled:
+                session["mfa_user_id"] = user.id
+                session["login_attempts"] = {"count": 0, "ts": datetime.utcnow().isoformat()}
+                return redirect(url_for("auth.mfa_verify"))
             login_user(user)
             user.last_login = datetime.utcnow()
             db.session.commit()
@@ -147,4 +158,9 @@ def logout():
         logout_user()
         flash("Logged out", "success")
     return redirect(url_for("auth.login"))
+
+
+# Register additional auth routes
+from . import forgot  # noqa: E402,F401
+from . import mfa  # noqa: E402,F401
 

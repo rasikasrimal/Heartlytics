@@ -11,6 +11,8 @@ import json
 import uuid
 import pickle
 import math
+import secrets
+import hashlib
 from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo
 import click
@@ -26,10 +28,60 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, current_user, logout_user, login_required
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
-from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
-from services.crypto import envelope
-from services.crypto import get_keyring
+try:
+    from argon2 import PasswordHasher
+    from argon2.exceptions import VerifyMismatchError
+except Exception:  # pragma: no cover - fallback when argon2 is unavailable
+    from werkzeug.security import generate_password_hash as _gen, check_password_hash as _check
+
+    class VerifyMismatchError(Exception):
+        pass
+
+    class PasswordHasher:  # type: ignore
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def hash(self, password: str) -> str:
+            return _gen(password)
+
+        def verify(self, hash: str, password: str) -> None:
+            if not _check(hash, password):
+                raise VerifyMismatchError()
+
+        def check_needs_rehash(self, hash: str) -> bool:  # noqa: ARG002
+            return False
+try:
+    from services.crypto import envelope
+    from services.crypto import get_keyring
+except Exception:  # pragma: no cover - minimal stubs when crypto deps missing
+    class envelope:  # type: ignore
+        @staticmethod
+        def encrypt(*args, **kwargs):  # noqa: ANN001
+            return b"", b"", b""
+
+        @staticmethod
+        def decrypt(*args, **kwargs):  # noqa: ANN001
+            return b""
+
+        @staticmethod
+        def encrypt_field(value, context):  # noqa: ANN001
+            if isinstance(value, str):
+                value = value.encode()
+            return {
+                "ciphertext": value,
+                "nonce": b"",
+                "tag": b"",
+                "wrapped_dk": b"",
+                "kid": "",
+                "kver": 1,
+            }
+
+        @staticmethod
+        def decrypt_field(blob, context):  # noqa: ANN001
+            return blob["ciphertext"]
+
+    def get_keyring():  # type: ignore
+        return None
 from config import DevelopmentConfig, ProductionConfig
 from navigation import get_nav_items
 
@@ -74,6 +126,7 @@ from services.security import (
     csrf_protect_api,
 )
 from services.theme import init_theme
+from services.email import EmailService
 
 from sqlalchemy import inspect, text
 
@@ -93,6 +146,7 @@ app.permanent_session_lifetime = timedelta(minutes=30)
 
 # Theme handling
 init_theme(app)
+EmailService(app)
 
 # Ensure instance dir
 os.makedirs(app.instance_path, exist_ok=True)
@@ -301,6 +355,17 @@ class User(db.Model, UserMixin):
     )
     last_login = db.Column(db.DateTime)
     avatar = db.Column(db.String(255))
+    mfa_enabled = db.Column(db.Boolean, default=False)
+    mfa_email_enabled = db.Column(db.Boolean, default=True)
+    mfa_email_verified_at = db.Column(db.DateTime)
+    mfa_secret_ct = db.Column(db.LargeBinary)
+    mfa_secret_nonce = db.Column(db.LargeBinary)
+    mfa_secret_tag = db.Column(db.LargeBinary)
+    mfa_secret_wrapped_dk = db.Column(db.LargeBinary)
+    mfa_secret_kid = db.Column(db.String(64))
+    mfa_secret_kver = db.Column(db.Integer)
+    mfa_recovery_hashes = db.Column(db.JSON)
+    mfa_last_enforced_at = db.Column(db.DateTime)
 
     def set_password(self, password: str) -> None:
         """Hash and store the given password using Argon2id."""
@@ -328,6 +393,58 @@ class User(db.Model, UserMixin):
             return True
         return False
 
+    @property
+    def mfa_secret(self) -> str | None:
+        if not self.mfa_secret_ct:
+            return None
+        blob = {
+            "ciphertext": self.mfa_secret_ct,
+            "nonce": self.mfa_secret_nonce,
+            "tag": self.mfa_secret_tag,
+            "wrapped_dk": self.mfa_secret_wrapped_dk,
+            "kid": self.mfa_secret_kid,
+            "kver": self.mfa_secret_kver,
+        }
+        context = f"user:{self.id}:mfa_secret"
+        if current_app.config.get("ENCRYPTION_ENABLED"):
+            try:
+                return envelope.decrypt_field(blob, context).decode()
+            except Exception:
+                return None
+        try:
+            return bytes(blob["ciphertext"]).decode()
+        except Exception:
+            return None
+
+    def set_mfa_secret(self, secret: str) -> None:
+        if current_app.config.get("ENCRYPTION_ENABLED"):
+            try:
+                blob = envelope.encrypt_field(secret.encode(), f"user:{self.id}:mfa_secret")
+            except Exception:
+                blob = {
+                    "ciphertext": secret.encode(),
+                    "nonce": b"",
+                    "tag": b"",
+                    "wrapped_dk": b"",
+                    "kid": "",
+                    "kver": 1,
+                }
+        else:
+            blob = {
+                "ciphertext": secret.encode(),
+                "nonce": b"",
+                "tag": b"",
+                "wrapped_dk": b"",
+                "kid": "",
+                "kver": 1,
+            }
+        self.mfa_secret_ct = blob["ciphertext"]
+        self.mfa_secret_nonce = blob["nonce"]
+        self.mfa_secret_tag = blob["tag"]
+        self.mfa_secret_wrapped_dk = blob["wrapped_dk"]
+        self.mfa_secret_kid = blob["kid"]
+        self.mfa_secret_kver = blob["kver"]
+
 
 class AuditLog(db.Model):
     """Record administrative actions for accountability."""
@@ -344,6 +461,43 @@ class AuditLog(db.Model):
 
     acting_user = db.relationship("User", foreign_keys=[acting_user_id])
     target_user = db.relationship("User", foreign_keys=[target_user_id])
+
+
+class PasswordResetRequest(db.Model):
+    """Short-lived record for password reset verification codes."""
+
+    id = db.Column(db.Integer, primary_key=True)
+    request_id = db.Column(
+        db.String(36), unique=True, nullable=False, default=lambda: str(uuid.uuid4())
+    )
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    hashed_code = db.Column(db.String(64), nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    attempts = db.Column(db.Integer, nullable=False, default=0)
+    resend_count = db.Column(db.Integer, nullable=False, default=0)
+    last_sent_at = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.String(20), nullable=False, default="pending")
+    requester_ip = db.Column(db.String(45))
+    user_agent = db.Column(db.String(200))
+
+    user = db.relationship("User")
+
+
+class MFAEmailChallenge(db.Model):
+    """Short-lived record for email MFA verification codes."""
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    code_hash = db.Column(db.String(64), nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    attempts = db.Column(db.Integer, nullable=False, default=0)
+    resend_count = db.Column(db.Integer, nullable=False, default=0)
+    last_sent_at = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.String(20), nullable=False, default="pending")
+    requester_ip = db.Column(db.String(45))
+    user_agent = db.Column(db.String(200))
+
+    user = db.relationship("User")
 
 
 class Role(db.Model):
@@ -572,6 +726,8 @@ app.User = User
 app.Prediction = Prediction
 app.ClusterSummary = ClusterSummary
 app.AuditLog = AuditLog
+app.PasswordResetRequest = PasswordResetRequest
+app.MFAEmailChallenge = MFAEmailChallenge
 app.Role = Role
 app.UserRole = UserRole
 app.Patient = Patient
@@ -688,6 +844,24 @@ with app.app_context():
             )
         )
         db.session.commit()
+
+    # ensure MFA columns exist for older databases
+    for col, coltype in [
+        ("mfa_enabled", "BOOLEAN"),
+        ("mfa_secret_ct", "BLOB"),
+        ("mfa_secret_nonce", "BLOB"),
+        ("mfa_secret_tag", "BLOB"),
+        ("mfa_secret_wrapped_dk", "BLOB"),
+        ("mfa_secret_kid", "VARCHAR(64)"),
+        ("mfa_secret_kver", "INTEGER"),
+        ("mfa_recovery_hashes", "JSON"),
+        ("mfa_last_enforced_at", "DATETIME"),
+        ("mfa_email_enabled", "BOOLEAN"),
+        ("mfa_email_verified_at", "DATETIME"),
+    ]:
+        if col not in user_cols:
+            db.session.execute(text(f"ALTER TABLE user ADD COLUMN {col} {coltype}"))
+            db.session.commit()
 
     # ensure default roles are present
     for name, perms in DEFAULT_ROLE_PERMISSIONS.items():

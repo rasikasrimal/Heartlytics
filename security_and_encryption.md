@@ -6,6 +6,9 @@ This document summarizes the security controls implemented in the HeartLytics we
 - Session-based authentication powered by **Flask-Login**.
 - Login attempts are rate limited to five per 15 minutes to mitigate brute-force attacks.
 - Sessions are marked as permanent and respect server-side timeouts.
+- Optional TOTP-based two-step verification with one-time recovery codes; secrets are envelope-encrypted at rest.
+- Optional email-based MFA codes act as a lower-assurance fallback to TOTP, with single-use hashes and rate limits.
+- Password resets end with a forced login using the new password and trigger a notification email.
 
 ## Authorization
 - Strict role-based access control with roles **User**, **Doctor**, **Admin**, and **SuperAdmin**.
@@ -21,6 +24,12 @@ This document summarizes the security controls implemented in the HeartLytics we
 ## Password Storage
 - Passwords are hashed using `argon2-cffi` with the Argon2id algorithm.
 - Legacy PBKDF2 hashes are accepted and upgraded to Argon2id on successful login.
+- Password reset codes are 6-digit OTPs hashed with SHA-256 and expire after 10 minutes.
+- OTP records store only a salted hash; the plaintext code is never persisted.
+- Email MFA codes follow the same hashing and TTL policy and allow only five attempts with a 30-second resend cooldown.
+- Each request enforces a 5-attempt limit, 10-minute TTL, and 30-second resend cooldown.
+- Rate limits per IP and per identifier help mitigate abuse and enumeration.
+- After a successful reset, all session data related to the request is cleared.
 
 ## CSRF Protection
 - Forms and API routes include CSRF tokens verified on every non-GET request.

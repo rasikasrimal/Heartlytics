@@ -46,6 +46,36 @@ class Config:
 
     RBAC_STRICT = os.environ.get("RBAC_STRICT", "1").lower() not in {"0", "false"}
 
+    # --- Email / OTP settings ---
+    EMAIL_PROVIDER = os.environ.get("EMAIL_PROVIDER", "gmail")
+    SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+    SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+    SMTP_USERNAME = os.environ.get("SMTP_USERNAME")
+    SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD")
+    MAIL_FROM = os.environ.get("MAIL_FROM", SMTP_USERNAME)
+    MAIL_REPLY_TO = os.environ.get("MAIL_REPLY_TO")
+
+    OTP_TTL_MIN = int(os.environ.get("OTP_TTL_MIN", "10"))
+    OTP_LENGTH = int(os.environ.get("OTP_LENGTH", "6"))
+    OTP_MAX_ATTEMPTS = int(os.environ.get("OTP_MAX_ATTEMPTS", "5"))
+    OTP_RESEND_COOLDOWN_SEC = int(os.environ.get("OTP_RESEND_COOLDOWN_SEC", "30"))
+
+    AUTO_LOGIN_AFTER_RESET = os.environ.get("AUTO_LOGIN_AFTER_RESET", "0").lower() in {"1", "true"}
+    MFA_TOTP_ENABLED = os.environ.get("MFA_TOTP_ENABLED", "1").lower() not in {"0", "false"}
+    MFA_REMEMBER_DEVICE_DAYS = int(os.environ.get("MFA_REMEMBER_DEVICE_DAYS", "30"))
+    MFA_EMAIL_ENABLED = os.environ.get("MFA_EMAIL_ENABLED", "1").lower() not in {"0", "false"}
+    MFA_EMAIL_CODE_LENGTH = int(os.environ.get("MFA_EMAIL_CODE_LENGTH", "6"))
+    MFA_EMAIL_TTL_MIN = int(os.environ.get("MFA_EMAIL_TTL_MIN", "10"))
+    MFA_EMAIL_MAX_ATTEMPTS = int(os.environ.get("MFA_EMAIL_MAX_ATTEMPTS", "5"))
+    MFA_EMAIL_RESEND_COOLDOWN_SEC = int(os.environ.get("MFA_EMAIL_RESEND_COOLDOWN_SEC", "30"))
+    MFA_EMAIL_DAILY_CAP_PER_USER = int(os.environ.get("MFA_EMAIL_DAILY_CAP_PER_USER", "10"))
+    MFA_TRUST_WINDOW_DAYS_TOTP = int(os.environ.get("MFA_TRUST_WINDOW_DAYS_TOTP", "30"))
+    MFA_TRUST_WINDOW_DAYS_EMAIL = int(os.environ.get("MFA_TRUST_WINDOW_DAYS_EMAIL", "7"))
+    MFA_STEPUP_REQUIRE_TOTP = os.environ.get("MFA_STEPUP_REQUIRE_TOTP", "1").lower() not in {"0", "false"}
+
+    RATE_LIMIT_PER_IP = int(os.environ.get("RATE_LIMIT_PER_IP", "5"))
+    RATE_LIMIT_PER_ID = int(os.environ.get("RATE_LIMIT_PER_ID", "5"))
+
 class DevelopmentConfig(Config):
     DEBUG = True
 

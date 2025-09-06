@@ -61,7 +61,14 @@ Recent work shows strong performance for supervised ML models in heart disease p
 \item Train and tune Random Forest and XGBoost models.
 \item Compare models on accuracy, precision, recall, F1, and ROC--AUC.
 \item Deploy the best model as a Flask web application.
+\item Secure the password reset flow via Gmail SMTP with diagnostics, enforce re-login after reset, and provide optional TOTP-based two-factor authentication.
+\item Offer fallback email one-time codes as a lower-assurance MFA method.
 \end{enumerate}
+
+The deployed interface includes inline loading indicators on simulation
+inputs, replacing them with timestamped "Updated" confirmations once new
+results are rendered. This ensures clinicians can distinguish fresh
+recomputations even when outputs appear unchanged.
 
 % =======================================================
 \section{Dataset and Exploratory Data Analysis (EDA)}
@@ -251,4 +258,6 @@ A.~Ronacher, ``Flask Documentation,'' Pallets Projects, v2.0, 2021. [Online]. Av
 % If using two columns, place this after the first column of the last page:
 % \IEEEpubidadjcol
 % ---------- End ----------
+\section{Security Update}
+The accompanying web application now includes a forgotten password workflow issuing short-lived verification codes hashed at rest.
 \end{document}

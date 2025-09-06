@@ -20,7 +20,7 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 - 👥 **Role-Based Access Control**: Users, Doctors, Admins, and SuperAdmins with dedicated dashboards, account approval workflow, and audit logs.
 - 🩺 **Doctor Portal**: Doctors can review their own patient predictions and histories.
 - ⚙️ **Profile Settings**: Update username, email, nickname, avatar, and password while viewing recent activity logs.
-- 🧪 **Simulations**: What-if analysis and risk projections for variables such as age or exercise-induced angina.
+  - 🧪 **Simulations**: What-if analysis and risk projections for variables such as age or exercise-induced angina with inline auto-update loader and fresh-result acknowledgment.
 - 🕵️ **Outlier Detection**: Batch EDA includes IQR, Isolation Forest, Z-Score, LOF, and DBSCAN methods to highlight anomalous records.
 - 📈 **EDA**: Cleaning log, summary statistics, and numeric correlation heatmap.
 - 🛡️ **Resilient Batch Prediction**: Handles missing `num_major_vessels` values without failing.
@@ -29,6 +29,9 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 - 🧾 **Themed Tables & Logs**: Cleaning logs and patient record tables match the active theme for consistent readability.
 - 🧹 **Normalized Cleaning Logs**: Blank lines are stripped server-side for compact output; batch predictions surface a concise inline notice.
 - 🔐 **Redesigned Login**: Clean layout without top navigation, centered branding and form, fields start empty with autofill disabled, password visibility toggle, hover animation on login button, and quick links.
+- 🔑 **Forgot Password Flow**: Email verification code with enumeration-safe messaging; after reset, users re-authenticate with the new password.
+- 🔐 **TOTP 2-Step Verification**: Optional authenticator app codes with one-time recovery codes.
+- ✉️ **Email MFA Codes**: Enabled by default and sent as single-use backups when authenticator codes aren't available.
 - 📌 **Sticky Footer**: Consistent footer on every page that stays at the bottom.
 - 🧭 **Responsive Navigation**: Evenly spaced top bar with RBAC-driven items, sticky elevation, and utility icons.
 - 🎞️ **Motion System**: Tokenized durations/easings applied across components with `prefers-reduced-motion` support.
@@ -189,6 +192,34 @@ The application reads configuration from environment variables (see `.env.exampl
 | `KMS_PROVIDER` | `dev` uses local keyring                  | `dev` |
 | `DEV_KMS_MASTER_KEY` | base64 master key for dev keyring    | _none_ |
 | `DEV_KMS_IDX_KEY` | base64 key for blind indexes           | _none_ |
+
+### Gmail SMTP configuration
+
+Enable 2-Step Verification on the Gmail account and create an **App Password**.
+Configure these environment variables so the Forgot Password flow can send
+codes over TLS:
+
+```
+EMAIL_PROVIDER=gmail
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=<gmail address>
+SMTP_PASSWORD=<gmail app password>
+MAIL_FROM=<gmail address>
+MAIL_REPLY_TO=<support email>
+OTP_TTL_MIN=10
+OTP_LENGTH=6
+OTP_MAX_ATTEMPTS=5
+OTP_RESEND_COOLDOWN_SEC=30
+MFA_EMAIL_ENABLED=1
+MFA_EMAIL_CODE_LENGTH=6
+MFA_EMAIL_TTL_MIN=10
+MFA_EMAIL_MAX_ATTEMPTS=5
+MFA_EMAIL_RESEND_COOLDOWN_SEC=30
+```
+
+Use the `/debug/mail` page (SuperAdmin only) to send a test message and inspect
+recent delivery events.
 
 ## 📈 Example Workflow
 

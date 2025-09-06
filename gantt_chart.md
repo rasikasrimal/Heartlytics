@@ -38,5 +38,11 @@ gantt
 - **Deployment** marks the production release.
 - **Post-Deployment** includes monitoring and ongoing maintenance.
 - Recent iteration adds cleaning-log normalization, a compact batch prediction notice, and a theme toggle on auth pages.
+- Latest update introduces an email-based forgot password flow with OTP verification.
 - Latest update introduces a spaced, role-aware navigation bar and a shared motion token system.
+- Simulations now feature inline auto-update feedback with subtle loader and timestamped confirmation.
+- Forgot-password emails now send via Gmail SMTP with `/debug/mail` diagnostics and rate-limited OTP handling.
+- Password resets require re-authentication and send change notifications.
+- Optional TOTP-based two-step verification with recovery codes is now available.
+- Email-based MFA codes can be enabled as a fallback to TOTP.
 

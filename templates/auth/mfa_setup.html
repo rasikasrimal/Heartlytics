@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Set up Two-Step Verification{% endblock %}
+{% from 'components/forms.html' import text_input %}
+{% block content %}
+<h1 class="mb-3">Set up 2-Step Verification</h1>
+<p>Scan the QR code with your authenticator app and enter the current code.</p>
+<img src="https://api.qrserver.com/v1/create-qr-code/?data={{ uri|urlencode }}" alt="QR" class="mb-3">
+<p>Secret: {{ secret_masked }}</p>
+<form method="post" autocomplete="off">
+  {{ form.hidden_tag() }}
+  {{ text_input('code', 'Verification Code', attrs={'required': '', 'autocomplete': 'one-time-code'}, error=form.code.errors[0] if form.code.errors else None) }}
+  <button type="submit" class="btn btn-brand">Enable</button>
+</form>
+{% endblock %}

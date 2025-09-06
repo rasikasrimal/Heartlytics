@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Disable Two-Step Verification{% endblock %}
+{% from 'components/forms.html' import text_input, password_input %}
+{% block content %}
+<h1 class="mb-3">Disable 2-Step Verification</h1>
+<form method="post" autocomplete="off">
+  {{ form.hidden_tag() }}
+  {{ password_input('password', 'Current Password', attrs={'required': ''}, error=form.password.errors[0] if form.password.errors else None) }}
+  {{ text_input('code', 'Authentication or Recovery Code', attrs={'required': ''}, error=form.code.errors[0] if form.code.errors else None) }}
+  <button type="submit" class="btn btn-danger">Disable</button>
+</form>
+{% endblock %}

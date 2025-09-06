@@ -349,3 +349,16 @@ label.required::after {
   transition: opacity .3s ease;
 }
 
+.update-flash {
+  animation: update-flash var(--motion-slow) var(--ease-out);
+}
+
+@keyframes update-flash {
+  from { box-shadow: 0 0 0 2px var(--bs-success); }
+  to { box-shadow: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .update-flash { animation: none; }
+}
+

@@ -159,6 +159,8 @@ Security controls include:
 * **Authentication** – Flask‑Login sessions with rate limiting on login attempts【c1e841†L14-L44】.
 * **Authorization** – Decorators enforce role and module access before route execution【afe6fc†L1-L46】.
 * **Password Storage** – Argon2id hashing with transparent PBKDF2 upgrades【c1e841†L40-L56】【4088a1†L25-L48】.
+* **Password Reset** – Email-based one-time codes hashed with SHA-256, five-attempt limit and 10-minute expiry; password changes require re-login and send confirmation mail.
+* **Multi-factor Authentication** – Optional TOTP codes with one-time recovery codes and fallback email one-time codes; secrets are envelope-encrypted.
 * **CSRF Protection** – Form and API decorators verify tokens stored in session【2dc86b†L1-L27】.
 * **Security Headers and Cookies** – Configured to limit sniffing, framing and track theme preference only【69cf44†L1-L32】.
 * **Encryption** – Envelope scheme with AES‑256‑GCM; key rotation and cryptographic erasure follow docs/encryption.md guidelines【5337ea†L1-L33】.
@@ -166,6 +168,7 @@ Security controls include:
 
 ## UI/UX and Theming
 The default theme is light; a `theme` cookie and `localStorage` entry persist user preference. Server‑side hooks expose the theme before rendering to avoid flashes of incorrect color【5269c0†L1-L15】. Client scripts toggle modes and update the cookie, meta theme color and chart libraries; dark mode uses transparent chart backgrounds for seamless integration【10dec7†L1-L42】【f25d16†L1-L64】. A new evenly spaced navigation bar surfaces only permitted modules per role and shares motion tokens with buttons, dropdowns and tables, all honoring `prefers-reduced-motion`.
+Recent iterations add inline loading indicators to the simulations page that debounce input changes, cancel stale requests and announce when fresh results are available.
 
 ## Key Execution Flows
 ### Login with Theme Persistence
@@ -207,7 +210,7 @@ sequenceDiagram
 ```
 
 ## Implementation Details and Configuration
-Configuration resides in `config.py` with environment variables for database URI, model path, encryption flags, KMS provider and role strictness【ac6f4a†L15-L44】. Theme features read `SIMULATION_FEATURES` flags, while encryption toggles (`ENCRYPTION_ENABLED`, `READ_LEGACY_PLAINTEXT`) govern patient data handling. A CLI (`flask roles`) manages user roles and can be extended for key rotation (`manage_keys.py`).
+Configuration resides in `config.py` with environment variables for database URI, model path, encryption flags, KMS provider and role strictness【ac6f4a†L15-L44】. Theme features read `SIMULATION_FEATURES` flags, while encryption toggles (`ENCRYPTION_ENABLED`, `READ_LEGACY_PLAINTEXT`) govern patient data handling. Gmail SMTP variables (`SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `MAIL_FROM`) enable TLS email delivery for password resets, and OTP settings (`OTP_TTL_MIN`, `OTP_MAX_ATTEMPTS`) harden the flow. A CLI (`flask roles`) manages user roles and can be extended for key rotation (`manage_keys.py`).
 
 ## Testing and Evaluation
 Automated tests cover authentication, RBAC, predictions, EDA payload, dashboard, encryption and theming (e.g., `tests/test_theme.py`) ensuring functional and security requirements. TEST_CASES.md enumerates manual and automated scenarios across modules, including CSRF, rate limiting, and theme persistence【02abce†L1-L126】. Running `pytest` executes unit and integration suites.

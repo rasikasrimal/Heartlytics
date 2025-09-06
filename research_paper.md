@@ -1,4 +1,3 @@
-
 # Prediction of Heart Disease Using Machine Learning Algorithms
 
 **Author:** HMRS Samaranayaka  
@@ -22,6 +21,8 @@ Recent work shows strong performance for supervised ML models in heart disease p
 3. Train and tune Random Forest and XGBoost models.
 4. Compare models on accuracy, precision, recall, F1, and ROC–AUC.
 5. Deploy the best model as a Flask web application.
+6. Secure the password reset flow using Gmail SMTP with diagnostics, enforce re-authentication after reset, and offer optional TOTP-based 2FA with recovery codes.
+7. Provide fallback email-based one-time codes as a lower-assurance MFA option.
 
 ## Dataset and Exploratory Data Analysis (EDA)
 
@@ -130,3 +131,6 @@ Future work includes: (i) larger, more diverse cohorts; (ii) threshold tuning fo
 **XGBoost:** `n_estimators ∈ {100,150,200}`, `learning_rate ∈ {0.01,0.05,0.1}`, `max_depth ∈ {3,4,5}`, `subsample ∈ {0.6,0.8,1.0}`, `colsample_bytree ∈ {0.6,0.8,1.0}`, `γ ∈ {0,0.1,0.5}`.
 
 © 2025 IEEE.
+
+## Security Update
+The web application now provides a secure forgotten password flow using short-lived verification codes hashed at rest to protect user accounts.
