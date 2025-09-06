@@ -22,6 +22,10 @@ This document summarizes the security controls implemented in the HeartLytics we
 - Passwords are hashed using `argon2-cffi` with the Argon2id algorithm.
 - Legacy PBKDF2 hashes are accepted and upgraded to Argon2id on successful login.
 - Password reset codes are 6-digit OTPs hashed with SHA-256 and expire after 10 minutes.
+- OTP records store only a salted hash; the plaintext code is never persisted.
+- Each request enforces a 5-attempt limit, 10-minute TTL, and 30-second resend cooldown.
+- Rate limits per IP and per identifier help mitigate abuse and enumeration.
+- After a successful reset, all session data related to the request is cleared.
 
 ## CSRF Protection
 - Forms and API routes include CSRF tokens verified on every non-GET request.

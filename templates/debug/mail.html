@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Mail Debug{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1>Mail Debug</h1>
+  <form method="post" class="mb-4">
+    <div class="mb-3">
+      <label for="address" class="form-label">To address</label>
+      <input type="email" class="form-control" name="address" id="address" required>
+    </div>
+    <button type="submit" class="btn btn-brand">Send test mail</button>
+  </form>
+  <h2>Recent events</h2>
+  <ul class="list-group">
+    {% for e in events %}
+    <li class="list-group-item">{{ e.ts }} — {{ e.to }} — {{ e.status }}</li>
+    {% else %}
+    <li class="list-group-item">No events</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
