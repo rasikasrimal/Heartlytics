@@ -20,7 +20,7 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 - 👥 **Role-Based Access Control**: Users, Doctors, Admins, and SuperAdmins with dedicated dashboards, account approval workflow, and audit logs.
 - 🩺 **Doctor Portal**: Doctors can review their own patient predictions and histories.
 - ⚙️ **Profile Settings**: Update username, email, nickname, avatar, and password while viewing recent activity logs.
-- 🧪 **Simulations**: What-if analysis and risk projections for variables such as age or exercise-induced angina.
+  - 🧪 **Simulations**: What-if analysis and risk projections for variables such as age or exercise-induced angina with inline auto-update loader and fresh-result acknowledgment.
 - 🕵️ **Outlier Detection**: Batch EDA includes IQR, Isolation Forest, Z-Score, LOF, and DBSCAN methods to highlight anomalous records.
 - 📈 **EDA**: Cleaning log, summary statistics, and numeric correlation heatmap.
 - 🛡️ **Resilient Batch Prediction**: Handles missing `num_major_vessels` values without failing.

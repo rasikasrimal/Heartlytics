@@ -39,4 +39,5 @@ gantt
 - **Post-Deployment** includes monitoring and ongoing maintenance.
 - Recent iteration adds cleaning-log normalization, a compact batch prediction notice, and a theme toggle on auth pages.
 - Latest update introduces a spaced, role-aware navigation bar and a shared motion token system.
+- Simulations now feature inline auto-update feedback with subtle loader and timestamped confirmation.
 

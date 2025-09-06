@@ -7,3 +7,5 @@ Even the login and signup pages now expose the theme toggle so readers
 arrive at the paper with their preferred mode already applied.
 The interface now uses an evenly spaced navigation bar and subtle motion
 tokens that respect reduced-motion preferences.
+Simulations provide inline loading feedback and an "Updated just now"
+acknowledgment so clinicians see when fresh results arrive.

@@ -46,3 +46,8 @@ UI theme choice is stored in a long-lived `theme` cookie and
 `localStorage`. The cookie is read server-side—even on the authentication
 pages—so the selected mode is applied on first render. The value is a
 simple string (`"light"` or `"dark"`) and does not require encryption.
+
+Recent simulation enhancements add an inline auto-update loader and
+status acknowledgment on the results panel. These UI changes operate
+client-side and introduce no new encrypted fields or key management
+requirements.
