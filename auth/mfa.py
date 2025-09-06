@@ -27,7 +27,7 @@ def mfa_setup():
     uri = provisioning_uri(secret, current_user.email, current_app.config.get("APP_NAME", "Heartlytics"))
     form = TOTPSetupForm()
     if form.validate_on_submit():
-        code = re.sub(r"\s+", "", form.code.data)
+        code = re.sub(r"[^0-9A-Za-z]", "", form.code.data)
         if verify_totp(secret, code):
             current_user.set_mfa_secret(secret)
             codes = [secrets.token_hex(8) for _ in range(10)]
@@ -76,7 +76,7 @@ def mfa_verify():
         return redirect(url_for("auth.login"))
     form = TOTPVerifyForm()
     if form.validate_on_submit():
-        code = re.sub(r"\s+", "", form.code.data)
+        code = re.sub(r"[^0-9A-Za-z]", "", form.code.data)
         secret = user.mfa_secret
         if secret and verify_totp(secret, code):
             login_user(user)
@@ -111,7 +111,7 @@ def mfa_disable():
         if not current_user.check_password(form.password.data):
             flash("Invalid password", "error")
         else:
-            code = re.sub(r"\s+", "", form.code.data)
+            code = re.sub(r"[^0-9A-Za-z]", "", form.code.data)
             secret = current_user.mfa_secret
             valid = secret and verify_totp(secret, code)
             hashed = _hash_code(code)

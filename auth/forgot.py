@@ -8,6 +8,7 @@ import secrets
 import hashlib
 
 from flask import current_app, render_template, request, session, redirect, url_for, flash
+import re
 from sqlalchemy import or_
 
 from . import auth_bp
@@ -141,7 +142,8 @@ def verify_forgot():
             flash("Too many attempts. Request a new code.", "error")
             return redirect(url_for("auth.forgot"))
         pr.attempts += 1
-        if _hash_code(form.code.data.strip()) == pr.hashed_code:
+        code = re.sub(r"[^0-9A-Za-z]", "", form.code.data)
+        if _hash_code(code) == pr.hashed_code:
             pr.status = "verified"
             current_app.db.session.commit()
             session["pr_verified"] = True
