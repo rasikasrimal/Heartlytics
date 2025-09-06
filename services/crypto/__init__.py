@@ -1,5 +1,4 @@
 import os
-import base64
 from .keyring import (
     DevKeyring,
     AwsKmsKeyring,
@@ -20,10 +19,7 @@ def get_keyring():
     if provider == "dev":
         kr = load_dev_keyring(kid)
         if kr is None:
-            # Auto-generate a random master key so dev setups work
-            key_b64 = base64.b64encode(os.urandom(32)).decode()
-            os.environ["DEV_KMS_MASTER_KEY"] = key_b64
-            kr = load_dev_keyring(kid)
+            raise RuntimeError("DEV_KMS_MASTER_KEY not configured")
         _keyring = kr
     elif provider == "aws":
         _keyring = AwsKmsKeyring(kid)

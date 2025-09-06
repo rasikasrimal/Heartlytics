@@ -39,20 +39,6 @@ def test_forgot_password_flow(client, app, monkeypatch):
         assert updated is not None and updated.check_password("Newpass1!")
 
 
-def test_no_auto_login_after_reset(client, app, monkeypatch):
-    user = _create_user(app)
-    monkeypatch.setattr("auth.forgot._generate_code", lambda: "123456")
-    app.email_service.send_mail = lambda *a, **k: "msg"
-    client.post("/auth/forgot", data={"identifier": "u1@example.com"}, follow_redirects=True)
-    client.post("/auth/forgot/verify", data={"code": "123456"}, follow_redirects=True)
-    resp = client.post(
-        "/auth/forgot/reset",
-        data={"password": "Newpass1!", "confirm": "Newpass1!"},
-    )
-    assert resp.status_code == 302
-    assert "/auth/login" in resp.headers["Location"]
-
-
 def test_resend_cooldown(client, app, monkeypatch):
     _create_user(app)
     app.email_service.send_mail = lambda *a, **k: "msg"

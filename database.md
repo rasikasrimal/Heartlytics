@@ -162,19 +162,9 @@ DESC user;
 | updated_at | DATETIME |  |  |
 | last_login | DATETIME |  |  |
 | avatar | VARCHAR(255) |  |  |
-| mfa_enabled | BOOLEAN |  |  |
-| mfa_secret_ct | BLOB |  |  |
-| mfa_secret_nonce | BLOB |  |  |
-| mfa_secret_tag | BLOB |  |  |
-| mfa_secret_wrapped_dk | BLOB |  |  |
-| mfa_secret_kid | VARCHAR(64) |  |  |
-| mfa_secret_kver | INTEGER |  |  |
-| mfa_recovery_hashes | JSON |  |  |
-| mfa_last_enforced_at | DATETIME |  |  |
 
 Note: Users can log in using either the `username` or `email` field. The `last_login` column stores the timestamp of the most recent successful login. Login credentials are never persisted; the form clears identifier and password fields after each request.
 The `role` column drives RBAC enforcement with allowed values `SuperAdmin`, `Admin`, `Doctor`, and `User`.
-TOTP multi-factor authentication uses the `mfa_*` columns to hold an encrypted secret, recovery code hashes, and enforcement timestamps.
 
 ## user_roles
 

@@ -17,9 +17,6 @@
 | TC-071 | Resend is blocked during 30s cooldown. | Authentication & Roles | 🟡 Medium | 🔒 Security | ⏳ Not Run |
 | TC-072 | Verification code expires after 10 minutes. | Authentication & Roles | 🟡 Medium | 🔒 Security | ⏳ Not Run |
 | TC-073 | `/debug/mail` sends test email and lists recent events. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
-| TC-074 | Password reset requires re-login; no automatic session. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
-| TC-075 | User with TOTP enabled must enter valid code after password. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
-| TC-076 | Recovery codes allow login without authenticator app. | Authentication & Roles | 🟡 Medium | 🔒 Security | ⏳ Not Run |
 
 ## Prediction
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |

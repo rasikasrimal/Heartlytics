@@ -42,6 +42,4 @@ gantt
 - Latest update introduces a spaced, role-aware navigation bar and a shared motion token system.
 - Simulations now feature inline auto-update feedback with subtle loader and timestamped confirmation.
 - Forgot-password emails now send via Gmail SMTP with `/debug/mail` diagnostics and rate-limited OTP handling.
-- Password resets require re-authentication and send change notifications.
-- Optional TOTP-based two-step verification with recovery codes is now available.
 

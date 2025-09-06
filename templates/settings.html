@@ -46,24 +46,6 @@
       </div>
     </div>
   </div>
-  <div class="col-md-6">
-    <div class="card shadow-sm">
-      <div class="card-header">Two-Step Verification</div>
-      <div class="card-body">
-        {% if current_user.mfa_enabled %}
-          <p>Two-step verification is enabled.</p>
-          <a class="btn btn-danger me-2" href="{{ url_for('auth.mfa_disable') }}">Disable</a>
-          <form method="post" action="{{ url_for('auth.mfa_regenerate_codes') }}" class="d-inline">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <button class="btn btn-secondary" type="submit">Regenerate Codes</button>
-          </form>
-        {% else %}
-          <p>Protect your account with an extra step during login.</p>
-          <a class="btn btn-brand" href="{{ url_for('auth.mfa_setup') }}">Enable</a>
-        {% endif %}
-      </div>
-    </div>
-  </div>
   {% if current_user.role == 'SuperAdmin' %}
   <div class="col-md-6">
     <div class="card shadow-sm">

@@ -230,17 +230,8 @@ def reset_password():
         session.pop("pr_id", None)
         session.pop("pr_verified", None)
         flash("Password updated", "success")
-        current_app.email_service.send_mail(
-            user.email,
-            "Your password was changed",
-            "If you did not initiate this change, please contact support immediately.",
-            "If you did not initiate this change, please contact support immediately.",
-            purpose="security",
-        )
-        if current_app.config.get("AUTO_LOGIN_AFTER_RESET"):
-            from flask_login import login_user
+        from flask_login import login_user
 
-            login_user(user)
-            return redirect(url_for("index"))
-        return redirect(url_for("auth.login", identifier=user.email))
+        login_user(user)
+        return redirect(url_for("index"))
     return render_template("auth/reset.html", form=form)

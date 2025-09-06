@@ -13,8 +13,6 @@ sensitive fields.
 * The database stores ciphertext, nonce, tag, wrapped key, key id and
   key version in separate columns suffixed with `_ct`, `_nonce`, `_tag`,
   `_wrapped_dk`, `_kid` and `_kver`.
-* TOTP secrets for multi-factor authentication follow the same
-  envelope-encrypted structure and are never stored in plaintext.
 
 ## Adding a new encrypted field
 

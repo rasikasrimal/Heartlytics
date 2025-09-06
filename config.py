@@ -60,10 +60,6 @@ class Config:
     OTP_MAX_ATTEMPTS = int(os.environ.get("OTP_MAX_ATTEMPTS", "5"))
     OTP_RESEND_COOLDOWN_SEC = int(os.environ.get("OTP_RESEND_COOLDOWN_SEC", "30"))
 
-    AUTO_LOGIN_AFTER_RESET = os.environ.get("AUTO_LOGIN_AFTER_RESET", "0").lower() in {"1", "true"}
-    MFA_TOTP_ENABLED = os.environ.get("MFA_TOTP_ENABLED", "1").lower() not in {"0", "false"}
-    MFA_REMEMBER_DEVICE_DAYS = int(os.environ.get("MFA_REMEMBER_DEVICE_DAYS", "30"))
-
     RATE_LIMIT_PER_IP = int(os.environ.get("RATE_LIMIT_PER_IP", "5"))
     RATE_LIMIT_PER_ID = int(os.environ.get("RATE_LIMIT_PER_ID", "5"))
 

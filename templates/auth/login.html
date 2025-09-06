@@ -21,7 +21,7 @@
       <div class="card shadow-sm p-4">
         <form method="post" autocomplete="off">
           {{ form.hidden_tag() }}
-          {{ text_input('identifier', 'Email or Username', value=form.identifier.data, attrs={'required': '', 'autocomplete': 'off'}, error=form.identifier.errors[0] if form.identifier.errors else None) }}
+          {{ text_input('identifier', 'Email or Username', attrs={'required': '', 'autocomplete': 'off'}, error=form.identifier.errors[0] if form.identifier.errors else None) }}
           {{ password_input('password', 'Password', attrs={'required': '', 'autocomplete': 'off'}, error=form.password.errors[0] if form.password.errors else None) }}
           <button type="submit" class="btn btn-brand w-100 mb-3">Login</button>
           <div class="d-flex justify-content-between">
