@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% block title %}Login{% endblock %}
 {% from 'components/forms.html' import text_input, password_input %}
-{% block navbar %}{% endblock %}
+{% block navbar %}
+<nav class="navbar justify-content-end p-3">
+  {% include 'components/theme_toggle.html' %}
+</nav>
+{% endblock %}
 
 {% block main_classes %}container flex-grow-1{% endblock %}
 

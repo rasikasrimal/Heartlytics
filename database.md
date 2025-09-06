@@ -7,6 +7,8 @@ User interface theme preferences are stored in client-side cookies and
 
 Recent theming updates (transparent charts and table header styling) do
 not introduce any new columns.
+Cleaning-log normalization and the auth-page theme toggle are handled
+in application logic and likewise require no schema changes.
 
 ## audit_log
 

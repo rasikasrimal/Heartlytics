@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import Dict, List, Tuple, Set
+from typing import Dict, List, Tuple, Set, Union
 
 import numpy as np
 import pandas as pd
@@ -175,6 +175,27 @@ def _map_with_dict(x, mapping, fallback_allowed=None):
     if fallback_allowed and s in {_normalize_key(v) for v in fallback_allowed}:
         return s
     return None
+
+
+def normalize_log(log: List[Union[dict, str]]) -> List[dict]:
+    """Normalize cleaning log entries.
+
+    Collapses different line endings, trims whitespace, and removes blank
+    lines so the log renders compactly in templates.
+    """
+
+    normalized: List[dict] = []
+    for item in log:
+        entry = item.copy() if isinstance(item, dict) else {"text": str(item)}
+        text = entry.get("text", "")
+        text = text.replace("\r\n", "\n").replace("\r", "\n")
+        lines = [ln.strip() for ln in text.split("\n")]
+        lines = [ln for ln in lines if ln]
+        if not lines:
+            continue
+        entry["text"] = "\n".join(lines)
+        normalized.append(entry)
+    return normalized
 
 
 def group_cleaning_log(log: List[dict]) -> Dict[str, List[dict]]:

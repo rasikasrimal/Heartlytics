@@ -24,7 +24,11 @@
     {% if banner %}
       <div class="alert alert-success mt-3">{{ banner }}</div>
     {% endif %}
+    {% if predict_notice %}
+      <div class="predict-notice mt-2 mb-0">{{ predict_notice }}</div>
+    {% endif %}
 
+    {% if cleaning_log|length > (predict_notice and 1 or 0) %}
     <h2 class="h6 mt-3">Cleaning Log</h2>
     {% set groups = cleaning_groups %}
     <div class="cleaning-log border rounded p-2 small table-scroll">
@@ -39,8 +43,8 @@
         <li class="mt-1"><strong>📊 Outliers softened</strong><ul>{% for item in groups['outliers'] %}<li>{{ item.text }}{% if item.details %}<button class="btn btn-link btn-sm p-0 ms-1 log-view" data-detail="{{ item.idx }}">View</button>{% endif %}</li>{% endfor %}</ul></li>{% endif %}
         {% for item in groups['other'] %}<li class="mt-1">{{ item.text }}{% if item.details %}<button class="btn btn-link btn-sm p-0 ms-1 log-view" data-detail="{{ item.idx }}">View</button>{% endif %}</li>{% endfor %}
       </ul>
-
     </div>
+    {% endif %}
 
     <div class="d-flex justify-content-between align-items-center mt-3">
       <h2 class="h6 mb-0">Preview (first 20 rows)</h2>
