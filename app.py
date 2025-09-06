@@ -109,6 +109,7 @@ from services.security import (
     csrf_protect_api,
 )
 from services.theme import init_theme
+from services.email import EmailService
 
 from sqlalchemy import inspect, text
 
@@ -128,6 +129,7 @@ app.permanent_session_lifetime = timedelta(minutes=30)
 
 # Theme handling
 init_theme(app)
+EmailService(app)
 
 # Ensure instance dir
 os.makedirs(app.instance_path, exist_ok=True)

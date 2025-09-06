@@ -14,8 +14,33 @@ from . import auth_bp
 from .forms import ForgotPasswordForm, VerifyCodeForm, ResetPasswordForm
 
 
+def _mask_email(email: str) -> str:
+    try:
+        local, domain = email.split("@")
+    except ValueError:
+        return email
+    if len(local) <= 2:
+        return local[0] + "*" * (len(local) - 1) + "@" + domain
+    return f"{local[0]}••••{local[-1]}@{domain}"
+
+
 def _generate_code() -> str:
-    return f"{secrets.randbelow(10**6):06d}"
+    length = current_app.config.get("OTP_LENGTH", 6)
+    return "".join(secrets.choice("0123456789") for _ in range(length))
+
+
+def _rate_limited(key: str, limit: int) -> bool:
+    rl = session.setdefault("rate_limits", {})
+    data = rl.get(key)
+    now = datetime.utcnow()
+    if data and now - datetime.fromisoformat(data["ts"]) < timedelta(hours=1):
+        if data["count"] >= limit:
+            return True
+        data["count"] += 1
+    else:
+        rl[key] = {"count": 1, "ts": now.isoformat()}
+    session["rate_limits"] = rl
+    return False
 
 
 def _hash_code(code: str) -> str:
@@ -37,6 +62,20 @@ def forgot():
     form = ForgotPasswordForm()
     if form.validate_on_submit():
         ident = form.identifier.data.strip()
+        per_ip = current_app.config.get("RATE_LIMIT_PER_IP", 5)
+        per_id = current_app.config.get("RATE_LIMIT_PER_ID", 5)
+        if _rate_limited(f"ip:{request.remote_addr}", per_ip) or _rate_limited(
+            f"id:{ident}", per_id
+        ):
+            current_app.logger.warning(
+                "otp.resend.blocked ident=%s ip=%s", ident, request.remote_addr
+            )
+            flash(
+                "If an account is associated with the details you provided, a verification code has been sent to the registered email.",
+                "info",
+            )
+            return redirect(url_for("auth.verify_forgot"))
+
         db = current_app.db
         User = current_app.User
         PasswordResetRequest = current_app.PasswordResetRequest
@@ -46,22 +85,39 @@ def forgot():
             code = _generate_code()
             hashed = _hash_code(code)
             now = datetime.utcnow()
+            ttl = current_app.config.get("OTP_TTL_MIN", 10)
             pr = PasswordResetRequest(
                 request_id=request_id,
                 user_id=user.id,
                 hashed_code=hashed,
-                expires_at=now + timedelta(minutes=10),
+                expires_at=now + timedelta(minutes=ttl),
                 last_sent_at=now,
                 requester_ip=request.remote_addr,
                 user_agent=request.headers.get("User-Agent"),
             )
             db.session.add(pr)
             db.session.commit()
-            current_app.logger.info(f"Password reset code for {user.email}: {code}")
+            text = (
+                f"Your verification code is {code}.\n"
+                f"It expires in {ttl} minutes.\n"
+                f"Request time: {now.strftime('%Y-%m-%d %H:%M UTC')}\n"
+                f"IP: {request.remote_addr}\n"
+                "If this wasn't you, ignore this message."
+            )
+            html = text.replace("\n", "<br>")
+            current_app.email_service.send_mail(
+                user.email, "Your verification code", text, html, purpose="otp"
+            )
+            current_app.logger.info(
+                "otp.issued user=%s request=%s", _mask_email(user.email), request_id
+            )
             session["pr_id"] = request_id
         else:
             session.pop("pr_id", None)
-        flash("If an account is associated with the details you provided, a verification code has been sent to the registered email.", "info")
+        flash(
+            "If an account is associated with the details you provided, a verification code has been sent to the registered email.",
+            "info",
+        )
         return redirect(url_for("auth.verify_forgot"))
     return render_template("auth/forgot.html", form=form)
 
@@ -72,9 +128,16 @@ def verify_forgot():
     form = VerifyCodeForm()
     if form.validate_on_submit() and pr:
         if datetime.utcnow() > pr.expires_at:
+            current_app.logger.info(
+                "otp.expired user=%s request=%s", _mask_email(pr.user.email), pr.request_id
+            )
             flash("Code expired. Request a new code.", "error")
             return redirect(url_for("auth.forgot"))
-        if pr.attempts >= 5:
+        max_attempts = current_app.config.get("OTP_MAX_ATTEMPTS", 5)
+        if pr.attempts >= max_attempts:
+            current_app.logger.warning(
+                "otp.failed attempts_exhausted user=%s request=%s", _mask_email(pr.user.email), pr.request_id
+            )
             flash("Too many attempts. Request a new code.", "error")
             return redirect(url_for("auth.forgot"))
         pr.attempts += 1
@@ -82,9 +145,18 @@ def verify_forgot():
             pr.status = "verified"
             current_app.db.session.commit()
             session["pr_verified"] = True
+            current_app.logger.info(
+                "otp.verified user=%s request=%s", _mask_email(pr.user.email), pr.request_id
+            )
             return redirect(url_for("auth.reset_password"))
         current_app.db.session.commit()
-        remaining = 5 - pr.attempts
+        remaining = max_attempts - pr.attempts
+        current_app.logger.warning(
+            "otp.failed user=%s request=%s remaining=%s",
+            _mask_email(pr.user.email),
+            pr.request_id,
+            remaining,
+        )
         flash(f"Invalid code. You have {remaining} attempts remaining.", "error")
     return render_template("auth/verify.html", form=form)
 
@@ -96,20 +168,48 @@ def resend_code():
         flash("Request a new code.", "error")
         return redirect(url_for("auth.forgot"))
     now = datetime.utcnow()
-    if (now - pr.last_sent_at).total_seconds() < 30:
+    cooldown = current_app.config.get("OTP_RESEND_COOLDOWN_SEC", 30)
+    if (now - pr.last_sent_at).total_seconds() < cooldown:
+        current_app.logger.warning(
+            "otp.resend.blocked cooldown user=%s request=%s",
+            _mask_email(pr.user.email),
+            pr.request_id,
+        )
         flash("Please wait before requesting a new code.", "error")
         return redirect(url_for("auth.verify_forgot"))
     if pr.resend_count >= 10:
+        current_app.logger.warning(
+            "otp.resend.blocked daily user=%s request=%s",
+            _mask_email(pr.user.email),
+            pr.request_id,
+        )
         flash("Daily limit reached. Try again later.", "error")
         return redirect(url_for("auth.verify_forgot"))
     code = _generate_code()
     pr.hashed_code = _hash_code(code)
-    pr.expires_at = now + timedelta(minutes=10)
+    ttl = current_app.config.get("OTP_TTL_MIN", 10)
+    pr.expires_at = now + timedelta(minutes=ttl)
     pr.resend_count += 1
     pr.last_sent_at = now
     current_app.db.session.commit()
-    current_app.logger.info(f"Password reset code resend for user {pr.user_id}: {code}")
-    flash("If an account is associated with the details you provided, a verification code has been sent to the registered email.", "info")
+    text = (
+        f"Your verification code is {code}.\n"
+        f"It expires in {ttl} minutes.\n"
+        f"Request time: {now.strftime('%Y-%m-%d %H:%M UTC')}\n"
+        f"IP: {request.remote_addr}\n"
+        "If this wasn't you, ignore this message."
+    )
+    html = text.replace("\n", "<br>")
+    current_app.email_service.send_mail(
+        pr.user.email, "Your verification code", text, html, purpose="otp"
+    )
+    current_app.logger.info(
+        "otp.issued user=%s request=%s", _mask_email(pr.user.email), pr.request_id
+    )
+    flash(
+        "If an account is associated with the details you provided, a verification code has been sent to the registered email.",
+        "info",
+    )
     return redirect(url_for("auth.verify_forgot"))
 
 

@@ -14,6 +14,9 @@
 | TC-009 | Password must include upper, lower, number and special character. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-040 | Legacy password hashes upgrade to Argon2id on login. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-070 | Forgot password flow resets account password via emailed code. | Authentication & Roles | 🔴 High | 🧪 Functional | ⏳ Not Run |
+| TC-071 | Resend is blocked during 30s cooldown. | Authentication & Roles | 🟡 Medium | 🔒 Security | ⏳ Not Run |
+| TC-072 | Verification code expires after 10 minutes. | Authentication & Roles | 🟡 Medium | 🔒 Security | ⏳ Not Run |
+| TC-073 | `/debug/mail` sends test email and lists recent events. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 
 ## Prediction
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |

@@ -15,6 +15,7 @@ def _create_user(app, username="user1", email="u1@example.com"):
 
 def test_forgot_password_message_same(client, app):
     _create_user(app)
+    app.email_service.send_mail = lambda *a, **k: "msg"
     resp1 = client.post("/auth/forgot", data={"identifier": "u1@example.com"}, follow_redirects=True)
     resp2 = client.post("/auth/forgot", data={"identifier": "nope@example.com"}, follow_redirects=True)
     assert b"verification code has been sent" in resp1.data
@@ -23,7 +24,8 @@ def test_forgot_password_message_same(client, app):
 
 def test_forgot_password_flow(client, app, monkeypatch):
     user = _create_user(app)
-    monkeypatch.setattr("secrets.randbelow", lambda n: 123456)
+    monkeypatch.setattr("auth.forgot._generate_code", lambda: "123456")
+    app.email_service.send_mail = lambda *a, **k: "msg"
     client.post("/auth/forgot", data={"identifier": "u1@example.com"}, follow_redirects=True)
     client.post("/auth/forgot/verify", data={"code": "123456"}, follow_redirects=True)
     client.post(
@@ -35,3 +37,23 @@ def test_forgot_password_flow(client, app, monkeypatch):
     with app.app_context():
         updated = User.query.filter_by(email="u1@example.com").first()
         assert updated is not None and updated.check_password("Newpass1!")
+
+
+def test_resend_cooldown(client, app, monkeypatch):
+    _create_user(app)
+    app.email_service.send_mail = lambda *a, **k: "msg"
+    monkeypatch.setattr("auth.forgot._generate_code", lambda: "654321")
+    client.post("/auth/forgot", data={"identifier": "u1@example.com"}, follow_redirects=True)
+    resp = client.post("/auth/forgot/resend", follow_redirects=True)
+    assert b"Please wait" in resp.data
+
+
+def test_attempts_exhausted(client, app, monkeypatch):
+    _create_user(app)
+    app.email_service.send_mail = lambda *a, **k: "msg"
+    monkeypatch.setattr("auth.forgot._generate_code", lambda: "222222")
+    client.post("/auth/forgot", data={"identifier": "u1@example.com"}, follow_redirects=True)
+    for _ in range(5):
+        client.post("/auth/forgot/verify", data={"code": "000000"}, follow_redirects=True)
+    resp = client.post("/auth/forgot/verify", data={"code": "000000"}, follow_redirects=True)
+    assert b"Too many attempts" in resp.data
