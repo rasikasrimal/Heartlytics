@@ -16,6 +16,7 @@ gantt
     Backend Implementation          :active,  back, 2024-02-01,2024-03-15
     Frontend Integration            :         front, after back, 30d
     Machine Learning Model          :         ml,   2024-02-15,2024-03-15
+    Security & Encryption           :         sec,  2024-03-05,2024-03-25
 
     section Testing
     Unit & Integration Tests        :         test, 2024-03-16,2024-03-31

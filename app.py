@@ -24,7 +24,11 @@ from flask import (
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, current_user, logout_user, login_required
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
+from services.crypto import envelope
+from services.crypto import get_keyring
 from config import DevelopmentConfig, ProductionConfig
 
 # ML imputation helpers
@@ -78,6 +82,8 @@ app.config.from_object(DevelopmentConfig if env == "development" else Production
 # Session configuration
 login_manager = LoginManager(app)
 login_manager.login_view = "auth.login"
+
+password_hasher = PasswordHasher(time_cost=2, memory_cost=65536, parallelism=1, hash_len=32, salt_len=16)
 app.permanent_session_lifetime = timedelta(minutes=30)
 
 # Ensure instance dir
@@ -282,12 +288,30 @@ class User(db.Model, UserMixin):
     avatar = db.Column(db.String(255))
 
     def set_password(self, password: str) -> None:
-        """Hash and store the given password."""
-        self.password_hash = generate_password_hash(password)
+        """Hash and store the given password using Argon2id."""
+        self.password_hash = password_hasher.hash(password)
 
     def check_password(self, password: str) -> bool:
-        """Return ``True`` if ``password`` matches the stored hash."""
-        return check_password_hash(self.password_hash, password)
+        """Return ``True`` if ``password`` matches the stored hash.
+
+        Supports legacy Werkzeug PBKDF2 hashes and transparently upgrades
+        them to Argon2id upon successful verification.
+        """
+
+        if self.password_hash.startswith("$argon2id$"):
+            try:
+                password_hasher.verify(self.password_hash, password)
+            except VerifyMismatchError:
+                return False
+            if password_hasher.check_needs_rehash(self.password_hash):
+                self.password_hash = password_hasher.hash(password)
+            return True
+
+        # Legacy Werkzeug hash
+        if check_password_hash(self.password_hash, password):
+            self.password_hash = password_hasher.hash(password)
+            return True
+        return False
 
 
 class AuditLog(db.Model):
@@ -357,16 +381,68 @@ class Patient(db.Model):
     entered_by_user_id = db.Column(
         db.Integer, db.ForeignKey("user.id"), nullable=False
     )
-    patient_data = db.Column(db.JSON, nullable=False)
+    patient_data_legacy = db.Column("patient_data", db.JSON)
+    patient_data_ct = db.Column(db.LargeBinary)
+    patient_data_nonce = db.Column(db.LargeBinary)
+    patient_data_tag = db.Column(db.LargeBinary)
+    patient_data_wrapped_dk = db.Column(db.LargeBinary)
+    patient_data_kid = db.Column(db.String(64))
+    patient_data_kver = db.Column(db.Integer)
     prediction_result = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     entered_by = db.relationship("User", backref="patients")
 
+    @property
+    def patient_data(self):
+        if self.patient_data_ct:
+            blob = {
+                "ciphertext": self.patient_data_ct,
+                "nonce": self.patient_data_nonce,
+                "tag": self.patient_data_tag,
+                "wrapped_dk": self.patient_data_wrapped_dk,
+                "kid": self.patient_data_kid,
+                "kver": self.patient_data_kver,
+            }
+            context = f"{self.__tablename__}:patient_data|{self.patient_data_kid}|{self.patient_data_kver}"
+            try:
+                data = envelope.decrypt_field(blob, context)
+                return json.loads(data.decode())
+            except Exception:
+                return None
+        if current_app.config.get("READ_LEGACY_PLAINTEXT"):
+            return self.patient_data_legacy
+        return None
+
+    @patient_data.setter
+    def patient_data(self, value):
+        if current_app.config.get("ENCRYPTION_ENABLED") and value is not None:
+            data = json.dumps(value).encode()
+            blob = envelope.encrypt_field(
+                data,
+                f"{self.__tablename__}:patient_data|{get_keyring().current_kid()}|1",
+            )
+            self.patient_data_ct = blob["ciphertext"]
+            self.patient_data_nonce = blob["nonce"]
+            self.patient_data_tag = blob["tag"]
+            self.patient_data_wrapped_dk = blob["wrapped_dk"]
+            self.patient_data_kid = blob["kid"]
+            self.patient_data_kver = blob["kver"]
+            if current_app.config.get("READ_LEGACY_PLAINTEXT"):
+                self.patient_data_legacy = value
+        else:
+            self.patient_data_legacy = value
+
 class Prediction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    patient_name = db.Column(db.String(120))
+    patient_name_legacy = db.Column("patient_name", db.String(120))
+    patient_name_ct = db.Column(db.LargeBinary)
+    patient_name_nonce = db.Column(db.LargeBinary)
+    patient_name_tag = db.Column(db.LargeBinary)
+    patient_name_wrapped_dk = db.Column(db.LargeBinary)
+    patient_name_kid = db.Column(db.String(64))
+    patient_name_kver = db.Column(db.Integer)
     age = db.Column(db.Integer, nullable=False)
     sex = db.Column(db.Integer, nullable=False)  # 0/1
     chest_pain_type = db.Column(db.String(50))
@@ -407,6 +483,44 @@ class Prediction(db.Model):
             "model_version": self.model_version,
             "cluster_id": self.cluster_id,
         }
+
+    @property
+    def patient_name(self):
+        if self.patient_name_ct:
+            blob = {
+                "ciphertext": self.patient_name_ct,
+                "nonce": self.patient_name_nonce,
+                "tag": self.patient_name_tag,
+                "wrapped_dk": self.patient_name_wrapped_dk,
+                "kid": self.patient_name_kid,
+                "kver": self.patient_name_kver,
+            }
+            context = f"{self.__tablename__}:patient_name|{self.patient_name_kid}|{self.patient_name_kver}"
+            try:
+                return envelope.decrypt_field(blob, context).decode()
+            except Exception:
+                return None
+        if current_app.config.get("READ_LEGACY_PLAINTEXT"):
+            return self.patient_name_legacy
+        return None
+
+    @patient_name.setter
+    def patient_name(self, value):
+        if current_app.config.get("ENCRYPTION_ENABLED") and value is not None:
+            blob = envelope.encrypt_field(
+                value.encode(),
+                f"{self.__tablename__}:patient_name|{get_keyring().current_kid()}|1",
+            )
+            self.patient_name_ct = blob["ciphertext"]
+            self.patient_name_nonce = blob["nonce"]
+            self.patient_name_tag = blob["tag"]
+            self.patient_name_wrapped_dk = blob["wrapped_dk"]
+            self.patient_name_kid = blob["kid"]
+            self.patient_name_kver = blob["kver"]
+            if current_app.config.get("READ_LEGACY_PLAINTEXT"):
+                self.patient_name_legacy = value
+        else:
+            self.patient_name_legacy = value
 
 # Summary stats for clusters
 class ClusterSummary(db.Model):

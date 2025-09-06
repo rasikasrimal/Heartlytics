@@ -48,7 +48,13 @@ DESC patient;
 | --- | --- | --- | --- |
 | id | INTEGER | PK | - |
 | entered_by_user_id | INTEGER | FK | user.id |
-| patient_data | JSON |  |  |
+| patient_data | JSON (legacy) |  |  |
+| patient_data_ct | BLOB |  |  |
+| patient_data_nonce | BLOB |  |  |
+| patient_data_tag | BLOB |  |  |
+| patient_data_wrapped_dk | BLOB |  |  |
+| patient_data_kid | VARCHAR(64) |  |  |
+| patient_data_kver | INTEGER |  |  |
 | prediction_result | VARCHAR(50) |  |  |
 | created_at | DATETIME |  |  |
 
@@ -62,7 +68,13 @@ DESC prediction;
 | --- | --- | --- | --- |
 | id | INTEGER | PK | - |
 | created_at | DATETIME |  |  |
-| patient_name | VARCHAR(120) |  |  |
+| patient_name | VARCHAR(120) (legacy) |  |  |
+| patient_name_ct | BLOB |  |  |
+| patient_name_nonce | BLOB |  |  |
+| patient_name_tag | BLOB |  |  |
+| patient_name_wrapped_dk | BLOB |  |  |
+| patient_name_kid | VARCHAR(64) |  |  |
+| patient_name_kver | INTEGER |  |  |
 | age | INTEGER |  |  |
 | sex | INTEGER |  |  |
 | chest_pain_type | VARCHAR(50) |  |  |
