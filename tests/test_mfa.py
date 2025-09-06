@@ -57,6 +57,32 @@ def test_login_with_totp_spaces(client, app):
     assert b"Predict" in resp.data
 
 
+def test_login_with_totp_hyphen(client, app):
+    from app import db, User
+    with app.app_context():
+        User.query.filter_by(email="mfa4@example.com").delete()
+        db.session.commit()
+        user = User(username="mfauser4", email="mfa4@example.com", status="approved")
+        user.password_hash = generate_password_hash("Passw0rd!")
+        user.mfa_enabled = True
+        secret = random_base32()
+        user.set_mfa_secret(secret)
+        db.session.add(user)
+        db.session.commit()
+    client.post(
+        "/auth/login",
+        data={"identifier": "mfa4@example.com", "password": "Passw0rd!"},
+    )
+    code = generate_totp(secret)
+    dashed = code[:3] + "-" + code[3:]
+    resp = client.post(
+        "/auth/mfa/verify",
+        data={"code": dashed},
+        follow_redirects=True,
+    )
+    assert b"Predict" in resp.data
+
+
 def test_login_with_recovery_code(client, app):
     from app import db, User
     from auth.forgot import _hash_code
@@ -82,6 +108,37 @@ def test_login_with_recovery_code(client, app):
         follow_redirects=True,
     )
     assert b"Predict" in resp.data
+
+
+def test_disable_mfa_with_hyphen(client, app):
+    from app import db, User
+    with app.app_context():
+        User.query.filter_by(email="mfa5@example.com").delete()
+        db.session.commit()
+        user = User(username="mfauser5", email="mfa5@example.com", status="approved")
+        user.password_hash = generate_password_hash("Passw0rd!")
+        user.mfa_enabled = True
+        secret = random_base32()
+        user.set_mfa_secret(secret)
+        db.session.add(user)
+        db.session.commit()
+    client.post(
+        "/auth/login",
+        data={"identifier": "mfa5@example.com", "password": "Passw0rd!"},
+    )
+    client.post(
+        "/auth/mfa/verify",
+        data={"code": generate_totp(secret)},
+        follow_redirects=True,
+    )
+    code = generate_totp(secret)
+    dashed = code[:3] + "-" + code[3:]
+    resp = client.post(
+        "/auth/mfa/disable",
+        data={"password": "Passw0rd!", "code": dashed},
+        follow_redirects=True,
+    )
+    assert b"Two-step verification disabled" in resp.data
 
 
 def test_settings_shows_mfa_option(auth_client):
