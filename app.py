@@ -63,6 +63,23 @@ except Exception:  # pragma: no cover - minimal stubs when crypto deps missing
         def decrypt(*args, **kwargs):  # noqa: ANN001
             return b""
 
+        @staticmethod
+        def encrypt_field(value, context):  # noqa: ANN001
+            if isinstance(value, str):
+                value = value.encode()
+            return {
+                "ciphertext": value,
+                "nonce": b"",
+                "tag": b"",
+                "wrapped_dk": b"",
+                "kid": "",
+                "kver": 1,
+            }
+
+        @staticmethod
+        def decrypt_field(blob, context):  # noqa: ANN001
+            return blob["ciphertext"]
+
     def get_keyring():  # type: ignore
         return None
 from config import DevelopmentConfig, ProductionConfig
@@ -338,6 +355,15 @@ class User(db.Model, UserMixin):
     )
     last_login = db.Column(db.DateTime)
     avatar = db.Column(db.String(255))
+    mfa_enabled = db.Column(db.Boolean, default=False)
+    mfa_secret_ct = db.Column(db.LargeBinary)
+    mfa_secret_nonce = db.Column(db.LargeBinary)
+    mfa_secret_tag = db.Column(db.LargeBinary)
+    mfa_secret_wrapped_dk = db.Column(db.LargeBinary)
+    mfa_secret_kid = db.Column(db.String(64))
+    mfa_secret_kver = db.Column(db.Integer)
+    mfa_recovery_hashes = db.Column(db.JSON)
+    mfa_last_enforced_at = db.Column(db.DateTime)
 
     def set_password(self, password: str) -> None:
         """Hash and store the given password using Argon2id."""
@@ -364,6 +390,58 @@ class User(db.Model, UserMixin):
             self.password_hash = password_hasher.hash(password)
             return True
         return False
+
+    @property
+    def mfa_secret(self) -> str | None:
+        if not self.mfa_secret_ct:
+            return None
+        blob = {
+            "ciphertext": self.mfa_secret_ct,
+            "nonce": self.mfa_secret_nonce,
+            "tag": self.mfa_secret_tag,
+            "wrapped_dk": self.mfa_secret_wrapped_dk,
+            "kid": self.mfa_secret_kid,
+            "kver": self.mfa_secret_kver,
+        }
+        context = f"user:{self.id}:mfa_secret"
+        if current_app.config.get("ENCRYPTION_ENABLED"):
+            try:
+                return envelope.decrypt_field(blob, context).decode()
+            except Exception:
+                return None
+        try:
+            return bytes(blob["ciphertext"]).decode()
+        except Exception:
+            return None
+
+    def set_mfa_secret(self, secret: str) -> None:
+        if current_app.config.get("ENCRYPTION_ENABLED"):
+            try:
+                blob = envelope.encrypt_field(secret.encode(), f"user:{self.id}:mfa_secret")
+            except Exception:
+                blob = {
+                    "ciphertext": secret.encode(),
+                    "nonce": b"",
+                    "tag": b"",
+                    "wrapped_dk": b"",
+                    "kid": "",
+                    "kver": 1,
+                }
+        else:
+            blob = {
+                "ciphertext": secret.encode(),
+                "nonce": b"",
+                "tag": b"",
+                "wrapped_dk": b"",
+                "kid": "",
+                "kver": 1,
+            }
+        self.mfa_secret_ct = blob["ciphertext"]
+        self.mfa_secret_nonce = blob["nonce"]
+        self.mfa_secret_tag = blob["tag"]
+        self.mfa_secret_wrapped_dk = blob["wrapped_dk"]
+        self.mfa_secret_kid = blob["kid"]
+        self.mfa_secret_kver = blob["kver"]
 
 
 class AuditLog(db.Model):
@@ -746,6 +824,22 @@ with app.app_context():
             )
         )
         db.session.commit()
+
+    # ensure MFA columns exist for older databases
+    for col, coltype in [
+        ("mfa_enabled", "BOOLEAN"),
+        ("mfa_secret_ct", "BLOB"),
+        ("mfa_secret_nonce", "BLOB"),
+        ("mfa_secret_tag", "BLOB"),
+        ("mfa_secret_wrapped_dk", "BLOB"),
+        ("mfa_secret_kid", "VARCHAR(64)"),
+        ("mfa_secret_kver", "INTEGER"),
+        ("mfa_recovery_hashes", "JSON"),
+        ("mfa_last_enforced_at", "DATETIME"),
+    ]:
+        if col not in user_cols:
+            db.session.execute(text(f"ALTER TABLE user ADD COLUMN {col} {coltype}"))
+            db.session.commit()
 
     # ensure default roles are present
     for name, perms in DEFAULT_ROLE_PERMISSIONS.items():

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Recovery Codes{% endblock %}
+{% block content %}
+<h1 class="mb-3">Recovery Codes</h1>
+<p>Store these one-time codes in a safe place. Each code can be used once.</p>
+<ul class="list-unstyled">
+  {% for c in codes %}<li><code>{{ c }}</code></li>{% endfor %}
+</ul>
+<form method="post" action="{{ url_for('auth.mfa_regenerate_codes') }}">
+  {{ csrf_token() }}
+  <button type="submit" class="btn btn-secondary">Regenerate Codes</button>
+</form>
+{% endblock %}

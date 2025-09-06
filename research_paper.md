@@ -21,7 +21,7 @@ Recent work shows strong performance for supervised ML models in heart disease p
 3. Train and tune Random Forest and XGBoost models.
 4. Compare models on accuracy, precision, recall, F1, and ROC–AUC.
 5. Deploy the best model as a Flask web application.
-6. Secure the password reset flow using Gmail SMTP with diagnostics.
+6. Secure the password reset flow using Gmail SMTP with diagnostics, enforce re-authentication after reset, and offer optional TOTP-based 2FA with recovery codes.
 
 ## Dataset and Exploratory Data Analysis (EDA)
 
