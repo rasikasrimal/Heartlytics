@@ -39,3 +39,9 @@ sensitive fields.
 
 Disabling or deleting the KMS key prevents future decryption of wrapped
 keys, effectively erasing the protected data.
+
+## Non-sensitive preferences
+
+UI theme choice is stored in a long-lived `theme` cookie and
+`localStorage`. The value is a simple string (`"light"` or `"dark"`) and
+does not require encryption.

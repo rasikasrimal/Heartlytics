@@ -116,3 +116,4 @@
 | --- | --- | --- | --- | --- | --- |
 | TC-060 | Theme toggle updates `data-bs-theme`, cookie, and `localStorage` consistently. | UI Theming | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-061 | Server-side rendering respects `theme` cookie to avoid flash of incorrect theme. | UI Theming | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-062 | Charts and table headers render without white backgrounds in dark mode. | UI Theming | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
