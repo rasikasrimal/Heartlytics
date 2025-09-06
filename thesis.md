@@ -1,254 +1,116 @@
 # HeartLytics: Secure Role‑Based Heart Disease Prediction Web Application
 
-**Author:** HMRS Samaranayaka
+**Authors:** HMRS Samaranayaka
 
 **Affiliation:** NSBM Green University, Homagama, Sri Lanka
 
-**Date:** 2025-08-01
+**Date:** 2025-09-06
 
 ## Abstract
-HeartLytics is a full‑stack Python/Flask platform that predicts heart disease risk while enforcing strict security, encryption and user experience guarantees. The system ingests single records or CSV batches, cleans and analyzes data, executes a trained Random Forest model, and surfaces results through role‑aware dashboards and PDF reports. Application‑level envelope encryption protects patient identifiers, while Bootstrap 5 theming enables accessible light and dark modes. Extensive tests and a phased project plan demonstrate the feasibility of deploying HeartLytics as a secure clinical decision‑support prototype.
+HeartLytics is a full-stack Flask application that predicts the risk of heart disease and couples machine learning with rigorous security and usability controls. A Random Forest model trained on the UCI Heart Disease dataset powers single and batch predictions, while Exploratory Data Analysis (EDA) and outlier detection aid interpretability. Role-based access control, application-level envelope encryption, Argon2id password hashing, and CSRF protection safeguard patient data. A persistent light/dark theme, responsive charts, and PDF reporting deliver a cohesive user experience. This thesis documents the system's architecture, data flows, security model, theming, and comprehensive test strategy that collectively demonstrate HeartLytics as a secure clinical decision-support prototype.
 
 ## Table of Contents
-- [Working Topic](#working-topic)
-- [Study Area and Study Objectives](#study-area-and-study-objectives)
-- [Research Gap](#research-gap)
-- [Research Problem / Questions](#research-problem--questions)
-- [Research Strategy and Research Method](#research-strategy-and-research-method)
-- [System Overview and Architecture](#system-overview-and-architecture)
-  - [Context Diagram](#context-diagram)
-  - [High-Level Architecture](#high-level-architecture)
-- [Data Flow Diagrams](#data-flow-diagrams)
-  - [Level-0 DFD](#level-0-dfd)
-  - [Level-1 DFD – Batch Upload](#level-1-dfd--batch-upload)
-  - [Level-1 DFD – Predict](#level-1-dfd--predict)
-- [Data Model and Database Design](#data-model-and-database-design)
-- [Security Architecture](#security-architecture)
-- [UI/UX and Theming](#uiux-and-theming)
-- [Key Execution Flows](#key-execution-flows)
-  - [Login with Theme Persistence](#login-with-theme-persistence)
-  - [Data Upload to EDA](#data-upload-to-eda)
-  - [Prediction Inference](#prediction-inference)
-- [Implementation Details and Configuration](#implementation-details-and-configuration)
-- [Testing and Evaluation](#testing-and-evaluation)
-- [Timeline and Project Management](#timeline-and-project-management)
-- [Ethics, Privacy, and Compliance](#ethics-privacy-and-compliance)
-- [Results, Discussion, and Conclusion](#results-discussion-and-conclusion)
-- [References](#references)
-- [Appendices](#appendices)
-  - [RBAC Matrix](#rbac-matrix)
-  - [API Endpoints](#api-endpoints)
-  - [Extended Test Cases](#extended-test-cases)
+- [List of Figures](#list-of-figures)
+- [List of Tables](#list-of-tables)
+- [Repository Snapshot](#repository-snapshot)
+- [1. Working Topic](#1-working-topic)
+- [2. Study Area & Study Objectives](#2-study-area--study-objectives)
+- [3. Research Gap](#3-research-gap)
+- [4. Research Problem / Questions](#4-research-problem--questions)
+- [5. Research Strategy & Method](#5-research-strategy--method)
+- [6. System Overview & Architecture](#6-system-overview--architecture)
+  - [6.1 Context Diagram](#61-context-diagram)
+  - [6.2 High-Level Architecture Diagram](#62-high-level-architecture-diagram)
+  - [6.3 Deployment View](#63-deployment-view)
+- [7. Data Flow Diagrams](#7-data-flow-diagrams)
+  - [7.1 Level-0 DFD](#71-level-0-dfd)
+  - [7.2 Level-1 DFD – Predict Workflow](#72-level-1-dfd--predict-workflow)
+  - [7.3 Level-1 DFD – Batch Pipeline](#73-level-1-dfd--batch-pipeline)
+- [8. Data Model & ERD](#8-data-model--erd)
+- [9. Security Architecture](#9-security-architecture)
+- [10. UI/UX & Theming](#10-uiux--theming)
+- [11. Key Execution Flows](#11-key-execution-flows)
+- [12. Implementation & Configuration](#12-implementation--configuration)
+- [13. Testing & Evaluation](#13-testing--evaluation)
+- [14. Timeline & Project Management](#14-timeline--project-management)
+- [15. Ethics, Privacy & Compliance](#15-ethics-privacy--compliance)
+- [16. Results, Discussion & Conclusion](#16-results-discussion--conclusion)
+- [17. References](#17-references)
+- [Appendix A — Full Test Cases](#appendix-a--full-test-cases)
+- [Appendix B — API Endpoint Catalog](#appendix-b--api-endpoint-catalog)
+- [Appendix C — RBAC Matrix & Permission Mapping](#appendix-c--rbac-matrix--permission-mapping)
+- [Appendix D — Extended Figures](#appendix-d--extended-figures)
+- [Appendix E — Glossary & Acronyms](#appendix-e--glossary--acronyms)
 
-## Working Topic
-HeartLytics delivers clinician‑friendly heart disease risk prediction through a Flask web application backed by a scikit‑learn Random Forest model. It targets doctors, researchers and end‑users requiring an auditable, secure and themed interface for interactive or batch predictions.
+## List of Figures
+No figures are included in this initial pass. Subsequent passes will enumerate and link all diagrams.
 
-## Study Area and Study Objectives
-Cardiovascular diseases remain the leading global cause of death, accounting for approximately 17.9 million fatalities each year【f141cb†L222-L226】. Early detection enables timely intervention, yet traditional diagnostics like ECG and angiography can be invasive or resource intensive. Recent research applies supervised machine learning to improve risk stratification, with ensemble models such as Random Forest and XGBoost demonstrating strong predictive power【92cebb†L55-L57】【92cebb†L178-L187】.
+## List of Tables
+No tables are included in this initial pass. Subsequent passes will enumerate and link all tabular content.
 
-HeartLytics situates itself in this landscape by providing:
+## Repository Snapshot
+- **Commit Hash:** dcc7a3623f37a4b69d4b0f97a041af07ac757147
+- **Commit Date:** 2025-09-06 13:30:20 +0530
 
-* **Secure data entry and prediction** – single patients and CSV batches.
-* **Exploratory Data Analysis (EDA)** – cleaning logs, summary statistics, correlation heatmaps and outlier detection using IQR, Isolation Forest, Z‑Score, LOF and DBSCAN algorithms【cdb8b2†L1-L76】.
-* **Role‑aware dashboards** – Doctors review their own patients; SuperAdmins manage users and audit logs.
-* **Envelope encryption** for patient data and names, storing ciphertext, nonce, tag and wrapped data keys with key identifiers【5337ea†L9-L21】.
-* **Accessible theming** – default light mode, persistent theme cookie and chart patches for dark mode transparency【82b3da†L1-L13】【f25d16†L1-L64】.
-* **PDF reporting** – per‑patient summaries via ReportLab【e82694†L1-L36】.
+### Stack Inventory
+HeartLytics is implemented in Python 3 using the Flask web framework and Jinja2 templates. Persistent data is managed via SQLAlchemy ORM over SQLite by default, with environment-driven database configuration. Machine learning features rely on scikit-learn, pandas, numpy, and a pre-trained Random Forest model. Front-end styling leverages Bootstrap 5, custom CSS, and Plotly.js for interactive charts. ReportLab generates PDF summaries.
 
-Functional objectives include accurate prediction, reliable batch processing, and intuitive dashboards. Non‑functional objectives target security (RBAC, CSRF, encryption), usability (theme persistence, responsive UI), and maintainability (tested services, modular blueprints).
+### Module Inventory
+Key modules include:
+- **auth/** – authentication forms, role-based decorators, and RBAC policy definitions.
+- **routes/** – blueprints for prediction, settings, debugging utilities, and module access checks.
+- **services/** – domain logic for data cleaning, simulation, PDF generation, security utilities, theming hooks, and cryptographic helpers (AEAD, envelope encryption, keyring management).
+- **doctor/**, **user/**, **superadmin/** – role-specific dashboards and management interfaces.
+- **templates/** – Jinja templates for pages and components.
+- **static/** – stylesheets, scripts, and assets including chart theming scripts.
+- **tests/** – pytest suites covering authentication, encryption, RBAC, dashboards, simulations, uploads, and theming.
 
-## Research Gap
-Existing ML pipelines often emphasize predictive accuracy but neglect operational concerns such as secure storage, role separation and accessible visualization. Prior work shows strong model performance【92cebb†L55-L57】, yet integration into a secure web platform with envelope encryption and comprehensive RBAC is less explored. HeartLytics addresses this gap by combining industry‑grade security controls【69cf44†L1-L32】 with robust data handling and theming, bridging machine learning outputs and clinical workflows.
+### Data Model Inventory
+The database schema (see [database.md](database.md)) defines tables `user`, `role`, `user_roles`, `patient`, `prediction`, `cluster_summary`, and `audit_log`. Encrypted fields appear in `patient` and `prediction` as groups of columns (`*_ct`, `_nonce`, `_tag`, `_wrapped_dk`, `_kid`, `_kver`). Foreign keys connect predictions to clustering summaries and users to roles and audit entries.
 
-## Research Problem / Questions
-The central problem is how to deploy heart disease prediction in a manner that is secure, role‑aware and user friendly. Key research questions include:
+### Security Inventory
+Security controls span authentication via Flask-Login, Argon2id password hashing with legacy PBKDF2 upgrade, CSRF decorators for forms and APIs, rate limiting on login attempts, security headers, and strict role-based access control enforced by decorators. Application-level envelope encryption uses AES-256-GCM with per-record data keys wrapped by a pluggable keyring; rollout flags (`ENCRYPTION_ENABLED`, `READ_LEGACY_PLAINTEXT`, `KMS_PROVIDER`, `KMS_KEY_ID`) govern operation. TLS is expected in production deployments.
 
-1. How can application‑level envelope encryption protect patient identifiers without impeding usability?
-2. What RBAC policies ensure clinicians access necessary modules while restricting administrative features?
-3. How does persistent light/dark theming affect visualization clarity across modules?
-4. Can batch EDA and outlier detection enhance clinician trust in model outputs?
-5. How can the system be evaluated for security and functional correctness?
+### Theming Inventory
+Light mode is the default. A `theme` cookie and `localStorage` entry persist the preference, read server-side on every request to avoid flashes of incorrect styling. `static/theme.charts.js` patches Plotly and Chart.js so visualizations adapt automatically. Dark mode renders charts with transparent backgrounds and adjusted text colors. The theme toggle appears on login and signup pages and all authenticated views.
 
-## Research Strategy and Research Method
-The project follows Design Science Research Methodology (DSRM)【Peffers2007】. Artefacts include the Flask application, encryption utilities and theming modules. Iterative development cycles gathered requirements, implemented prototypes, and evaluated functionality through automated tests and user feedback. Data originates from the UCI Heart Disease repository【92cebb†L69-L71】; model analysis leverages Random Forest and XGBoost comparisons.【92cebb†L178-L187】 Logs and test outcomes form the basis of evaluation.
+### Testing Inventory
+Automated tests reside under `tests/` and include suites for authentication (`test_auth.py`), password policies (`test_passwords.py`), encryption utilities (`test_crypto.py`, `test_encrypted_fields.py`), RBAC (`test_rbac.py`), theming (`test_theme.py`), dashboard and upload workflows, simulations, superadmin operations, and EDA payload handling. `TEST_CASES.md` enumerates manual and automated scenarios across modules, prioritizing security and functionality.
 
-## System Overview and Architecture
-HeartLytics uses a Python 3/Flask runtime with Jinja2 templates, SQLAlchemy ORM and a scikit‑learn Random Forest model (`ml/model.pkl`). SQLite is the default database, configurable via environment variables【ac6f4a†L15-L34】. Envelope encryption employs AES‑256‑GCM with per‑record data keys wrapped by a keyring service【5337ea†L3-L21】.
+### Timeline Inventory
+`gantt_chart.md` provides a mermaid Gantt diagram detailing phases: Planning (requirements, feasibility), Development (backend, frontend, model, security, RBAC, theming), Testing (unit/integration, user acceptance), Deployment, and Post-Deployment monitoring. Recent iterations added cleaning-log normalization, batch prediction notices, and theme toggle improvements on authentication pages.
 
-### Context Diagram
-```mermaid
-flowchart LR
-    User -->|HTTPS| FlaskApp
-    Doctor -->|HTTPS| FlaskApp
-    Admin -->|HTTPS| FlaskApp
-    SuperAdmin -->|HTTPS| FlaskApp
-    FlaskApp -->|SQL| Database[(SQLite/PostgreSQL)]
-    FlaskApp -->|KMS API| Keyring
-```
+## 1. Working Topic
+HeartLytics delivers clinician-friendly heart disease risk prediction through a Flask-based web application secured by role-based access control and envelope encryption. Stakeholders include doctors, administrators, and end-users seeking interpretable predictions. The system's value lies in combining accurate machine learning with robust security and accessible theming.
 
-### High-Level Architecture
-```mermaid
-flowchart TB
-    subgraph Client
-        Browser
-    end
-    subgraph Server
-        FlaskApp-->Services
-        Services-->Model[(RandomForest)]
-        Services-->Keyring[(KMS/HSM)]
-        Services-->DB[(SQLAlchemy ORM)]
-    end
-    Browser-->FlaskApp
-    FlaskApp-->Browser
-    DB-->Storage[(Encrypted Disk)]
-```
 
-RBAC governs access: SuperAdmin has full rights, Admin lacks Predict/Batch/Dashboard/Research, Doctors see all modules, Users access Predict only【69cf44†L8-L20】.
+## 2. Study Area & Study Objectives
+Cardiovascular diseases account for nearly one third of global deaths, with lifestyle factors and limited access to early diagnostics exacerbating risks in low-resource settings. Digital decision-support systems can widen access to preventive care by transforming raw clinical measurements into actionable insights. HeartLytics positions itself in this domain as a web platform that integrates machine learning, exploratory analytics, and secure data management tailored for clinicians and researchers.
 
-## Data Flow Diagrams
-### Level-0 DFD
-```mermaid
-flowchart LR
-    A[User] -->|Enter data/CSV| B[HeartLytics]
-    B -->|Clean & EDA| C[Model]
-    C -->|Predictions| B
-    B -->|Results & PDFs| A
-```
+The primary functional objectives are:
+1. **Accurate Prediction:** Use a tuned Random Forest model (`ml/model.pkl`) to classify patient records with probability estimates.
+2. **Batch Processing and EDA:** Allow CSV uploads, automatic cleaning, outlier detection via IQR, Isolation Forest, Z-Score, LOF, and DBSCAN, and a dashboard summarizing distributions and correlations.
+3. **Role-Specific Dashboards:** Provide dedicated views for Users, Doctors, Administrators, and SuperAdmins with module restrictions enforced through decorators.
+4. **Reporting:** Generate per-patient and aggregate PDF reports using ReportLab, embedding charts and tables that respect the active theme.
 
-### Level-1 DFD – Batch Upload
-```mermaid
-flowchart LR
-    U[Doctor/User]-->U1[Upload CSV]
-    U1-->C1[Column Mapping]
-    C1-->D1[Cleaning & Imputation]
-    D1-->O1[Outlier Detection]
-    O1-->M1[Model Scoring]
-    M1-->S1[Store Predictions]
-    S1-->R1[Dashboard & PDF]
-    R1-->U
-```
+Non-functional objectives emphasize:
+- **Security:** Envelope encryption for patient identifiers and data, Argon2id password hashing, CSRF protection, and audit logging.
+- **Usability:** Responsive Bootstrap 5 interface, persistent theming, accessible color contrast, and informative error feedback.
+- **Maintainability:** Modular blueprints, service-oriented helpers for data and encryption, and comprehensive automated tests.
 
-### Level-1 DFD – Predict
-```mermaid
-flowchart LR
-    U[User]-->F1[Prediction Form]
-    F1-->V1[Validate & Sanitize]
-    V1-->M2[Model Predict]
-    M2-->S2[Persist Result]
-    S2-->R2[Render Result]
-    R2-->U
-```
+Collectively, these objectives align with stakeholders' needs for trustworthy, interpretable, and secure heart disease risk assessment.
 
-## Data Model and Database Design
-```mermaid
-erDiagram
-    USER ||--o{ PATIENT : entered_by_user_id
-    USER ||--o{ AUDIT_LOG : acting_user_id
-    USER ||--o{ AUDIT_LOG : target_user_id
-    USER ||--o{ USER_ROLE : user_id
-    ROLE ||--o{ USER_ROLE : role_id
-    PATIENT ||--o{ PREDICTION : patient_id
-    CLUSTER_SUMMARY ||--o{ PREDICTION : cluster_id
-```
+## 3. Research Gap
+Prior research often focuses on improving algorithmic performance of heart disease prediction but overlooks operational security and role differentiation. The bundled research paper emphasizes theming and user experience improvements but offers limited discussion on encryption or RBAC enforcement. Moreover, while studies highlight accuracy of machine learning models on the UCI dataset, few describe full-stack implementations that handle sensitive data with envelope encryption or provide audit-ready role separation. HeartLytics fills this gap by coupling predictive modeling with production-grade security practices and a theming system that adapts charts and tables for readability across light and dark modes.
 
-Tables `patient` and `prediction` store encrypted fields (`*_ct`, `_nonce`, `_tag`, `_wrapped_dk`, `_kid`, `_kver`) alongside legacy plaintext columns while `READ_LEGACY_PLAINTEXT` remains true【aa345d†L19-L55】. Primary and foreign keys align with database.md relations.
+## 4. Research Problem / Questions
+The overarching problem is delivering machine learning predictions for heart disease in a way that remains secure, auditable, and user-friendly. The project investigates:
+1. How can application-level envelope encryption be implemented without degrading user experience or system performance?
+2. What RBAC policies balance clinician autonomy with administrative oversight and minimal attack surface?
+3. In what ways does theme persistence influence comprehension of charts and logs across devices and sessions?
+4. Can comprehensive EDA and outlier detection improve trust in model predictions for clinical decision-making?
+5. How do automated tests and logs support verification of security controls and functional workflows?
 
-## Security Architecture
-Security controls include:
+## 5. Research Strategy & Method
+HeartLytics follows Design Science Research Methodology (DSRM) by iteratively designing, building, and evaluating artefacts—namely the Flask application, encryption utilities, and theming modules. Requirements were elicited from documentation of clinical datasets and security best practices. Development cycles produced incremental prototypes tested via pytest and manual scenarios in `TEST_CASES.md`. Data originates from the UCI Heart Disease repository, preprocessed into model features using pandas and scikit-learn. Evaluation combines quantitative metrics (prediction probabilities, test outcomes, log entries) with qualitative assessment of usability. The methodology aligns with Peffers et al. (2007), ensuring that constructed artefacts address identified gaps and provide a foundation for further academic and clinical validation.
 
-* **Authentication** – Flask‑Login sessions with rate limiting on login attempts【c1e841†L14-L44】.
-* **Authorization** – Decorators enforce role and module access before route execution【afe6fc†L1-L46】.
-* **Password Storage** – Argon2id hashing with transparent PBKDF2 upgrades【c1e841†L40-L56】【4088a1†L25-L48】.
-* **CSRF Protection** – Form and API decorators verify tokens stored in session【2dc86b†L1-L27】.
-* **Security Headers and Cookies** – Configured to limit sniffing, framing and track theme preference only【69cf44†L1-L32】.
-* **Encryption** – Envelope scheme with AES‑256‑GCM; key rotation and cryptographic erasure follow docs/encryption.md guidelines【5337ea†L1-L33】.
-* **Audit Logging** – Administrative actions recorded in `audit_log` with acting and target users【69cf44†L8-L20】【aa345d†L12-L18】.
-
-## UI/UX and Theming
-The default theme is light; a `theme` cookie and `localStorage` entry persist user preference. Server‑side hooks expose the theme before rendering to avoid flashes of incorrect color【5269c0†L1-L15】. Client scripts toggle modes and update the cookie, meta theme color and chart libraries; dark mode uses transparent chart backgrounds for seamless integration【10dec7†L1-L42】【f25d16†L1-L64】.
-
-## Key Execution Flows
-### Login with Theme Persistence
-```mermaid
-sequenceDiagram
-    participant B as Browser
-    participant S as Server
-    B->>S: GET /auth/login (theme cookie)
-    S->>B: Render login (matching theme)
-    B->>S: POST /auth/login (credentials, CSRF)
-    S->>S: Validate, rate limit, authenticate
-    S->>B: Redirect & set session
-    B->>B: theme.js persists preference
-```
-
-### Data Upload to EDA
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant S as Server
-    U->>S: POST /upload (CSV)
-    S->>S: Map & clean columns
-    S->>S: Run outlier detectors
-    S->>S: Score via model
-    S->>U: EDA dashboard & notice
-```
-
-### Prediction Inference
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant S as Server
-    U->>S: POST /predict (form)
-    S->>S: Validate & sanitize
-    S->>M: RandomForest.predict
-    M-->>S: Label & probability
-    S->>DB: Store Prediction
-    S->>U: Render result & risk band
-```
-
-## Implementation Details and Configuration
-Configuration resides in `config.py` with environment variables for database URI, model path, encryption flags, KMS provider and role strictness【ac6f4a†L15-L44】. Theme features read `SIMULATION_FEATURES` flags, while encryption toggles (`ENCRYPTION_ENABLED`, `READ_LEGACY_PLAINTEXT`) govern patient data handling. A CLI (`flask roles`) manages user roles and can be extended for key rotation (`manage_keys.py`).
-
-## Testing and Evaluation
-Automated tests cover authentication, RBAC, predictions, EDA payload, dashboard, encryption and theming (e.g., `tests/test_theme.py`) ensuring functional and security requirements. TEST_CASES.md enumerates manual and automated scenarios across modules, including CSRF, rate limiting, and theme persistence【02abce†L1-L126】. Running `pytest` executes unit and integration suites.
-
-## Timeline and Project Management
-The project followed a structured Gantt plan spanning planning, development, testing and deployment phases with milestones such as Security & Encryption, RBAC Hardening and UI Theming【dccd76†L5-L27】. Post‑deployment monitoring extends into maintenance.
-
-## Ethics, Privacy, and Compliance
-HeartLytics minimizes data retention and encrypts sensitive fields. Cookies store only non‑sensitive theme preferences; sessions timeout to reduce exposure. The system adheres to OWASP guidelines and enables cryptographic erasure via KMS key deletion【69cf44†L33-L48】【5337ea†L29-L33】. Deployments targeting EU residents must ensure GDPR compliance, user consent and breach notification procedures【69cf44†L33-L48】.
-
-## Results, Discussion, and Conclusion
-The implemented system validates the feasibility of delivering secure, role‑aware heart disease predictions through a themed web interface. Envelope encryption and RBAC address confidentiality and access control gaps identified in prior literature, while batch EDA and simulations foster transparency. Future work includes larger datasets, threshold tuning, fairness audits and integration with clinical information systems【76743a†L1-L7】.
-
-## References
-- Breiman, L. (2001). Random forests. *Machine Learning*, 45(1), 5–32.
-- Chen, T., & Guestrin, C. (2016). XGBoost: A scalable tree boosting system. In *Proc. KDD'16* (pp. 785–794).
-- Janosi, A., Steinbrunn, W., Pfisterer, M., & Detrano, R. (1988). Heart Disease Dataset. *UCI Machine Learning Repository*.
-- Peffers, K., Tuunanen, T., Rothenberger, M. A., & Chatterjee, S. (2007). A design science research methodology for information systems research. *Journal of Management Information Systems*, 24(3), 45–77.
-- Ronacher, A. (2021). Flask documentation. *Pallets Projects*.
-- World Health Organization. (2021). Cardiovascular diseases (CVDs) [Fact sheet].
-- Zhang, D., et al. (2021). Heart disease prediction based on the embedded feature selection method and deep neural network. *Journal of Healthcare Engineering*, Article ID 6260022.
-
-## Appendices
-### RBAC Matrix
-| Role       | Predict | Batch | Dashboard | Research |
-|------------|:------:|:-----:|:--------:|:--------:|
-| SuperAdmin | ✔ | ✔ | ✔ | ✔ |
-| Admin      | ✖ | ✖ | ✖ | ✖ |
-| Doctor     | ✔ | ✔ | ✔ | ✔ |
-| User       | ✔ | ✖ | ✖ | ✖ |
-
-### API Endpoints
-| Endpoint | Method | Description |
-| --- | --- | --- |
-| `/auth/login` | GET/POST | User authentication |
-| `/auth/signup` | GET/POST | User registration |
-| `/predict` | GET/POST | Single prediction form and result |
-| `/upload` | GET/POST | Batch upload workflow |
-| `/settings` | GET | User settings and activity |
-| `/doctor/` | GET | Doctor dashboard |
-| `/superadmin/` | GET | SuperAdmin dashboard |
-
-### Extended Test Cases
-See `TEST_CASES.md` for the full suite covering authentication, prediction, batch processing, encryption, RBAC, dashboards, settings, simulations, research viewer, security, regression, UI layout and theming scenarios【02abce†L1-L126】.
