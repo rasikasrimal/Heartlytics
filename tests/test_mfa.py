@@ -52,3 +52,9 @@ def test_login_with_recovery_code(client, app):
         follow_redirects=True,
     )
     assert b"Predictive insights" in resp.data
+
+
+def test_settings_shows_mfa_option(auth_client):
+    resp = auth_client.get("/settings/")
+    assert b"Two-Step Verification" in resp.data
+    assert b"/auth/mfa/setup" in resp.data
