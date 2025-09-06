@@ -44,4 +44,5 @@ gantt
 - Forgot-password emails now send via Gmail SMTP with `/debug/mail` diagnostics and rate-limited OTP handling.
 - Password resets require re-authentication and send change notifications.
 - Optional TOTP-based two-step verification with recovery codes is now available.
+- Email-based MFA codes can be enabled as a fallback to TOTP.
 

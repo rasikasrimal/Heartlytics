@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import secrets
 import re
 from flask import current_app, render_template, redirect, url_for, flash, session, request
 from flask_login import login_required, current_user, login_user
 
 from . import auth_bp
-from .forms import TOTPSetupForm, TOTPVerifyForm, MFADisableForm
-from .forgot import _hash_code
+from .forms import TOTPSetupForm, TOTPVerifyForm, MFADisableForm, EmailCodeForm
+from .forgot import _hash_code, _mask_email
 from .totp import random_base32, provisioning_uri, verify_totp
 
 
@@ -98,7 +98,79 @@ def mfa_verify():
             flash("Recovery code used", "warning")
             return redirect(url_for("index"))
         flash("Invalid code", "error")
-    return render_template("auth/mfa_verify.html", form=form)
+    return render_template("auth/mfa_verify.html", form=form, email_option=user.mfa_email_enabled)
+
+
+@auth_bp.route("/mfa/email", methods=["GET", "POST"])
+def mfa_email():
+    user_id = session.get("mfa_user_id")
+    if not user_id:
+        return redirect(url_for("auth.login"))
+    User = current_app.User
+    Challenge = current_app.MFAEmailChallenge
+    user = User.query.get(user_id)
+    if not user or not user.mfa_email_enabled:
+        return redirect(url_for("auth.login"))
+    form = EmailCodeForm()
+    now = datetime.utcnow()
+    challenge = (
+        Challenge.query.filter_by(user_id=user.id, status="pending")
+        .order_by(Challenge.id.desc())
+        .first()
+    )
+    if request.method == "GET":
+        send = True
+        if challenge:
+            cooldown = current_app.config.get("MFA_EMAIL_RESEND_COOLDOWN_SEC", 30)
+            if (now - challenge.last_sent_at).total_seconds() < cooldown:
+                send = False
+        if send:
+            length = current_app.config.get("MFA_EMAIL_CODE_LENGTH", 6)
+            code = ''.join(secrets.choice('0123456789') for _ in range(length))
+            hashed = _hash_code(code)
+            ttl = current_app.config.get("MFA_EMAIL_TTL_MIN", 10)
+            if challenge:
+                challenge.code_hash = hashed
+                challenge.expires_at = now + timedelta(minutes=ttl)
+                challenge.attempts = 0
+                challenge.resend_count += 1
+                challenge.last_sent_at = now
+            else:
+                challenge = Challenge(
+                    user_id=user.id,
+                    code_hash=hashed,
+                    expires_at=now + timedelta(minutes=ttl),
+                    last_sent_at=now,
+                    requester_ip=request.remote_addr,
+                    user_agent=request.headers.get("User-Agent", ""),
+                )
+                current_app.db.session.add(challenge)
+            current_app.db.session.commit()
+            text = f"Your verification code is {code}\nIt expires in {ttl} minutes."
+            current_app.email_service.send_mail(
+                user.email,
+                "Your verification code",
+                text,
+                purpose="mfa.email",
+            )
+    if form.validate_on_submit():
+        if not challenge or challenge.expires_at < now:
+            flash("Code expired", "error")
+        else:
+            code = re.sub(r"[^0-9A-Za-z]", "", form.code.data)
+            if _hash_code(code) == challenge.code_hash:
+                challenge.status = "verified"
+                login_user(user)
+                user.last_login = now
+                user.mfa_last_enforced_at = now
+                current_app.db.session.commit()
+                session.pop("mfa_user_id", None)
+                return redirect(request.args.get("next") or url_for("index"))
+            challenge.attempts += 1
+            current_app.db.session.commit()
+            flash("Invalid code", "error")
+    masked = _mask_email(user.email)
+    return render_template("auth/mfa_email.html", form=form, email=masked, challenge=challenge)
 
 
 @auth_bp.route("/mfa/disable", methods=["GET", "POST"])
@@ -134,3 +206,5 @@ def mfa_disable():
                 flash("Two-step verification disabled", "success")
                 return redirect(url_for("index"))
     return render_template("auth/mfa_disable.html", form=form)
+
+

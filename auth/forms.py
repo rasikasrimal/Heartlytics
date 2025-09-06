@@ -64,6 +64,13 @@ class VerifyCodeForm(FlaskForm):
     submit = SubmitField("Continue")
 
 
+class EmailCodeForm(FlaskForm):
+    """Form for entering an email one-time code."""
+
+    code = StringField("Verification Code", validators=[DataRequired(), Length(min=6, max=8)])
+    submit = SubmitField("Verify")
+
+
 class ResetPasswordForm(FlaskForm):
     """Step 3: choose a new password."""
 

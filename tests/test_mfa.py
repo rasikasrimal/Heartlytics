@@ -145,3 +145,31 @@ def test_settings_shows_mfa_option(auth_client):
     resp = auth_client.get("/settings/")
     assert b"Two-Step Verification" in resp.data
     assert b"/auth/mfa/setup" in resp.data
+
+
+def test_login_with_email_code(monkeypatch, client, app):
+    from app import db, User
+    from auth.totp import random_base32
+    with app.app_context():
+        User.query.filter_by(email="mfaemail@example.com").delete()
+        db.session.commit()
+        user = User(username="mfaemail", email="mfaemail@example.com", status="approved")
+        user.password_hash = generate_password_hash("Passw0rd!")
+        user.mfa_enabled = True
+        secret = random_base32()
+        user.set_mfa_secret(secret)
+        db.session.add(user)
+        db.session.commit()
+    monkeypatch.setattr("auth.mfa.secrets.choice", lambda seq: seq[0])
+    monkeypatch.setattr("services.email.EmailService.send_mail", lambda self, *args, **kwargs: None)
+    client.post(
+        "/auth/login",
+        data={"identifier": "mfaemail@example.com", "password": "Passw0rd!"},
+    )
+    client.get("/auth/mfa/email")
+    resp = client.post(
+        "/auth/mfa/email",
+        data={"code": "000000"},
+        follow_redirects=True,
+    )
+    assert b"Predict" in resp.data

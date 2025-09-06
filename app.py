@@ -356,6 +356,8 @@ class User(db.Model, UserMixin):
     last_login = db.Column(db.DateTime)
     avatar = db.Column(db.String(255))
     mfa_enabled = db.Column(db.Boolean, default=False)
+    mfa_email_enabled = db.Column(db.Boolean, default=True)
+    mfa_email_verified_at = db.Column(db.DateTime)
     mfa_secret_ct = db.Column(db.LargeBinary)
     mfa_secret_nonce = db.Column(db.LargeBinary)
     mfa_secret_tag = db.Column(db.LargeBinary)
@@ -470,6 +472,23 @@ class PasswordResetRequest(db.Model):
     )
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     hashed_code = db.Column(db.String(64), nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    attempts = db.Column(db.Integer, nullable=False, default=0)
+    resend_count = db.Column(db.Integer, nullable=False, default=0)
+    last_sent_at = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.String(20), nullable=False, default="pending")
+    requester_ip = db.Column(db.String(45))
+    user_agent = db.Column(db.String(200))
+
+    user = db.relationship("User")
+
+
+class MFAEmailChallenge(db.Model):
+    """Short-lived record for email MFA verification codes."""
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    code_hash = db.Column(db.String(64), nullable=False)
     expires_at = db.Column(db.DateTime, nullable=False)
     attempts = db.Column(db.Integer, nullable=False, default=0)
     resend_count = db.Column(db.Integer, nullable=False, default=0)
@@ -708,6 +727,7 @@ app.Prediction = Prediction
 app.ClusterSummary = ClusterSummary
 app.AuditLog = AuditLog
 app.PasswordResetRequest = PasswordResetRequest
+app.MFAEmailChallenge = MFAEmailChallenge
 app.Role = Role
 app.UserRole = UserRole
 app.Patient = Patient
@@ -836,6 +856,8 @@ with app.app_context():
         ("mfa_secret_kver", "INTEGER"),
         ("mfa_recovery_hashes", "JSON"),
         ("mfa_last_enforced_at", "DATETIME"),
+        ("mfa_email_enabled", "BOOLEAN"),
+        ("mfa_email_verified_at", "DATETIME"),
     ]:
         if col not in user_cols:
             db.session.execute(text(f"ALTER TABLE user ADD COLUMN {col} {coltype}"))
