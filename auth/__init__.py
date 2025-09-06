@@ -58,6 +58,11 @@ def login():
                 flash(msg, "error")
                 return render_template("auth/login.html", form=form)
 
+            if not user.mfa_email_enabled:
+                user.mfa_email_enabled = True
+                user.mfa_email_verified_at = datetime.utcnow()
+                db.session.commit()
+
             if user.mfa_enabled:
                 session["mfa_user_id"] = user.id
                 session["login_attempts"] = {"count": 0, "ts": datetime.utcnow().isoformat()}
