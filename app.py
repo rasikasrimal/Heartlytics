@@ -783,6 +783,22 @@ with app.app_context():
         )
         db.session.commit()
 
+    # ensure MFA columns exist for older databases
+    for col, coltype in [
+        ("mfa_enabled", "BOOLEAN"),
+        ("mfa_secret_ct", "BLOB"),
+        ("mfa_secret_nonce", "BLOB"),
+        ("mfa_secret_tag", "BLOB"),
+        ("mfa_secret_wrapped_dk", "BLOB"),
+        ("mfa_secret_kid", "VARCHAR(64)"),
+        ("mfa_secret_kver", "INTEGER"),
+        ("mfa_recovery_hashes", "JSON"),
+        ("mfa_last_enforced_at", "DATETIME"),
+    ]:
+        if col not in user_cols:
+            db.session.execute(text(f"ALTER TABLE user ADD COLUMN {col} {coltype}"))
+            db.session.commit()
+
     # ensure default roles are present
     for name, perms in DEFAULT_ROLE_PERMISSIONS.items():
         if not Role.query.filter_by(role_name=name).first():
