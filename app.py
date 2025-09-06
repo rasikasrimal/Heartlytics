@@ -61,6 +61,7 @@ from services.data import (
     BINARY_FEATURES,
     CATEGORICAL_FEATURES,
     group_cleaning_log,
+    normalize_log,
     clean_dataframe,
     find_optional_in_raw,
     normalize_columns,
@@ -2321,12 +2322,10 @@ def upload_eda(uid: str):
 
         has_results = os.path.exists(p["results"])
         raw_log = payload.get("log", [])
-        log = []
-        for item in raw_log:
-            if isinstance(item, dict):
-                log.append(item)
-            else:
-                log.append({"text": item})
+        log = normalize_log(raw_log)
+        predict_notice = None
+        if len(log) == 1 and log[0].get("text", "").startswith("Predictions added"):
+            predict_notice = log[0]["text"]
         groups = group_cleaning_log(log)
 
         return render_template(
@@ -2340,6 +2339,7 @@ def upload_eda(uid: str):
             outliers_json=json.dumps(payload.get("outliers", [])),
             has_results=has_results,
             banner=None,
+            predict_notice=predict_notice,
         )
 
     csv_path = p["results"] if os.path.exists(p["results"]) else p["clean"]
@@ -2364,7 +2364,11 @@ def upload_eda(uid: str):
         .replace({np.nan: None})
         .to_dict(orient="records")
     )
-    cleaning_log = [{"text": "Loaded results dataset" if os.path.exists(p["results"]) else "Loaded cleaned dataset"}, {"text": f"Rows: {len(df)}"}]
+    cleaning_log = [
+        {"text": "Loaded results dataset" if os.path.exists(p["results"]) else "Loaded cleaned dataset"},
+        {"text": f"Rows: {len(df)}"},
+    ]
+    cleaning_log = normalize_log(cleaning_log)
     groups = group_cleaning_log(cleaning_log)
 
     to_save = {"log": cleaning_log, "eda": eda_payload, "preview": preview}
@@ -2534,7 +2538,8 @@ def upload_predict(uid: str):
         .replace({np.nan: None})
         .to_dict(orient="records")
     )
-    log = [{"text": f"Predictions added: {len(df)} rows"}]
+    log = normalize_log([{"text": f"Predictions added: {len(df)} rows"}])
+    notice = log[0]["text"] if log else None
     to_save = {"log": log, "eda": eda_payload, "preview": preview, "outliers": outliers}
     try:
         with open(p["eda_json"], "w", encoding="utf-8") as f:
@@ -2548,11 +2553,11 @@ def upload_predict(uid: str):
         cleaning_log=log,
         cleaning_groups=groups,
         cleaning_log_json=json.dumps(log),
-
         preview_json=json.dumps(preview),
         eda_json=json.dumps(eda_payload),
         outliers_json=json.dumps(outliers),
         has_results=True,
+        predict_notice=notice,
         banner=f"Batch prediction complete: {len(df)} rows saved.",
         outliers=outliers,
     )

@@ -25,8 +25,9 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 - 📈 **EDA**: Cleaning log, summary statistics, and numeric correlation heatmap.
 - 🛡️ **Resilient Batch Prediction**: Handles missing `num_major_vessels` values without failing.
 - 🎨 **Modern UI**: Responsive Bootstrap 5 theme with custom colors, icons, and charts.
-- 🌗 **Light/Dark Theme**: Toggle via navbar, preference stored in localStorage/cookie with server-side rendering awareness. Charts adapt automatically with transparent backgrounds in dark mode.
+- 🌗 **Light/Dark Theme**: Toggle via navbar or auth pages, preference stored in localStorage/cookie with server-side rendering awareness. Charts adapt automatically with transparent backgrounds in dark mode.
 - 🧾 **Themed Tables & Logs**: Cleaning logs and patient record tables match the active theme for consistent readability.
+- 🧹 **Normalized Cleaning Logs**: Blank lines are stripped server-side for compact output; batch predictions surface a concise inline notice.
 - 🔐 **Redesigned Login**: Clean layout without top navigation, centered branding and form, fields start empty with autofill disabled, password visibility toggle, hover animation on login button, and quick links.
 - 📌 **Sticky Footer**: Consistent footer on every page that stays at the bottom.
 - 🔒 **Safe by design**:
