@@ -40,6 +40,12 @@
 | --- | --- | --- | --- | --- | --- |
 | TC-041 | Patient data encrypted with envelope scheme when enabled. | Encryption | 🔴 High | 🔒 Security | ⏳ Not Run |
 
+## RBAC
+| Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
+| --- | --- | --- | --- | --- | --- |
+| TC-050 | Admin role is forbidden from Predict, Batch, Dashboard, Research modules. | RBAC | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-051 | SuperAdmin bypasses all module restrictions. | RBAC | 🔴 High | 🔒 Security | ⏳ Not Run |
+
 ## Doctor Dashboard
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
 | --- | --- | --- | --- | --- | --- |

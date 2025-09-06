@@ -5,14 +5,14 @@ from __future__ import annotations
 from flask import render_template, current_app
 from flask_login import current_user, login_required
 
-from services.auth import role_required
+from auth.decorators import require_roles
 
 from . import doctor_bp
 
 
 @doctor_bp.route("/")
 @login_required
-@role_required(["Doctor"])
+@require_roles("Doctor")
 def dashboard():
     """Display patients entered by the logged-in doctor."""
     db = current_app.extensions["sqlalchemy"]

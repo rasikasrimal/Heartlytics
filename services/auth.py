@@ -15,6 +15,7 @@ from typing import Iterable
 
 from flask import abort, current_app
 from flask_login import current_user
+from auth.rbac import rbac_can
 
 
 def role_required(roles: Iterable[str]):
@@ -109,4 +110,10 @@ def permission_required(permission: str):
     return decorator
 
 
-__all__ = ["role_required", "permission_required"]
+__all__ = ["role_required", "permission_required", "ensure_module_access"]
+
+
+def ensure_module_access(module: str) -> None:
+    """Raise 403 if current user cannot access ``module``."""
+    if not current_user.is_authenticated or not rbac_can(current_user, module):
+        abort(403)

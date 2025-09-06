@@ -13,6 +13,7 @@ import pickle
 import math
 from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo
+import click
 
 import numpy as np
 import pandas as pd
@@ -45,7 +46,8 @@ from outlier_detection import (
     run_outlier_methods,
 )
 
-from services.auth import role_required
+from auth.decorators import require_module_access, require_roles
+from auth.rbac import Role, rbac_can, is_superadmin
 from services.pdf import generate_prediction_pdf
 from services.data import (
     INPUT_COLUMNS,
@@ -120,6 +122,14 @@ def inject_branding():
         "app_logo": current_app.config.get("APP_LOGO", "logo.svg"),
     }
 
+
+@app.context_processor
+def inject_rbac_helpers():
+    return {
+        "can": lambda module: current_user.is_authenticated and rbac_can(current_user, module),
+        "is_superadmin": lambda: current_user.is_authenticated and is_superadmin(current_user),
+    }
+
 # Security headers
 @app.after_request
 def set_security_headers(resp):
@@ -129,19 +139,13 @@ def set_security_headers(resp):
     resp.headers['Permissions-Policy'] = 'interest-cohort=()'
     return resp
 
-# Restrict regular users to prediction functionality only
-@app.before_request
-def limit_user_pages():
-    if current_user.is_authenticated and getattr(current_user, "role", None) == "User":
-        allowed = {
-            "index",
-            "predict.predict_page",
-            "predict.predict",
-            "auth.logout",
-            "settings.settings",
-        }
-        if request.endpoint not in allowed and not (request.endpoint or "").startswith("static"):
-            return abort(403)
+
+@app.errorhandler(403)
+def handle_forbidden(e):
+    if request.accept_mimetypes.accept_json and not request.accept_mimetypes.accept_html:
+        return jsonify({"error": "forbidden"}), 403
+    return render_template("errors/403.html"), 403
+
 
 # Jinja helpers
 app.jinja_env.globals.update(zip=zip)
@@ -271,7 +275,7 @@ class User(db.Model, UserMixin):
     nickname = db.Column(db.String(80), unique=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False, default="")
-    role = db.Column(db.String(20), default="User")
+    role = db.Column(db.String(20), default=Role.USER.value, nullable=False)
     status = db.Column(db.String(20), default="pending")
     requested_role = db.Column(db.String(20))
     # Relationship to support many-to-many roles in future-proof design
@@ -905,7 +909,7 @@ app.register_blueprint(simulations_bp)
 
 @app.route("/admin/")
 @login_required
-@role_required(["Admin", "SuperAdmin"])
+@require_roles("Admin", "SuperAdmin")
 def admin_dashboard_alias():
     """Redirect legacy /admin/ path to unified dashboard."""
     return redirect(url_for("superadmin.dashboard"))
@@ -1001,6 +1005,7 @@ def index():
 # ---------------------------
 @app.get("/dashboard")
 @login_required
+@require_module_access("Dashboard")
 def dashboard():
     rows = Prediction.query.order_by(Prediction.created_at.asc()).all()
     data = [r.to_dict() for r in rows]
@@ -1013,6 +1018,7 @@ def dashboard():
 
 @app.route("/outliers", methods=["GET", "POST"])
 @login_required
+@require_module_access("Dashboard")
 def outlier_handling():
     """Interactive page to run and compare multiple outlier detectors."""
     rows = Prediction.query.order_by(Prediction.created_at.asc()).all()
@@ -1036,6 +1042,7 @@ def outlier_handling():
 
 @app.get("/dashboard/pdf")
 @login_required
+@require_module_access("Dashboard")
 def dashboard_pdf():
     """Render PDF generation options page with preview data."""
     rows = Prediction.query.order_by(Prediction.created_at.asc()).all()
@@ -1064,6 +1071,7 @@ def dashboard_pdf():
 
 @app.post("/dashboard/pdf")
 @login_required
+@require_module_access("Dashboard")
 def dashboard_pdf_generate():
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import A4, landscape
@@ -1545,6 +1553,7 @@ def dashboard_pdf_generate():
 
 @app.get("/dashboard/csv")
 @login_required
+@require_module_access("Dashboard")
 def dashboard_csv():
     import csv
 
@@ -1576,6 +1585,7 @@ def dashboard_csv():
 
 @app.get("/dashboard/clean-csv")
 @login_required
+@require_module_access("Dashboard")
 def dashboard_clean_csv():
     rows = Prediction.query.order_by(Prediction.created_at.asc()).all()
     data = [r.to_dict() for r in rows]
@@ -1595,6 +1605,7 @@ def dashboard_clean_csv():
 
 @app.get("/research")
 @login_required
+@require_module_access("Research")
 def research_paper():
     paper = load_research_paper()
     return render_template("research/index.html", paper=paper)
@@ -1948,6 +1959,7 @@ def _apply_user_mapping(df: pd.DataFrame, mapping: dict) -> pd.DataFrame:
 # ============================
 @app.get("/upload")
 @login_required
+@require_module_access("Batch")
 def upload_form():
     return render_template("uploads/form.html",
                            required_cols=sorted(list(REQUIRED_INTERNAL_COLUMNS)),
@@ -1955,6 +1967,7 @@ def upload_form():
 
 @app.post("/upload")
 @login_required
+@require_module_access("Batch")
 @csrf_protect
 def upload_post():
     file = request.files.get("file")
@@ -2006,6 +2019,7 @@ def upload_post():
 
 @app.get("/upload/<uid>/columns")
 @login_required
+@require_module_access("Batch")
 def upload_columns_map(uid: str):
     p = _paths(uid)
     if not os.path.exists(p["raw"]):
@@ -2066,6 +2080,7 @@ def upload_columns_map(uid: str):
 
 @app.post("/upload/<uid>/columns")
 @login_required
+@require_module_access("Batch")
 @csrf_protect
 def upload_columns_map_submit(uid: str):
     p = _paths(uid)
@@ -2602,6 +2617,36 @@ def upload_bulk_pdf(uid: str):
     c.save()
     buf.seek(0)
     return send_file(buf, as_attachment=True, download_name=f"batch_report_{uid}.pdf", mimetype="application/pdf")
+
+
+# ---------------------------
+# CLI role management
+# ---------------------------
+
+@app.cli.group()
+def roles():
+    """Manage user roles."""
+
+
+@roles.command("set")
+@click.argument("email")
+@click.argument("role")
+def roles_set(email: str, role: str) -> None:
+    """Set ``email`` user to ``role``."""
+    from click import echo
+
+    with app.app_context():
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            echo("User not found")
+            return
+        try:
+            user.role = Role(role).value
+        except ValueError:
+            echo("Invalid role")
+            return
+        db.session.commit()
+        echo(f"Updated {email} to {user.role}")
 
 
 # ---------------------------

@@ -44,6 +44,8 @@ class Config:
     DEV_KMS_MASTER_KEY = os.environ.get("DEV_KMS_MASTER_KEY")
     DEV_KMS_IDX_KEY = os.environ.get("DEV_KMS_IDX_KEY")
 
+    RBAC_STRICT = os.environ.get("RBAC_STRICT", "1").lower() not in {"0", "false"}
+
 class DevelopmentConfig(Config):
     DEBUG = True
 

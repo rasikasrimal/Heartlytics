@@ -8,8 +8,14 @@ This document summarizes the security controls implemented in the HeartLytics we
 - Sessions are marked as permanent and respect server-side timeouts.
 
 ## Authorization
-- Role-based access control with roles such as **User**, **Doctor**, **Admin**, and **SuperAdmin**.
-- Route-level restrictions ensure users only access permitted views.
+- Strict role-based access control with roles **User**, **Doctor**, **Admin**, and **SuperAdmin**.
+- Policy matrix:
+  - **SuperAdmin** – full access
+  - **Admin** – no access to Predict, Batch, Dashboard, Research modules
+  - **Doctor** – access to all modules
+  - **User** – Predict only
+- Server-side decorators enforce checks before any sensitive processing.
+- `RBAC_STRICT` environment flag (default `1`) ensures checks are always active.
 
 ## Password Storage
 - Passwords are hashed using `argon2-cffi` with the Argon2id algorithm.
