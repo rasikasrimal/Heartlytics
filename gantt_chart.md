@@ -38,4 +38,5 @@ gantt
 - **Deployment** marks the production release.
 - **Post-Deployment** includes monitoring and ongoing maintenance.
 - Recent iteration adds cleaning-log normalization, a compact batch prediction notice, and a theme toggle on auth pages.
+- Latest update introduces a spaced, role-aware navigation bar and a shared motion token system.
 

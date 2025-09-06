@@ -46,6 +46,13 @@
 | TC-050 | Admin role is forbidden from Predict, Batch, Dashboard, Research modules. | RBAC | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-051 | SuperAdmin bypasses all module restrictions. | RBAC | 🔴 High | 🔒 Security | ⏳ Not Run |
 
+## Navigation & Motion
+| Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
+| --- | --- | --- | --- | --- | --- |
+| TC-060 | Nav shows only permitted items for each role. | Navigation | 🔴 High | 🧪 Functional | ⏳ Not Run |
+| TC-061 | Theme toggle and user menu remain keyboard accessible after redesign. | Navigation | 🟡 Medium | 🧪 Accessibility | ⏳ Not Run |
+| TC-062 | Animations disable when `prefers-reduced-motion` is set. | Motion | 🟡 Medium | 🧪 Accessibility | ⏳ Not Run |
+
 ## Doctor Dashboard
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |
 | --- | --- | --- | --- | --- | --- |

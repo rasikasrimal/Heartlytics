@@ -31,6 +31,7 @@ from argon2.exceptions import VerifyMismatchError
 from services.crypto import envelope
 from services.crypto import get_keyring
 from config import DevelopmentConfig, ProductionConfig
+from navigation import get_nav_items
 
 # ML imputation helpers
 from sklearn.metrics import (
@@ -134,6 +135,11 @@ def inject_rbac_helpers():
         "can": lambda module: current_user.is_authenticated and rbac_can(current_user, module),
         "is_superadmin": lambda: current_user.is_authenticated and is_superadmin(current_user),
     }
+
+
+@app.context_processor
+def inject_nav():
+    return {"nav_items": get_nav_items(current_user)}
 
 # Security headers
 @app.after_request
@@ -882,10 +888,12 @@ def load_model(path: str):
 
 model = load_model(MODEL_PATH) if os.path.exists(MODEL_PATH) else None
 model_name = os.path.basename(MODEL_PATH)
+model_date = datetime.fromtimestamp(os.path.getmtime(MODEL_PATH)).date().isoformat() if os.path.exists(MODEL_PATH) else ""
 # Expose model info on the app for blueprint access without importing
 # this module again.
 app.model = model
 app.model_name = model_name
+app.model_date = model_date
 
 # ---------------------------
 # Training Schema (exact columns used by model)
@@ -1004,7 +1012,7 @@ def index():
         "num_major_vessels": 0,
         "thalassemia_type": "normal",
     }
-    return render_template("predict/form.html", defaults=defaults, model_name=model_name)
+    return render_template("predict/form.html", defaults=defaults, model_name=model_name, model_date=app.model_date)
 
 
 # ---------------------------
