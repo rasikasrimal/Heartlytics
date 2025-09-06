@@ -27,7 +27,7 @@
 
     <h2 class="h6 mt-3">Cleaning Log</h2>
     {% set groups = cleaning_groups %}
-    <div class="border rounded bg-light p-2 small table-scroll">
+    <div class="cleaning-log border rounded p-2 small table-scroll">
       <ul class="mb-0 ps-3">
         {% if groups['dup'] %}
         <li><strong>✅ Duplicates removed</strong><ul>{% for item in groups['dup'] %}<li>{{ item.text }}{% if item.details %}<button class="btn btn-link btn-sm p-0 ms-1 log-view" data-detail="{{ item.idx }}">View</button>{% endif %}</li>{% endfor %}</ul></li>{% endif %}

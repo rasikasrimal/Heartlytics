@@ -5,6 +5,9 @@ This document lists the tables in the application's database and includes `DESC`
 User interface theme preferences are stored in client-side cookies and
 `localStorage`; no database tables persist this information.
 
+Recent theming updates (transparent charts and table header styling) do
+not introduce any new columns.
+
 ## audit_log
 
 ```sql
