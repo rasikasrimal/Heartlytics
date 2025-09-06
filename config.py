@@ -46,6 +46,23 @@ class Config:
 
     RBAC_STRICT = os.environ.get("RBAC_STRICT", "1").lower() not in {"0", "false"}
 
+    # --- Email / OTP settings ---
+    EMAIL_PROVIDER = os.environ.get("EMAIL_PROVIDER", "gmail")
+    SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+    SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+    SMTP_USERNAME = os.environ.get("SMTP_USERNAME")
+    SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD")
+    MAIL_FROM = os.environ.get("MAIL_FROM", SMTP_USERNAME)
+    MAIL_REPLY_TO = os.environ.get("MAIL_REPLY_TO")
+
+    OTP_TTL_MIN = int(os.environ.get("OTP_TTL_MIN", "10"))
+    OTP_LENGTH = int(os.environ.get("OTP_LENGTH", "6"))
+    OTP_MAX_ATTEMPTS = int(os.environ.get("OTP_MAX_ATTEMPTS", "5"))
+    OTP_RESEND_COOLDOWN_SEC = int(os.environ.get("OTP_RESEND_COOLDOWN_SEC", "30"))
+
+    RATE_LIMIT_PER_IP = int(os.environ.get("RATE_LIMIT_PER_IP", "5"))
+    RATE_LIMIT_PER_ID = int(os.environ.get("RATE_LIMIT_PER_ID", "5"))
+
 class DevelopmentConfig(Config):
     DEBUG = True
 

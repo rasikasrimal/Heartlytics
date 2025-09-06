@@ -70,6 +70,8 @@ DESC password_reset_request;
 | requester_ip | VARCHAR(45) |  |  |
 | user_agent | VARCHAR(200) |  |  |
 
+Requests expire after 10 minutes and may be removed by periodic cleanup.
+
 ## patient
 
 ```sql

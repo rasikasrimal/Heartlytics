@@ -209,7 +209,7 @@ sequenceDiagram
 ```
 
 ## Implementation Details and Configuration
-Configuration resides in `config.py` with environment variables for database URI, model path, encryption flags, KMS provider and role strictness【ac6f4a†L15-L44】. Theme features read `SIMULATION_FEATURES` flags, while encryption toggles (`ENCRYPTION_ENABLED`, `READ_LEGACY_PLAINTEXT`) govern patient data handling. A CLI (`flask roles`) manages user roles and can be extended for key rotation (`manage_keys.py`).
+Configuration resides in `config.py` with environment variables for database URI, model path, encryption flags, KMS provider and role strictness【ac6f4a†L15-L44】. Theme features read `SIMULATION_FEATURES` flags, while encryption toggles (`ENCRYPTION_ENABLED`, `READ_LEGACY_PLAINTEXT`) govern patient data handling. Gmail SMTP variables (`SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `MAIL_FROM`) enable TLS email delivery for password resets, and OTP settings (`OTP_TTL_MIN`, `OTP_MAX_ATTEMPTS`) harden the flow. A CLI (`flask roles`) manages user roles and can be extended for key rotation (`manage_keys.py`).
 
 ## Testing and Evaluation
 Automated tests cover authentication, RBAC, predictions, EDA payload, dashboard, encryption and theming (e.g., `tests/test_theme.py`) ensuring functional and security requirements. TEST_CASES.md enumerates manual and automated scenarios across modules, including CSRF, rate limiting, and theme persistence【02abce†L1-L126】. Running `pytest` executes unit and integration suites.

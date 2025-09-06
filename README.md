@@ -191,6 +191,29 @@ The application reads configuration from environment variables (see `.env.exampl
 | `DEV_KMS_MASTER_KEY` | base64 master key for dev keyring    | _none_ |
 | `DEV_KMS_IDX_KEY` | base64 key for blind indexes           | _none_ |
 
+### Gmail SMTP configuration
+
+Enable 2-Step Verification on the Gmail account and create an **App Password**.
+Configure these environment variables so the Forgot Password flow can send
+codes over TLS:
+
+```
+EMAIL_PROVIDER=gmail
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=<gmail address>
+SMTP_PASSWORD=<gmail app password>
+MAIL_FROM=<gmail address>
+MAIL_REPLY_TO=<support email>
+OTP_TTL_MIN=10
+OTP_LENGTH=6
+OTP_MAX_ATTEMPTS=5
+OTP_RESEND_COOLDOWN_SEC=30
+```
+
+Use the `/debug/mail` page (SuperAdmin only) to send a test message and inspect
+recent delivery events.
+
 ## 📈 Example Workflow
 
 1. **Enter Data** → Open the homepage and fill in patient details through the form.
