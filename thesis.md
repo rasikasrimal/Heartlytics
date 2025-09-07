@@ -361,24 +361,28 @@ This sequence expands on the previous DFD by detailing temporal ordering and act
 
 ### BPMN Process for Prediction Pipeline
 ```mermaid
-bpmn
-    title HeartLytics Prediction
-    lane User {
-        startEvent start
-        task submit "Submit Patient Data"
-        task review "Review Prediction"
-        endEvent end
-    }
-    lane System {
-        task encrypt "Encrypt Data with KMS"
-        gateway valid "Data Valid?"
-        task predict "Run Risk Model"
-        task error "Return Validation Errors"
-    }
-    start --> submit --> encrypt --> valid
-    valid -->|Yes| predict --> review
-    valid -->|No| error --> review
-    review --> end
+flowchart LR
+  %% HeartLytics Prediction
+
+  subgraph User
+    start([Start])
+    submit[Submit Patient Data]
+    review[Review Prediction]
+    endNode([End])
+  end
+
+  subgraph System
+    encrypt[Encrypt Data with KMS]
+    valid{Data Valid?}
+    predict[Run Risk Model]
+    error[Return Validation Errors]
+  end
+
+  start --> submit --> encrypt --> valid
+  valid -- Yes --> predict --> review
+  valid -- No  --> error --> review
+  review --> endNode
+
 ```
 
 This BPMN 2.0 diagram illustrates the end-to-end prediction workflow with separate swimlanes for the user and system. After the user submits patient data, the system encrypts the payload, validates its structure, and either executes the risk model or returns validation issues before the user reviews the outcome.
