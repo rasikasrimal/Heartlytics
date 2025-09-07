@@ -14,7 +14,7 @@
       {{ primary_button('Continue', {'type':'submit'}) }}
     </form>
     <form method="post" action="{{ url_for('auth.resend_code') }}" class="mt-3 d-flex align-items-center gap-2 justify-content-center">
-      {{ link_button('Resend', {'type':'submit','disabled': 'disabled' if cooldown>0 else None}) }}
+      {{ link_button('Resend', {'type':'submit'} if cooldown <= 0 else {'type':'submit','disabled':'disabled'}) }}
       {% if cooldown>0 %}
         {{ countdown_badge('%02d:%02d' % (cooldown // 60, cooldown % 60)) }}
       {% endif %}
