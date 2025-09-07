@@ -18,6 +18,7 @@
 | TC-072 | Verification code expires after 10 minutes. | Authentication & Roles | 🟡 Medium | 🔒 Security | ⏳ Not Run |
 | TC-081 | Resend button disabled during 60s countdown. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-082 | Invalid verification codes decrement remaining attempts. | Authentication & Roles | 🟡 Medium | 🔒 Security | ⏳ Not Run |
+| TC-083 | Segmented OTP input auto-focuses and restricts to digits. | Authentication & Roles | 🟢 Low | 🧪 Accessibility | ⏳ Not Run |
 | TC-073 | `/debug/mail` sends test email and lists recent events. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-074 | Password reset requires re-login; no automatic session. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-075 | User with TOTP enabled must enter valid code after password. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |

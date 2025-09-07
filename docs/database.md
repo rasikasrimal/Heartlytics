@@ -13,6 +13,8 @@ The new simulations auto-update loader and timestamped status also run
 entirely on the client and do not impact the database schema.
 
 The password reset feature introduces a `password_reset_request` table storing short-lived verification codes.
+The latest UI redesign for the forgot-password page leverages this existing
+table without adding new columns.
 
 ## audit_log
 

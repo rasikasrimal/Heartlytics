@@ -6,6 +6,9 @@ The selection is stored in `localStorage` and a long-lived `theme` cookie so the
 server can render pages in the correct theme without a flash of incorrect
 colors.
 
+Auth pages reuse a compact card component and button macros so the forgot
+password flow matches the site's global theming and motion tokens.
+
 ## Usage
 
 No additional code is required to theme new Plotly or Chart.js charts. The

@@ -144,7 +144,8 @@ def verify_forgot():
         elapsed = (datetime.utcnow() - pr.last_sent_at).total_seconds()
         if elapsed < cooldown:
             remaining = int(cooldown - elapsed)
-    return render_template("auth/verify.html", form=form, cooldown=remaining)
+    masked = _mask_email(pr.user.email) if pr else None
+    return render_template("auth/verify.html", form=form, cooldown=remaining, masked_email=masked)
 
 
 @auth_bp.route("/forgot/resend", methods=["POST"])

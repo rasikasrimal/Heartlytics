@@ -87,6 +87,13 @@ body, .navbar, .card, .card-section, .table, .form-control, .form-select, .btn, 
   color: var(--bs-secondary-color);
 }
 
+.otp-input {
+  width: 2.75rem;
+  height: 2.75rem;
+  text-align: center;
+  font-size: 1.25rem;
+}
+
 .subheading {
   font-size: 1rem;
   font-weight: 600;

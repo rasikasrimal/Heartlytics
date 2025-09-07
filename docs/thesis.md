@@ -264,6 +264,7 @@ Envelope encryption protects sensitive columns. Each write operation generates a
 
 ## UI/UX and Theming
 The default theme is light; a `theme` cookie and `localStorage` entry persist user preference. Server-side hooks expose the theme before rendering to avoid flashes of incorrect color. Client scripts toggle modes and update the cookie, meta theme color and chart libraries; dark mode uses transparent chart backgrounds for seamless integration. A navigation bar surfaces only permitted modules per role and shares motion tokens with buttons, dropdowns and tables, all honoring `prefers-reduced-motion`. Inline loading indicators on the simulations page debounce input changes, cancel stale requests and announce when fresh results are available.
+Forgot-password screens now reuse these theming primitives, presenting a compact card with segmented OTP inputs and a visual resend countdown.
 
 ## Key Execution Flows
 ### Login with Theme Persistence

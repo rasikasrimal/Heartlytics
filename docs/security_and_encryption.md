@@ -15,6 +15,8 @@ links to the dedicated [Forgot Password / 2‑Step Verification flow](forget_pas
 - Password resets force a fresh login and send a notification email.
 - Login, OTP request, and verification endpoints enforce per‑IP and per‑ID
   limits to deter brute force attempts.
+- The redesigned forgot-password interface keeps these protections while
+  presenting segmented code inputs and a visual resend countdown.
 
 ## Authorization
 

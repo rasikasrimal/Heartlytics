@@ -15,6 +15,15 @@ encryption details see [Security and Encryption](security_and_encryption.md).
 - On success the password reset form is displayed; otherwise retry with respect
   to cooldown and attempt limits.
 
+## User Interface
+
+- A centered Bootstrap card guides users through email entry and code
+  verification.
+- The OTP step presents six segmented inputs with auto-tab and paste support,
+  plus a disabled Resend button showing a visual countdown badge.
+- Helper text and inline alerts use high-contrast styles and are announced
+  via `aria-live="polite"` for accessibility.
+
 ## BPMN 2.0
 
 ```mermaid
