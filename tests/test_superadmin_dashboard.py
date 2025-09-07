@@ -2,6 +2,7 @@
 
 def create_doctor(app, username="doc"):
     from app import db, User
+    from datetime import datetime
     with app.app_context():
         user = User.query.filter_by(username=username).first()
         if not user:
@@ -11,6 +12,7 @@ def create_doctor(app, username="doc"):
                 role="Doctor",
                 status="approved",
             )
+            user.email_verified_at = datetime.utcnow()
             db.session.add(user)
             db.session.commit()
         return user

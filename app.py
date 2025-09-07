@@ -354,6 +354,7 @@ class User(db.Model, UserMixin):
         onupdate=lambda: datetime.now(timezone.utc),
     )
     last_login = db.Column(db.DateTime)
+    email_verified_at = db.Column(db.DateTime)
     avatar = db.Column(db.String(255))
     mfa_enabled = db.Column(db.Boolean, default=False)
     mfa_email_enabled = db.Column(db.Boolean, default=True)
@@ -475,6 +476,22 @@ class PasswordResetRequest(db.Model):
     expires_at = db.Column(db.DateTime, nullable=False)
     attempts = db.Column(db.Integer, nullable=False, default=0)
     resend_count = db.Column(db.Integer, nullable=False, default=0)
+    last_sent_at = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.String(20), nullable=False, default="pending")
+    requester_ip = db.Column(db.String(45))
+    user_agent = db.Column(db.String(200))
+
+    user = db.relationship("User")
+
+
+class EmailVerification(db.Model):
+    """Email verification codes issued during signup."""
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    code_hash = db.Column(db.String(64), nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    attempts = db.Column(db.Integer, nullable=False, default=0)
     last_sent_at = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), nullable=False, default="pending")
     requester_ip = db.Column(db.String(45))
@@ -728,6 +745,7 @@ app.ClusterSummary = ClusterSummary
 app.AuditLog = AuditLog
 app.PasswordResetRequest = PasswordResetRequest
 app.MFAEmailChallenge = MFAEmailChallenge
+app.EmailVerification = EmailVerification
 app.Role = Role
 app.UserRole = UserRole
 app.Patient = Patient

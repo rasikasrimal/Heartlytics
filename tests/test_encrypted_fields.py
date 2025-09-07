@@ -1,10 +1,14 @@
 from app import db, Patient, User
+from datetime import datetime
 
 
 def test_patient_encryption_round_trip(app):
     app.config["ENCRYPTION_ENABLED"] = True
     with app.app_context():
+        User.query.filter_by(email="u1@example.com").delete()
+        db.session.commit()
         user = User(username="u1", email="u1@example.com", role="Doctor", status="approved")
+        user.email_verified_at = datetime.utcnow()
         db.session.add(user)
         db.session.commit()
         p = Patient(entered_by_user_id=user.id)

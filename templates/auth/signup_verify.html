@@ -16,6 +16,7 @@
   {% call auth_card('Verify your email') %}
     <p class="text-muted mb-3">Enter the 6-digit code sent to your email address.</p>
     <form method="post" autocomplete="off" novalidate>
+      {{ form.hidden_tag() }}
       {{ otp_inputs('code') }}
       {{ primary_button('Verify', attrs={'type':'submit'}) }}
     </form>

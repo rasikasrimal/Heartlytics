@@ -3,6 +3,7 @@ import types
 import pytest
 import os
 import base64
+from datetime import datetime
 
 # Provide a minimal stub for `python-dotenv` if the package isn't installed.
 # This avoids import errors during tests when the optional dependency is missing.
@@ -54,6 +55,7 @@ def auth_client(client):
             user = User(username="tester", email="t@example.com", role="Doctor", status="approved")
             db.session.add(user)
         user.password_hash = generate_password_hash("testpass")
+        user.email_verified_at = datetime.utcnow()
         db.session.commit()
 
     client.post(
@@ -81,6 +83,7 @@ def superadmin_client(client):
             )
             db.session.add(user)
         user.password_hash = generate_password_hash("sapass")
+        user.email_verified_at = datetime.utcnow()
         db.session.commit()
 
     client.post(

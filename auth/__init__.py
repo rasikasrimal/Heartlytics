@@ -4,11 +4,21 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 
-from flask import Blueprint, current_app, flash, redirect, render_template, session, url_for, request
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    session,
+    url_for,
+    request,
+)
 from flask_login import login_user, logout_user, current_user
 from sqlalchemy import or_
 
-from .forms import LoginForm, SignupForm
+from .forms import LoginForm, SignupForm, EmailCodeForm
+from services import mfa as mfa_service
 
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -48,6 +58,9 @@ def login():
         ).first()
 
         if user and user.check_password(form.password.data):
+            if not user.email_verified_at:
+                flash("Please verify your email before logging in.", "error")
+                return render_template("auth/login.html", form=form)
             if user.status != "approved":
                 if user.status == "pending":
                     msg = "Account pending approval"
@@ -141,19 +154,58 @@ def signup():
             flash("User created", "success")
             return redirect(url_for("superadmin.dashboard"))
 
-        if status == "approved":
-            flash("Account created. You can log in.", "success")
-        else:
-            flash("Signup request submitted. Await approval", "success")
-        return redirect(url_for("auth.login"))
+        code = mfa_service.generate_code()
+        ttl = current_app.config.get("OTP_TTL_MIN", 10)
+        EmailVerification = current_app.EmailVerification
+        ev = EmailVerification(
+            user_id=user.id,
+            code_hash=mfa_service.hash_code(code),
+            expires_at=datetime.utcnow() + timedelta(minutes=ttl),
+            last_sent_at=datetime.utcnow(),
+            requester_ip=request.remote_addr,
+            user_agent=request.headers.get("User-Agent"),
+        )
+        db.session.add(ev)
+        db.session.commit()
+        mfa_service.send_signup_email(user, code, ttl, request)
+        session["email_verify_id"] = ev.id
+        flash("Verification code sent. Check your email.", "info")
+        return redirect(url_for("auth.signup_verify"))
 
     return render_template("auth/signup.html", form=form)
 
 
-@auth_bp.route("/signup/verify")
+@auth_bp.route("/signup/verify", methods=["GET", "POST"])
 def signup_verify():
-    """Display email verification step after sign up."""
-    return render_template("auth/signup_verify.html")
+    """Verify the email code sent during signup."""
+
+    form = EmailCodeForm()
+    ev_id = session.get("email_verify_id")
+    EmailVerification = current_app.EmailVerification
+    ev = EmailVerification.query.get(ev_id) if ev_id else None
+    if not ev:
+        flash("Start signup first", "error")
+        return redirect(url_for("auth.signup"))
+
+    if form.validate_on_submit():
+        if datetime.utcnow() > ev.expires_at:
+            current_app.db.session.delete(ev)
+            current_app.db.session.commit()
+            session.pop("email_verify_id", None)
+            flash("Code expired. Sign up again.", "error")
+            return redirect(url_for("auth.signup"))
+        ev.attempts += 1
+        if mfa_service.verify_code(form.code.data, ev.code_hash):
+            user = ev.user
+            user.email_verified_at = datetime.utcnow()
+            current_app.db.session.delete(ev)
+            current_app.db.session.commit()
+            session.pop("email_verify_id", None)
+            flash("Email verified. You can log in.", "success")
+            return redirect(url_for("auth.login"))
+        current_app.db.session.commit()
+        flash("Invalid code", "error")
+    return render_template("auth/signup_verify.html", form=form)
 
 
 @auth_bp.route("/logout")

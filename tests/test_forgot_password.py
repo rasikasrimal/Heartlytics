@@ -1,4 +1,5 @@
 from werkzeug.security import generate_password_hash
+from datetime import datetime
 
 
 def _create_user(app, username="user1", email="u1@example.com"):
@@ -8,6 +9,7 @@ def _create_user(app, username="user1", email="u1@example.com"):
         if not user:
             user = User(username=username, email=email, status="approved")
             user.password_hash = generate_password_hash("oldpass")
+            user.email_verified_at = datetime.utcnow()
             db.session.add(user)
             db.session.commit()
     return user

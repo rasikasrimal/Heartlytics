@@ -23,6 +23,7 @@
 | TC-085 | Countdown badge shows mm:ss while resend is disabled. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-086 | Signup button stays disabled until form fields are valid. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-087 | Password strength meter reflects complexity rules. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-088 | Signup requires email verification before login. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-073 | `/debug/mail` sends test email and lists recent events. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-074 | Password reset requires re-login; no automatic session. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-075 | User with TOTP enabled must enter valid code after password. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |

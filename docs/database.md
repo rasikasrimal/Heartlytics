@@ -15,7 +15,7 @@ entirely on the client and do not impact the database schema.
 The password reset feature introduces a `password_reset_request` table storing short-lived verification codes.
 Email-based MFA uses an `mfa_email_challenge` table recording hashed codes, attempts, and resend timestamps.
 The redesigned forgot-password interface and segmented OTP inputs are client-side only and do not alter the database schema.
-The new sign-up page with password strength checks and optional email verification likewise introduces no additional tables or columns.
+The new sign-up flow requires email verification, adding an `email_verification` table for pending codes and an `email_verified_at` column on `user`.
 
 ## audit_log
 
@@ -74,6 +74,24 @@ DESC password_reset_request;
 | user_agent | VARCHAR(200) |  |  |
 
 Requests expire after 10 minutes and are stored as SHA-256 hashes with a server-side pepper. Submitted codes are verified using constant-time comparisons to prevent timing attacks.
+
+## email_verification
+
+```sql
+DESC email_verification;
+```
+
+| Column | Type | Key | References |
+| --- | --- | --- | --- |
+| id | INTEGER | PK | - |
+| user_id | INTEGER | FK | user.id |
+| code_hash | VARCHAR(64) |  |  |
+| expires_at | DATETIME |  |  |
+| attempts | INTEGER |  |  |
+| last_sent_at | DATETIME |  |  |
+| status | VARCHAR(20) |  |  |
+| requester_ip | VARCHAR(45) |  |  |
+| user_agent | VARCHAR(200) |  |  |
 
 ## patient
 
@@ -164,6 +182,7 @@ DESC user;
 | created_at | DATETIME |  |  |
 | updated_at | DATETIME |  |  |
 | last_login | DATETIME |  |  |
+| email_verified_at | DATETIME |  |  |
 | avatar | VARCHAR(255) |  |  |
 | mfa_enabled | BOOLEAN |  |  |
 | mfa_email_enabled | BOOLEAN |  |  |

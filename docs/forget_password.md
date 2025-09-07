@@ -16,7 +16,7 @@ encryption details see [Security and Encryption](security_and_encryption.md).
   to cooldown and attempt limits.
 
 The UI presents the flow in a single Bootstrap authentication card. The first step collects an email address with helper text. After submission, a subtle divider reveals a six‑box OTP entry interface with auto‑tab and paste support. A disabled resend button is paired with a muted mm:ss countdown badge and a link to change the email if necessary.
-The same segmented OTP component now powers optional email verification after account creation, providing a consistent experience.
+The same segmented OTP component now powers mandatory email verification after account creation, providing a consistent experience.
 
 ## BPMN 2.0
 

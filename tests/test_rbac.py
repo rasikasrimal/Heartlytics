@@ -5,6 +5,7 @@ from flask import url_for
 @pytest.fixture
 def login(client):
     from werkzeug.security import generate_password_hash
+    from datetime import datetime
     from app import db, User
 
     def _login(role: str):
@@ -15,6 +16,7 @@ def login(client):
                 user = User(username=role.lower(), email=email, role=role, status="approved")
                 db.session.add(user)
             user.password_hash = generate_password_hash("pass")
+            user.email_verified_at = datetime.utcnow()
             db.session.commit()
         client.post(
             "/auth/login",

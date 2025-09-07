@@ -46,3 +46,24 @@ def send_reset_email(user, code: str, ttl: int, request) -> None:
     except Exception as exc:  # pragma: no cover - network errors
         current_app.logger.error("otp.email.failed user=%s", user.email, exc_info=exc)
 
+
+def send_signup_email(user, code: str, ttl: int, request) -> None:
+    """Send a signup verification ``code`` to ``user`` via email."""
+
+    text = (
+        f"Your verification code is {code}.\n"
+        f"It expires in {ttl} minutes.\n"
+        f"Request time: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}\n"
+        f"IP: {request.remote_addr}\n"
+        "If this wasn't you, ignore this message."
+    )
+    html = text.replace("\n", "<br>")
+    try:
+        current_app.email_service.send_mail(
+            user.email, "Verify your email", text, html, purpose="signup_verify"
+        )
+    except Exception as exc:  # pragma: no cover - network errors
+        current_app.logger.error(
+            "signup.email.failed user=%s", user.email, exc_info=exc
+        )
+

@@ -1,6 +1,7 @@
 import secrets
 from werkzeug.security import generate_password_hash
 from auth.totp import random_base32, generate_totp
+from datetime import datetime
 
 
 def test_login_with_totp(client, app):
@@ -9,6 +10,7 @@ def test_login_with_totp(client, app):
         User.query.filter_by(email="mfa@example.com").delete()
         db.session.commit()
         user = User(username="mfauser", email="mfa@example.com", status="approved")
+        user.email_verified_at = datetime.utcnow()
         user.password_hash = generate_password_hash("Passw0rd!")
         user.mfa_enabled = True
         secret = random_base32()
@@ -37,6 +39,7 @@ def test_login_with_totp_spaces(client, app):
         User.query.filter_by(email="mfa3@example.com").delete()
         db.session.commit()
         user = User(username="mfauser3", email="mfa3@example.com", status="approved")
+        user.email_verified_at = datetime.utcnow()
         user.password_hash = generate_password_hash("Passw0rd!")
         user.mfa_enabled = True
         secret = random_base32()
@@ -63,6 +66,7 @@ def test_login_with_totp_hyphen(client, app):
         User.query.filter_by(email="mfa4@example.com").delete()
         db.session.commit()
         user = User(username="mfauser4", email="mfa4@example.com", status="approved")
+        user.email_verified_at = datetime.utcnow()
         user.password_hash = generate_password_hash("Passw0rd!")
         user.mfa_enabled = True
         secret = random_base32()
@@ -90,6 +94,7 @@ def test_login_with_recovery_code(client, app):
         User.query.filter_by(email="mfa2@example.com").delete()
         db.session.commit()
         user = User(username="mfauser2", email="mfa2@example.com", status="approved")
+        user.email_verified_at = datetime.utcnow()
         user.password_hash = generate_password_hash("Passw0rd!")
         user.mfa_enabled = True
         secret = random_base32()
@@ -116,6 +121,7 @@ def test_disable_mfa_with_hyphen(client, app):
         User.query.filter_by(email="mfa5@example.com").delete()
         db.session.commit()
         user = User(username="mfauser5", email="mfa5@example.com", status="approved")
+        user.email_verified_at = datetime.utcnow()
         user.password_hash = generate_password_hash("Passw0rd!")
         user.mfa_enabled = True
         secret = random_base32()
@@ -154,6 +160,7 @@ def test_login_with_email_code(monkeypatch, client, app):
         User.query.filter_by(email="mfaemail@example.com").delete()
         db.session.commit()
         user = User(username="mfaemail", email="mfaemail@example.com", status="approved")
+        user.email_verified_at = datetime.utcnow()
         user.password_hash = generate_password_hash("Passw0rd!")
         user.mfa_enabled = True
         secret = random_base32()
@@ -180,7 +187,10 @@ def test_mfa_verify_masks_email(client, app):
     from utils.mask import mask_email
     email = "mask@example.com"
     with app.app_context():
+        User.query.filter_by(email=email).delete()
+        db.session.commit()
         user = User(username="mask_user", email=email, status="approved")
+        user.email_verified_at = datetime.utcnow()
         user.set_password("Passw0rd!")
         db.session.add(user)
         db.session.commit()

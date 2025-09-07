@@ -41,7 +41,7 @@ gantt
 - Latest update introduces server-side masked OTP emails and resend countdowns.
 - Latest update introduces an email-based forgot password flow with OTP verification.
 - Latest update introduces a spaced, role-aware navigation bar and a shared motion token system.
-- Latest update redesigns the sign-up page with a strength meter and email verification card.
+- Latest update redesigns the sign-up page with a strength meter and mandatory email verification card.
 - Latest update redesigns the forgot-password page with a Bootstrap card, segmented OTP inputs, and a visual resend countdown.
 - Simulations now feature inline auto-update feedback with subtle loader and timestamped confirmation.
 - Forgot-password emails now send via Gmail SMTP with `/debug/mail` diagnostics and rate-limited OTP handling.

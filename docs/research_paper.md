@@ -25,6 +25,7 @@ Recent work shows strong performance for supervised ML models in heart disease p
 7. Provide fallback email-based one-time codes as a lower-assurance MFA option.
 8. Mask destination emails during verification to protect user privacy.
 9. Redesign the forgot-password interface using Bootstrap 5 cards and segmented OTP inputs for improved accessibility.
+10. Require email verification during sign-up before account use.
 
 ## Dataset and Exploratory Data Analysis (EDA)
 
