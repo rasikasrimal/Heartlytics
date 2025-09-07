@@ -191,7 +191,7 @@ Hyperparameters are optimized using 5-fold CV on the training set (stratified sp
 We report accuracy, precision, recall, F1-score (positive class), ROC--AUC, and confusion matrices. In clinical screening, recall (sensitivity) is critical to minimize false negatives.
 
 \subsection{Deployment}
-The best model is wrapped in a Flask web app \cite{flaskdocs}; inputs are preprocessed with the same pipeline and predictions (with confidence) are returned. A small dashboard summarizes recent usage statistics. The interface uses an evenly spaced navigation bar and tokenized motion system that respects user ``prefers-reduced-motion`` settings.
+The best model is wrapped in a Flask web app \cite{flaskdocs}; inputs are preprocessed with the same pipeline and predictions (with confidence) are returned. A small dashboard summarizes recent usage statistics. The interface uses an evenly spaced navigation bar and tokenized motion system that respects user ``prefers-reduced-motion`` settings. Verification emails reveal only masked addresses and resend links observe server-side cooldowns.
 
 % =======================================================
 \section{Results and Discussion}

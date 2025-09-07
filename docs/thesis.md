@@ -239,6 +239,7 @@ erDiagram
 ```
 
 The `user` table stores authentication and MFA state: `mfa_enabled`, `mfa_email_enabled`, `mfa_email_verified_at`, envelope‑encrypted TOTP secrets (`mfa_secret_ct`, `_nonce`, `_tag`, `_wrapped_dk`, `_kid`, `_kver`), hashed recovery codes (`mfa_recovery_hashes`) and a `mfa_last_enforced_at` timestamp to drive step‑up policies. The `mfa_email_challenge` table tracks single-use email codes with hashed values, expiry timestamps, attempt counters, resend counts, requester IPs and user agents. `password_reset_request` mirrors this structure for password recovery. The `patient` table holds envelope-encrypted `patient_data` and `patient_name` fields using the same metadata columns. Storing `kid` and `kver` enables rewrap migrations when rotating master keys. Blind indexes computed via HMAC-SHA256 permit equality searches without leaking plaintext values. Relationships among tables enforce referential integrity while keeping MFA artefacts and encryption metadata tightly bound to their parent records.
+All verification templates display masked email addresses so raw identifiers never appear client-side.
 
 ## Security Architecture
 HeartLytics layers defense-in-depth controls:

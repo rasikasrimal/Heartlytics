@@ -173,3 +173,20 @@ def test_login_with_email_code(monkeypatch, client, app):
         follow_redirects=True,
     )
     assert b"Predict" in resp.data
+
+
+def test_mfa_verify_masks_email(client, app):
+    from app import db, User
+    from utils.mask import mask_email
+    email = "mask@example.com"
+    with app.app_context():
+        user = User(username="mask_user", email=email, status="approved")
+        user.set_password("Passw0rd!")
+        db.session.add(user)
+        db.session.commit()
+        uid = user.id
+    with client.session_transaction() as sess:
+        sess["mfa_user_id"] = uid
+    resp = client.get("/auth/mfa/verify")
+    assert email.encode() not in resp.data
+    assert mask_email(email).encode() in resp.data

@@ -1,0 +1,6 @@
+{% macro otp_input(name='code', length=6) -%}
+  <div class="mb-3">
+    <label for="{{ name }}" class="form-label">6-digit code</label>
+    <input id="{{ name }}" name="{{ name }}" type="text" inputmode="numeric" maxlength="{{ length }}" class="form-control text-center otp-input" autocomplete="one-time-code" required>
+  </div>
+{%- endmacro %}

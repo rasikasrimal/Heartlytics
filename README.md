@@ -32,6 +32,7 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 - 🔑 **Forgot Password Flow**: Six-digit codes are emailed, hashed with a pepper, and expire after a short TTL. The resend link includes a cooldown timer and backend enforcement.
 - 🔐 **TOTP 2-Step Verification**: Optional authenticator app codes with one-time recovery codes.
 - ✉️ **Email MFA Codes**: Enabled by default and sent as single-use backups when authenticator codes aren't available.
+- 🙈 **Masked OTP Delivery**: Verification emails are masked server-side and resend links enforce cooldowns.
 - 📌 **Sticky Footer**: Consistent footer on every page that stays at the bottom.
 - 🧭 **Responsive Navigation**: Evenly spaced top bar with RBAC-driven items, sticky elevation, and utility icons.
 - 🎞️ **Motion System**: Tokenized durations/easings applied across components with `prefers-reduced-motion` support.

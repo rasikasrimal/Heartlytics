@@ -20,7 +20,7 @@ def settings():
         .limit(20)
         .all()
     )
-    return render_template("settings.html", logs=logs)
+    return render_template("settings/index.html", logs=logs)
 
 
 @settings_bp.post("/profile")

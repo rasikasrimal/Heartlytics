@@ -11,8 +11,8 @@ from flask_login import login_required, current_user, login_user
 from . import auth_bp
 from .forms import TOTPSetupForm, TOTPVerifyForm, MFADisableForm, EmailCodeForm
 from services.mfa import hash_code
-from .forgot_password import _mask_email
 from .totp import random_base32, provisioning_uri, verify_totp
+from utils.mask import mask_email
 
 
 @auth_bp.route("/mfa/setup", methods=["GET", "POST"])
@@ -99,7 +99,13 @@ def mfa_verify():
             flash("Recovery code used", "warning")
             return redirect(url_for("index"))
         flash("Invalid code", "error")
-    return render_template("auth/mfa_verify.html", form=form, email_option=user.mfa_email_enabled)
+    masked = mask_email(user.email)
+    return render_template(
+        "auth/mfa_verify.html",
+        form=form,
+        email_option=user.mfa_email_enabled,
+        masked_email=masked,
+    )
 
 
 @auth_bp.route("/mfa/email", methods=["GET", "POST"])
@@ -170,7 +176,7 @@ def mfa_email():
             challenge.attempts += 1
             current_app.db.session.commit()
             flash("Invalid code", "error")
-    masked = _mask_email(user.email)
+    masked = mask_email(user.email)
     return render_template("auth/mfa_email.html", form=form, email=masked, challenge=challenge)
 
 
