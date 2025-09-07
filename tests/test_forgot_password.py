@@ -24,7 +24,7 @@ def test_forgot_password_message_same(client, app):
 
 def test_forgot_password_flow(client, app, monkeypatch):
     user = _create_user(app)
-    monkeypatch.setattr("auth.forgot._generate_code", lambda: "123456")
+    monkeypatch.setattr("services.mfa.generate_code", lambda: "123456")
     app.email_service.send_mail = lambda *a, **k: "msg"
     client.post("/auth/forgot", data={"identifier": "u1@example.com"}, follow_redirects=True)
     client.post("/auth/forgot/verify", data={"code": "123456"}, follow_redirects=True)
@@ -41,7 +41,7 @@ def test_forgot_password_flow(client, app, monkeypatch):
 
 def test_no_auto_login_after_reset(client, app, monkeypatch):
     user = _create_user(app)
-    monkeypatch.setattr("auth.forgot._generate_code", lambda: "123456")
+    monkeypatch.setattr("services.mfa.generate_code", lambda: "123456")
     app.email_service.send_mail = lambda *a, **k: "msg"
     client.post("/auth/forgot", data={"identifier": "u1@example.com"}, follow_redirects=True)
     client.post("/auth/forgot/verify", data={"code": "123456"}, follow_redirects=True)
@@ -56,7 +56,7 @@ def test_no_auto_login_after_reset(client, app, monkeypatch):
 def test_resend_cooldown(client, app, monkeypatch):
     _create_user(app)
     app.email_service.send_mail = lambda *a, **k: "msg"
-    monkeypatch.setattr("auth.forgot._generate_code", lambda: "654321")
+    monkeypatch.setattr("services.mfa.generate_code", lambda: "654321")
     client.post("/auth/forgot", data={"identifier": "u1@example.com"}, follow_redirects=True)
     resp = client.post("/auth/forgot/resend", follow_redirects=True)
     assert b"Please wait" in resp.data
@@ -65,9 +65,29 @@ def test_resend_cooldown(client, app, monkeypatch):
 def test_attempts_exhausted(client, app, monkeypatch):
     _create_user(app)
     app.email_service.send_mail = lambda *a, **k: "msg"
-    monkeypatch.setattr("auth.forgot._generate_code", lambda: "222222")
+    monkeypatch.setattr("services.mfa.generate_code", lambda: "222222")
     client.post("/auth/forgot", data={"identifier": "u1@example.com"}, follow_redirects=True)
     for _ in range(5):
         client.post("/auth/forgot/verify", data={"code": "000000"}, follow_redirects=True)
     resp = client.post("/auth/forgot/verify", data={"code": "000000"}, follow_redirects=True)
     assert b"Too many attempts" in resp.data
+
+
+def test_mfa_utils(app):
+    from services import mfa
+    with app.app_context():
+        code = mfa.generate_code(6)
+        assert len(code) == 6 and code.isdigit()
+        hashed = mfa.hash_code(code)
+        assert hashed != code
+        assert mfa.verify_code(code, hashed)
+
+
+def test_email_send_failure(client, app, monkeypatch):
+    _create_user(app)
+    def fail(*a, **k):
+        raise RuntimeError("smtp")
+    monkeypatch.setattr("services.email.EmailService.send_mail", fail)
+    resp = client.post("/auth/forgot", data={"identifier": "u1@example.com"}, follow_redirects=True)
+    assert resp.status_code == 200
+    assert b"verification code has been sent" in resp.data

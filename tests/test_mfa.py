@@ -14,8 +14,8 @@ def test_login_with_totp(client, app):
         secret = random_base32()
         user.set_mfa_secret(secret)
         code = secrets.token_hex(8)
-        from auth.forgot import _hash_code
-        user.mfa_recovery_hashes = [_hash_code(code)]
+        from services.mfa import hash_code
+        user.mfa_recovery_hashes = [hash_code(code)]
         db.session.add(user)
         db.session.commit()
     resp = client.post(
@@ -85,7 +85,7 @@ def test_login_with_totp_hyphen(client, app):
 
 def test_login_with_recovery_code(client, app):
     from app import db, User
-    from auth.forgot import _hash_code
+    from services.mfa import hash_code
     with app.app_context():
         User.query.filter_by(email="mfa2@example.com").delete()
         db.session.commit()
@@ -95,7 +95,7 @@ def test_login_with_recovery_code(client, app):
         secret = random_base32()
         user.set_mfa_secret(secret)
         rec = secrets.token_hex(8)
-        user.mfa_recovery_hashes = [_hash_code(rec)]
+        user.mfa_recovery_hashes = [hash_code(rec)]
         db.session.add(user)
         db.session.commit()
     client.post(

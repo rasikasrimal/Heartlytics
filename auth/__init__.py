@@ -161,6 +161,6 @@ def logout():
 
 
 # Register additional auth routes
-from . import forgot  # noqa: E402,F401
+from . import forgot_password  # noqa: E402,F401
 from . import mfa  # noqa: E402,F401
 

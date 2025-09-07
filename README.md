@@ -29,7 +29,7 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 - 🧾 **Themed Tables & Logs**: Cleaning logs and patient record tables match the active theme for consistent readability.
 - 🧹 **Normalized Cleaning Logs**: Blank lines are stripped server-side for compact output; batch predictions surface a concise inline notice.
 - 🔐 **Redesigned Login**: Clean layout without top navigation, centered branding and form, fields start empty with autofill disabled, password visibility toggle, hover animation on login button, and quick links.
-- 🔑 **Forgot Password Flow**: Email verification code with enumeration-safe messaging; after reset, users re-authenticate with the new password.
+- 🔑 **Forgot Password Flow**: Six-digit codes are emailed, hashed with a pepper, and expire after a short TTL. The resend link includes a cooldown timer and backend enforcement.
 - 🔐 **TOTP 2-Step Verification**: Optional authenticator app codes with one-time recovery codes.
 - ✉️ **Email MFA Codes**: Enabled by default and sent as single-use backups when authenticator codes aren't available.
 - 📌 **Sticky Footer**: Consistent footer on every page that stays at the bottom.
@@ -192,6 +192,8 @@ The application reads configuration from environment variables (see `.env.exampl
 | `KMS_PROVIDER` | `dev` uses local keyring                  | `dev` |
 | `DEV_KMS_MASTER_KEY` | base64 master key for dev keyring    | _none_ |
 | `DEV_KMS_IDX_KEY` | base64 key for blind indexes           | _none_ |
+| `RESET_CODE_TTL` | Minutes before a reset code expires | `10` |
+| `RESET_RESEND_COOLDOWN` | Seconds before another code can be sent | `30` |
 
 ### Gmail SMTP configuration
 

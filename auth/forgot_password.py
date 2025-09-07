@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime, timedelta
-import secrets
-import hashlib
 
 from flask import current_app, render_template, request, session, redirect, url_for, flash
 import re
 from sqlalchemy import or_
+
+from services import mfa
 
 from . import auth_bp
 from .forms import ForgotPasswordForm, VerifyCodeForm, ResetPasswordForm
@@ -24,12 +24,6 @@ def _mask_email(email: str) -> str:
         return local[0] + "*" * (len(local) - 1) + "@" + domain
     return f"{local[0]}••••{local[-1]}@{domain}"
 
-
-def _generate_code() -> str:
-    length = current_app.config.get("OTP_LENGTH", 6)
-    return "".join(secrets.choice("0123456789") for _ in range(length))
-
-
 def _rate_limited(key: str, limit: int) -> bool:
     rl = session.setdefault("rate_limits", {})
     data = rl.get(key)
@@ -42,12 +36,6 @@ def _rate_limited(key: str, limit: int) -> bool:
         rl[key] = {"count": 1, "ts": now.isoformat()}
     session["rate_limits"] = rl
     return False
-
-
-def _hash_code(code: str) -> str:
-    pepper = current_app.config.get("OTP_PEPPER", "")
-    return hashlib.sha256((pepper + code).encode()).hexdigest()
-
 
 def _get_request() -> 'PasswordResetRequest | None':
     request_id = session.get("pr_id")
@@ -83,8 +71,8 @@ def forgot():
         user = User.query.filter(or_(User.email == ident, User.username == ident)).first()
         request_id = str(uuid.uuid4())
         if user:
-            code = _generate_code()
-            hashed = _hash_code(code)
+            code = mfa.generate_code()
+            hashed = mfa.hash_code(code)
             now = datetime.utcnow()
             ttl = current_app.config.get("OTP_TTL_MIN", 10)
             pr = PasswordResetRequest(
@@ -98,17 +86,7 @@ def forgot():
             )
             db.session.add(pr)
             db.session.commit()
-            text = (
-                f"Your verification code is {code}.\n"
-                f"It expires in {ttl} minutes.\n"
-                f"Request time: {now.strftime('%Y-%m-%d %H:%M UTC')}\n"
-                f"IP: {request.remote_addr}\n"
-                "If this wasn't you, ignore this message."
-            )
-            html = text.replace("\n", "<br>")
-            current_app.email_service.send_mail(
-                user.email, "Your verification code", text, html, purpose="otp"
-            )
+            mfa.send_reset_email(user, code, ttl, request)
             current_app.logger.info(
                 "otp.issued user=%s request=%s", _mask_email(user.email), request_id
             )
@@ -143,7 +121,7 @@ def verify_forgot():
             return redirect(url_for("auth.forgot"))
         pr.attempts += 1
         code = re.sub(r"[^0-9A-Za-z]", "", form.code.data)
-        if _hash_code(code) == pr.hashed_code:
+        if mfa.verify_code(code, pr.hashed_code):
             pr.status = "verified"
             current_app.db.session.commit()
             session["pr_verified"] = True
@@ -160,7 +138,13 @@ def verify_forgot():
             remaining,
         )
         flash(f"Invalid code. You have {remaining} attempts remaining.", "error")
-    return render_template("auth/verify.html", form=form)
+    cooldown = current_app.config.get("OTP_RESEND_COOLDOWN_SEC", 30)
+    remaining = 0
+    if pr:
+        elapsed = (datetime.utcnow() - pr.last_sent_at).total_seconds()
+        if elapsed < cooldown:
+            remaining = int(cooldown - elapsed)
+    return render_template("auth/verify.html", form=form, cooldown=remaining)
 
 
 @auth_bp.route("/forgot/resend", methods=["POST"])
@@ -187,24 +171,14 @@ def resend_code():
         )
         flash("Daily limit reached. Try again later.", "error")
         return redirect(url_for("auth.verify_forgot"))
-    code = _generate_code()
-    pr.hashed_code = _hash_code(code)
+    code = mfa.generate_code()
+    pr.hashed_code = mfa.hash_code(code)
     ttl = current_app.config.get("OTP_TTL_MIN", 10)
     pr.expires_at = now + timedelta(minutes=ttl)
     pr.resend_count += 1
     pr.last_sent_at = now
     current_app.db.session.commit()
-    text = (
-        f"Your verification code is {code}.\n"
-        f"It expires in {ttl} minutes.\n"
-        f"Request time: {now.strftime('%Y-%m-%d %H:%M UTC')}\n"
-        f"IP: {request.remote_addr}\n"
-        "If this wasn't you, ignore this message."
-    )
-    html = text.replace("\n", "<br>")
-    current_app.email_service.send_mail(
-        pr.user.email, "Your verification code", text, html, purpose="otp"
-    )
+    mfa.send_reset_email(pr.user, code, ttl, request)
     current_app.logger.info(
         "otp.issued user=%s request=%s", _mask_email(pr.user.email), pr.request_id
     )

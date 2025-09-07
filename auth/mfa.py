@@ -10,7 +10,8 @@ from flask_login import login_required, current_user, login_user
 
 from . import auth_bp
 from .forms import TOTPSetupForm, TOTPVerifyForm, MFADisableForm, EmailCodeForm
-from .forgot import _hash_code, _mask_email
+from services.mfa import hash_code
+from .forgot_password import _mask_email
 from .totp import random_base32, provisioning_uri, verify_totp
 
 
@@ -31,7 +32,7 @@ def mfa_setup():
         if verify_totp(secret, code):
             current_user.set_mfa_secret(secret)
             codes = [secrets.token_hex(8) for _ in range(10)]
-            current_user.mfa_recovery_hashes = [_hash_code(c) for c in codes]
+            current_user.mfa_recovery_hashes = [hash_code(c) for c in codes]
             current_user.mfa_enabled = True
             current_app.db.session.commit()
             session.pop("mfa_secret", None)
@@ -58,7 +59,7 @@ def mfa_regenerate_codes():
     if not current_user.mfa_enabled:
         return redirect(url_for("index"))
     codes = [secrets.token_hex(8) for _ in range(10)]
-    current_user.mfa_recovery_hashes = [_hash_code(c) for c in codes]
+    current_user.mfa_recovery_hashes = [hash_code(c) for c in codes]
     current_app.db.session.commit()
     session["recovery_codes"] = codes
     flash("Recovery codes regenerated", "success")
@@ -85,7 +86,7 @@ def mfa_verify():
             current_app.db.session.commit()
             session.pop("mfa_user_id", None)
             return redirect(request.args.get("next") or url_for("index"))
-        hashed = _hash_code(code)
+        hashed = hash_code(code)
         hashes = user.mfa_recovery_hashes or []
         if hashed in hashes:
             hashes.remove(hashed)
@@ -127,7 +128,7 @@ def mfa_email():
         if send:
             length = current_app.config.get("MFA_EMAIL_CODE_LENGTH", 6)
             code = ''.join(secrets.choice('0123456789') for _ in range(length))
-            hashed = _hash_code(code)
+            hashed = hash_code(code)
             ttl = current_app.config.get("MFA_EMAIL_TTL_MIN", 10)
             if challenge:
                 challenge.code_hash = hashed
@@ -158,7 +159,7 @@ def mfa_email():
             flash("Code expired", "error")
         else:
             code = re.sub(r"[^0-9A-Za-z]", "", form.code.data)
-            if _hash_code(code) == challenge.code_hash:
+            if hash_code(code) == challenge.code_hash:
                 challenge.status = "verified"
                 login_user(user)
                 user.last_login = now
@@ -186,7 +187,7 @@ def mfa_disable():
             code = re.sub(r"[^0-9A-Za-z]", "", form.code.data)
             secret = current_user.mfa_secret
             valid = secret and verify_totp(secret, code)
-            hashed = _hash_code(code)
+            hashed = hash_code(code)
             hashes = current_user.mfa_recovery_hashes or []
             if not valid and hashed not in hashes:
                 flash("Invalid code", "error")

@@ -7,12 +7,29 @@
   <p>We've sent a 6-digit code to your email. Enter it below.</p>
   <form method="post" autocomplete="off">
     {{ form.hidden_tag() }}
-    {{ text_input('code', 'Code', attrs={'required': '', 'pattern': '\\d{6}', 'inputmode': 'numeric'}, error=form.code.errors[0] if form.code.errors else None) }}
+    {{ text_input('code', 'Code', attrs={'required': '', 'pattern': '\\d{6}', 'inputmode': 'numeric', 'autofocus': ''}, error=form.code.errors[0] if form.code.errors else None) }}
     <button type="submit" class="btn btn-brand">Continue</button>
   </form>
   <form method="post" action="{{ url_for('auth.resend_code') }}" class="mt-2">
-    <button type="submit" class="btn btn-link">Resend code</button>
+    <button id="resend-btn" type="submit" class="btn btn-link" {% if cooldown>0 %}disabled{% endif %}>Resend code <span id="timer"></span></button>
   </form>
-  <a href="{{ url_for('auth.forgot') }}" class="small">Change email</a>
+  <a href="{{ url_for('auth.forgot') }}" class="small" onclick="return confirm('Use a different email?')">Change email</a>
+  <script>
+  const btn=document.getElementById('resend-btn');
+  const timer=document.getElementById('timer');
+  let remaining={{ cooldown }};
+  function tick(){
+    if(remaining>0){
+      btn.disabled=true;
+      timer.textContent='('+remaining+')';
+      remaining--;
+      setTimeout(tick,1000);
+    }else{
+      btn.disabled=false;
+      timer.textContent='';
+    }
+  }
+  tick();
+  </script>
 </div>
 {% endblock %}

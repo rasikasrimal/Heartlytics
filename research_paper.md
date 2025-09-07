@@ -134,3 +134,6 @@ Future work includes: (i) larger, more diverse cohorts; (ii) threshold tuning fo
 
 ## Security Update
 The web application now provides a secure forgotten password flow using short-lived verification codes hashed at rest to protect user accounts.
+
+## Authentication Flow Enhancements
+The web application now employs peppered hashes for password reset codes, enforced cooldowns on resend attempts, and a user-friendly countdown UI to reduce lockouts. These measures improve both security and usability in recovery scenarios.
