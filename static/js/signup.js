@@ -15,9 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
       /[A-Z]/.test(val),
       /[a-z]/.test(val),
       /\d/.test(val),
-      /[^A-Za-z0-9]/.test(val)
-    ].filter(Boolean).length;
-  }
+        /[!@#$%^&*]/.test(val)
+      ].filter(Boolean).length;
+    }
 
   function updateStrength() {
     const val = passwordInput.value;
