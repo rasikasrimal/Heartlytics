@@ -41,7 +41,6 @@ flowchart LR
   expired -- No --> code
 ```
 
-![Forgot password BPMN](img/forgotpassword.svg)
 
 The diagram shows user and system swimlanes. A timer boundary on the resend
 path enforces a 30‑second cooldown, while the exclusive gateway branches to a
