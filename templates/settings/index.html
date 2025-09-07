@@ -4,13 +4,12 @@
 {% from '_components/modal_upload.html' import modal_upload %}
 {% from '_components/form_field.html' import form_field %}
 {% from '_components/password_group.html' import password_group %}
-{% from '_components/toggle.html' import theme_toggle %}
 {% from '_components/file_input.html' import file_input %}
 {% from '_components/badges.html' import badge %}
 {% from '_components/accordion.html' import log_accordion %}
 {% from '_components/table_toolbar.html' import table_toolbar %}
 {% block content %}
-<nav class="sticky-md-top border-bottom py-2 mb-4 d-none d-md-block bg-transparent">
+<nav id="settings-nav" class="sticky-md-top border-bottom py-2 mb-4 d-none d-md-block bg-transparent" style="top: 70px;">
   <ul class="nav justify-content-center small">
     <li class="nav-item"><a class="nav-link" href="#account">Account</a></li>
     <li class="nav-item"><a class="nav-link" href="#security">Security</a></li>
@@ -22,7 +21,7 @@
   <aside class="col-md-4">
     <div class="card text-center">
       <div class="card-body">
-        {{ avatar(current_user.avatar_url or url_for('static', filename='avatars/None.jpg'), current_user.username) }}
+        {{ avatar(url_for('static', filename='avatars/' ~ (current_user.avatar or 'None.jpg')), current_user.username) }}
         <p class="fw-semibold mt-3 mb-0">{{ current_user.username }}</p>
         <p class="text-muted small mb-0">{{ current_user.email }}</p>
         <p class="text-muted small">{{ current_user.nickname }}</p>
@@ -38,7 +37,7 @@
           {{ form_field('text', 'username', 'Username', current_user.username, help='Visible to others.') }}
           {{ form_field('email', 'email', 'Email', current_user.email) }}
           {{ form_field('text', 'nickname', 'Nickname', current_user.nickname) }}
-          <div class="card-footer bg-body border-0 position-sticky bottom-0 d-flex justify-content-end gap-2">
+          <div class="card-footer bg-transparent border-0 position-sticky bottom-0 d-flex justify-content-end gap-2">
             <button type="reset" class="btn btn-secondary">Cancel</button>
             <button type="submit" class="btn btn-brand">Save</button>
           </div>
@@ -54,16 +53,6 @@
             <button type="submit" class="btn btn-brand">Save</button>
           </div>
         </form>
-      </div>
-      <div class="card" id="theme-card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h2 class="h6 mb-0">Theme</h2>
-          <span class="badge bg-info text-dark">Preview</span>
-        </div>
-        <div class="card-body p-4">
-          {{ theme_toggle('theme-preview-toggle') }}
-          <div class="form-text">Changes here are illustrative and not saved.</div>
-        </div>
       </div>
     </div>
     <div id="security" class="mb-5">
