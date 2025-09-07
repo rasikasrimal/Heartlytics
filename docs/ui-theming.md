@@ -16,3 +16,5 @@ blend with the page.
 If a new visualization library is introduced, listen for the `themechange` event
 on `window` and apply colors from CSS variables such as `--bs-body-bg` and
 `--bs-body-color`.
+
+Auth pages, including the redesigned forgot-password flow, consume reusable Bootstrap components so card backgrounds, buttons, and countdown badges adapt automatically to the selected theme.
