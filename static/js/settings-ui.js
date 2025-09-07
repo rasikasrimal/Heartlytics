@@ -10,13 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  const themeToggle = document.getElementById('theme-preview-toggle');
-  if (themeToggle) {
-    themeToggle.addEventListener('change', e => {
-      document.getElementById('theme-card').classList.toggle('theme-dark', e.target.checked);
-    });
-  }
-
   document.querySelectorAll('.toggle-password').forEach(btn => {
     btn.addEventListener('click', () => {
       const input = btn.previousElementSibling;
@@ -30,4 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
       input.focus();
     });
   });
+
+  if (document.body) {
+    new bootstrap.ScrollSpy(document.body, { target: '#settingsNav', offset: 100 });
+  }
 });
