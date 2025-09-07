@@ -15,8 +15,7 @@ The forgot-password and verification flow allows users to reset credentials secu
 - Reliability: retryable email queue, transactional database updates.
 - Accessibility: screen-reader labels, focus management on dialogs.
 
-## 2. BPMN 2.0 Process (Advanced)
-![BPMN Forgot Password](assets/forget_password_bpmn.svg)
+## 2. BPMN 2.0 Process
 
 ```mermaid
 flowchart LR
@@ -57,14 +56,15 @@ flowchart LR
   actor((User))
   sys([Auth System])
   mail((Email Service))
-  db[(UserDB\nPII)]
-  store[(OTPStore\nSecrets)]
+  db[(UserDB<br/>PII)]
+  store[(OTPStore<br/>Secrets)]
 
-  actor -->|Reset Request\n[PII]| sys
+  actor -->|Reset Request / PII| sys
   sys -->|Lookup| db
   sys -->|Store OTP| store
   sys -->|Send OTP| mail
   mail -->|Email with OTP| actor
+
 ```
 The context diagram shows the user interacting with the Auth System. Data stores are internal, while the Email Service is external and untrusted. PII and secrets never leave the system boundary except for the minimal OTP sent via email.
 
@@ -92,22 +92,27 @@ Level‑1 expands the system into discrete processes. Data flows are labelled, a
 
 ### Level‑2 Internal Details
 ```mermaid
+
+
 flowchart LR
-  subgraph OTP_Generation
-    hashPepper[Hash + Pepper]
-    ttlCheck[TTL Check]
-    rateLimit[Rate-Limit\n(user+IP)]
+  subgraph "OTP Generation"
+    hashPepper["Hash + Pepper"]
+    ttlCheck["TTL Check"]
+    rateLimit["Rate-Limit user+IP"]
   end
+
   subgraph Verification
-    audit[Audit Log]
-    compare[Constant-Time Compare]
+    audit["Audit Log"]
+    compare["Constant-Time Compare"]
     lock[Lockout]
   end
 
   hashPepper --> ttlCheck --> rateLimit
   rateLimit --> audit
-  compare -->|match| audit
-  compare -->|mismatch| lock
+  compare -- match --> audit
+  compare -- mismatch --> lock
+
+
 ```
 Level‑2 details cryptographic handling, TTL enforcement, rate limiting, and audit logging. Each subprocess runs within the system's trust boundary; only audit logs are exported to immutable storage.
 
@@ -233,25 +238,34 @@ mindmap
 
 ## 9. Data & Schema
 ```mermaid
+
 erDiagram
   USER ||--o{ OTP_CODE : has
   USER ||--o{ AUDIT_EVENT : generates
   USER ||--o{ EMAIL_QUEUE : requests
+
   OTP_CODE {
     string hashed_code PK
     uuid user_id FK
-    datetime expires_at INDEX
+    datetime expires_at
   }
+
   AUDIT_EVENT {
     uuid id PK
-    uuid user_id INDEX
+    uuid user_id
     datetime created_at
   }
+
   EMAIL_QUEUE {
     uuid id PK
-    uuid user_id INDEX
-    datetime queued_at TTL
+    uuid user_id
+    datetime queued_at
   }
+
+  %% Notes:
+  %% - Add DB indexes in schema: OTP_CODE.expires_at, OTP_CODE.user_id, AUDIT_EVENT.user_id, EMAIL_QUEUE.user_id
+  %% - Implement TTL/retention at the DB/job level for EMAIL_QUEUE. Not supported as an ER attribute flag.
+
 ```
 Data retention: OTP codes auto-delete after TTL via scheduled job. Audit events retained 1 year. PII stored encrypted at rest and decrypted only in memory.
 
