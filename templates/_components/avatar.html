@@ -1,6 +1,10 @@
-{% macro avatar(src, alt='', size=160) -%}
-<div class="avatar-edit" style="width:{{ size }}px;height:{{ size }}px;">
-  <img src="{{ src }}" alt="{{ alt }}" class="rounded-circle w-100 h-100 object-fit-cover">
-  <span class="edit-icon position-absolute top-50 start-50 translate-middle"><i class="bi bi-pencil"></i></span>
+{% macro avatar(src, alt='Avatar') -%}
+<div class="avatar-wrapper position-relative mx-auto" style="width:180px;height:180px;">
+  <img src="{{ src }}" alt="{{ alt }}" class="w-100 h-100 rounded-circle object-fit-cover border shadow-sm">
+  <div class="edit-overlay rounded-circle">
+    <button type="button" class="btn btn-light btn-sm rounded-circle" data-bs-toggle="modal" data-bs-target="#avatarModal" aria-label="Edit avatar">
+      <i class="bi bi-pencil"></i>
+    </button>
+  </div>
 </div>
 {%- endmacro %}

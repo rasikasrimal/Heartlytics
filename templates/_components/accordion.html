@@ -14,3 +14,31 @@
   {% endfor %}
 </div>
 {%- endmacro %}
+
+{% macro log_accordion(items) -%}
+<div class="accordion accordion-flush" id="activityAccordion">
+  {% for log in items %}
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="log-h{{ loop.index }}">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#log-c{{ loop.index }}" aria-expanded="false" aria-controls="log-c{{ loop.index }}">
+        <i class="bi bi-circle me-2"></i>
+        {{ log.action }}
+        <span class="ms-auto small text-muted">{{ log.timestamp }}</span>
+      </button>
+    </h2>
+    <div id="log-c{{ loop.index }}" class="accordion-collapse collapse" data-bs-parent="#activityAccordion">
+      <div class="accordion-body small">
+        IP: {{ log.ip or '—' }}<br>
+        Agent: {{ log.user_agent or '—' }}<br>
+        more details...
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="text-center text-muted py-5">
+    <i class="bi bi-inbox fs-1"></i>
+    <p class="mt-3">No activity yet</p>
+  </div>
+  {% endfor %}
+</div>
+{%- endmacro %}
