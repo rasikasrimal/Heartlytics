@@ -390,7 +390,7 @@ This BPMN 2.0 diagram illustrates the end-to-end prediction workflow with separa
 By modeling the process in this way, HeartLytics delineates control flow responsibilities and highlights the validation gateway that guards against malformed input. The diagram shows how encryption precedes scoring and how both successful and failed paths converge at result review, reinforcing the application’s commitment to secure, accurate predictions.
 
 ## Implementation Details and Configuration
-Configuration resides in `config.py` with environment variables for database URI, model path, encryption flags, KMS provider and role strictness. Theme features read `SIMULATION_FEATURES` flags, while encryption toggles (`ENCRYPTION_ENABLED`, `READ_LEGACY_PLAINTEXT`) govern patient data handling. Gmail SMTP variables enable TLS email delivery for password resets and MFA codes. OTP settings (`OTP_TTL_MIN`, `OTP_MAX_ATTEMPTS`) harden the reset flow, while MFA settings (`MFA_EMAIL_CODE_LENGTH`, `MFA_EMAIL_TTL_MIN`, trust windows, resend cooldowns) tune second-factor behavior. A CLI (`flask roles`) manages user roles and can be extended for key rotation via `manage_keys.py`.
+Configuration resides in `config.py` with environment variables for database URI, model path, encryption flags, KMS provider and role strictness. Theme features read `SIMULATION_FEATURES` flags, while encryption toggles (`ENCRYPTION_ENABLED`, `READ_LEGACY_PLAINTEXT`) govern patient data handling. Gmail SMTP variables enable TLS email delivery for password resets and MFA codes. OTP settings (`RESET_CODE_TTL`, `OTP_MAX_ATTEMPTS`) harden the reset flow, while MFA settings (`MFA_EMAIL_CODE_LENGTH`, `MFA_EMAIL_TTL_MIN`, trust windows, resend cooldowns) tune second-factor behavior. A CLI (`flask roles`) manages user roles and can be extended for key rotation via `manage_keys.py`.
 
 ## Testing and Evaluation
 Automated tests cover authentication, RBAC, predictions, EDA payload, dashboard, encryption, theming and MFA. Selected cases relevant to MFA and encryption are embedded below:
@@ -665,3 +665,26 @@ The implemented system validates the feasibility of delivering secure, role‑aw
 
 ### Extended Test Cases
 See `TEST_CASES.md` for the full suite covering authentication, prediction, batch processing, encryption, MFA, RBAC, dashboards, settings, simulations, research viewer, security, regression, UI layout and theming scenarios.
+
+
+### Password Reset DFD
+```mermaid
+flowchart LR
+  U[User]-->F[Forgot Password]
+  F-->E[Email Service]
+  E-->U
+  U-->V[Verify Code]
+  V-->R[Reset Password]
+```
+
+### Password Reset BPMN
+```mermaid
+flowchart LR
+  start([Start])-->request[Submit Email]
+  request-->send[Send Code]
+  send-->wait{Cooldown}
+  wait-->|Expires|send
+  wait-->verify[Enter Code]
+  verify-->reset[Set New Password]
+  reset-->end([End])
+```

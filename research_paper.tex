@@ -260,4 +260,6 @@ A.~Ronacher, ``Flask Documentation,'' Pallets Projects, v2.0, 2021. [Online]. Av
 % ---------- End ----------
 \section{Security Update}
 The accompanying web application now includes a forgotten password workflow issuing short-lived verification codes hashed at rest.
+\section{Authentication Flow Enhancements}
+Peppered hashes protect password reset codes, which expire quickly and enforce resend cooldowns. A countdown timer improves usability while server-side limits guard against brute-force attempts.
 \end{document}

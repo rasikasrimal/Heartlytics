@@ -55,10 +55,12 @@ class Config:
     MAIL_FROM = os.environ.get("MAIL_FROM", SMTP_USERNAME)
     MAIL_REPLY_TO = os.environ.get("MAIL_REPLY_TO")
 
-    OTP_TTL_MIN = int(os.environ.get("OTP_TTL_MIN", "10"))
+    RESET_CODE_TTL = int(os.environ.get("RESET_CODE_TTL", os.environ.get("OTP_TTL_MIN", "10")))
+    OTP_TTL_MIN = RESET_CODE_TTL
     OTP_LENGTH = int(os.environ.get("OTP_LENGTH", "6"))
     OTP_MAX_ATTEMPTS = int(os.environ.get("OTP_MAX_ATTEMPTS", "5"))
-    OTP_RESEND_COOLDOWN_SEC = int(os.environ.get("OTP_RESEND_COOLDOWN_SEC", "30"))
+    RESET_RESEND_COOLDOWN = int(os.environ.get("RESET_RESEND_COOLDOWN", os.environ.get("OTP_RESEND_COOLDOWN_SEC", "30")))
+    OTP_RESEND_COOLDOWN_SEC = RESET_RESEND_COOLDOWN
 
     AUTO_LOGIN_AFTER_RESET = os.environ.get("AUTO_LOGIN_AFTER_RESET", "0").lower() in {"1", "true"}
     MFA_TOTP_ENABLED = os.environ.get("MFA_TOTP_ENABLED", "1").lower() not in {"0", "false"}

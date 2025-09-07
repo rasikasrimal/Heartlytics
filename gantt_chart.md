@@ -45,4 +45,5 @@ gantt
 - Password resets require re-authentication and send change notifications.
 - Optional TOTP-based two-step verification with recovery codes is now available.
 - Email-based MFA codes can be enabled as a fallback to TOTP.
+- Improved forgot-password flow with hashed codes and resend countdown.
 
