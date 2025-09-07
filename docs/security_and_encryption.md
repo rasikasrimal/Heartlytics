@@ -101,20 +101,23 @@ flowchart LR
   end
 
   %% Flows
-  user  -- "username/email (PII)" --> api
+  user -- "username/email (PII)" --> api
   api --> auth
   auth -- "issue OTP (hashed+pepper, TTL)" --> cache
   auth -- "send OTP request" --> smtp
   user -- "submit code" --> api --> auth
-  auth -- "verify (consttime compare)" --> cache
+  auth -- "verify (constant-time compare)" --> cache
   api -- "result + session" --> user
 
   api --> crypto
-  crypto -- "DEK gen + AESGCM encrypt" --> db
+  crypto -- "DEK gen + AES-GCM encrypt" --> db
   crypto -- "wrap DEK with KMS (KID)" --> kms
-  api --> audit:::sens
+  api --> audit
 
-  classDef sens fill=ffe9e6,stroke=c33,strokewidth:1px;
+  %% Styling
+  classDef sens fill:#ffe9e6,stroke:#cc3333,stroke-width:1px;
+  class audit sens;
+
 ```
 
 The DFD highlights trust boundaries and data classifications. Only ciphertext
@@ -234,8 +237,9 @@ variables.
 
 ```mermaid
 erDiagram
-  USERS ||o{ RESET_TOKEN : has
-  USERS ||o{ AUDIT_LOG : records
+  USERS ||--o{ RESET_TOKEN : has
+  USERS ||--o{ AUDIT_LOG   : records
+
   USERS {
     UUID id PK
     STRING email
@@ -259,6 +263,7 @@ erDiagram
     STRING kid PK
     INT kver
   }
+
 ```
 
 ## Threat Model Quickview
