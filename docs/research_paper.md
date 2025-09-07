@@ -23,6 +23,7 @@ Recent work shows strong performance for supervised ML models in heart disease p
 5. Deploy the best model as a Flask web application.
 6. Secure the password reset flow using Gmail SMTP with diagnostics, enforce re-authentication after reset, and offer optional TOTP-based 2FA with recovery codes.
 7. Provide fallback email-based one-time codes as a lower-assurance MFA option.
+8. Mask destination emails during verification to protect user privacy.
 
 ## Dataset and Exploratory Data Analysis (EDA)
 

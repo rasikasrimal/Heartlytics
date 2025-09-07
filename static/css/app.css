@@ -1,0 +1,10 @@
+.otp-input {
+  letter-spacing: 0.3em;
+}
+.avatar-edit .edit-icon {
+  display: none;
+  color: #fff;
+}
+.avatar-edit:hover .edit-icon {
+  display: block;
+}

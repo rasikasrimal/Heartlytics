@@ -13,6 +13,7 @@ The new simulations auto-update loader and timestamped status also run
 entirely on the client and do not impact the database schema.
 
 The password reset feature introduces a `password_reset_request` table storing short-lived verification codes.
+Email-based MFA uses an `mfa_email_challenge` table recording hashed codes, attempts, and resend timestamps.
 
 ## audit_log
 

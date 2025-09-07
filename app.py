@@ -872,8 +872,8 @@ with app.app_context():
     # seed a default Super Admin if none exists
     if not User.query.filter_by(role="SuperAdmin").first():
         sa = User(
-            username="admin",
-            email="admin@example.com",
+            username="superadmin",
+            email="superadmin@example.com",
             role="SuperAdmin",
             status="approved",
             created_at=datetime.utcnow(),
@@ -1082,7 +1082,7 @@ from auth import auth_bp
 from superadmin import superadmin_bp
 from doctor import doctor_bp
 from user import user_bp
-from routes.settings import settings_bp
+from blueprints.settings.profile import settings_bp
 from simulations import simulations_bp
 from routes.debug import debug_bp
 

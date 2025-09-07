@@ -1,0 +1,6 @@
+{% macro primary(text, attrs={}) -%}
+  <button class="btn btn-primary" {% for k,v in attrs.items() %} {{k}}="{{v}}"{% endfor %}>{{ text }}</button>
+{%- endmacro %}
+{% macro secondary(text, attrs={}) -%}
+  <button class="btn btn-secondary" {% for k,v in attrs.items() %} {{k}}="{{v}}"{% endfor %}>{{ text }}</button>
+{%- endmacro %}

@@ -1,0 +1,6 @@
+{% macro avatar(src, alt='', size=160) -%}
+<div class="avatar-edit" style="width:{{ size }}px;height:{{ size }}px;">
+  <img src="{{ src }}" alt="{{ alt }}" class="rounded-circle w-100 h-100 object-fit-cover">
+  <span class="edit-icon position-absolute top-50 start-50 translate-middle"><i class="bi bi-pencil"></i></span>
+</div>
+{%- endmacro %}
