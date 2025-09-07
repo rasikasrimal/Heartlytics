@@ -12,6 +12,7 @@ body, .navbar, .card, .card-section, .table, .form-control, .form-select, .btn, 
   border-bottom: 1px solid var(--bs-border-color);
   transition: box-shadow var(--motion-medium) var(--ease-out);
   height: var(--nav-height);
+  z-index: 1040; /* raise above sticky sections so dropdown escapes stacking context */
 }
 
 .nav-elevated {
@@ -59,7 +60,6 @@ body, .navbar, .card, .card-section, .table, .form-control, .form-select, .btn, 
   opacity: 0;
   transform: scale(0.95);
   transition: opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
-  z-index: 1040; /* ensure dropdown appears above sticky sections */
 }
 
 .dropdown-menu.show {
