@@ -4,3 +4,7 @@
 {% macro secondary(text, attrs={}) -%}
   <button class="btn btn-secondary" {% for k,v in attrs.items() %} {{k}}="{{v}}"{% endfor %}>{{ text }}</button>
 {%- endmacro %}
+{% macro link(text, attrs={}) -%}
+  {% set cls = attrs.pop('class', '') %}
+  <a class="btn btn-link {{ cls }}" {% for k,v in attrs.items() %} {{k}}="{{v}}"{% endfor %}>{{ text }}</a>
+{%- endmacro %}

@@ -1,18 +1,38 @@
 {% extends 'base.html' %}
-{% block title %}Find Your Account{% endblock %}
-{% from '_components/form.html' import text_input %}
-{% from '_components/buttons.html' import primary as primary_button %}
+{% block title %}Forgot Password{% endblock %}
+{% from '_components/auth_card.html' import auth_card %}
+{% from '_components/form_field.html' import form_field %}
+{% from '_components/otp_inputs.html' import otp_inputs %}
+{% from '_components/alerts.html' import render_flashes %}
+{% from '_components/countdown_badge.html' import countdown_badge %}
+{% import '_components/buttons.html' as btn %}
 {% block content %}
-<div class="card mx-auto" style="max-width:480px;">
-  <div class="card-body">
-    <h1 class="h4 mb-3">Find Your Account</h1>
-    <p>Please enter your email address or username to search for your account.</p>
-    <form method="post" autocomplete="off">
-      {{ form.hidden_tag() }}
-      {{ text_input('identifier', 'Email or Username', attrs={'required': ''}, error=form.identifier.errors[0] if form.identifier.errors else None) }}
-      {{ primary_button('Search') }}
-      <a href="{{ url_for('auth.login') }}" class="btn btn-secondary ms-2">Cancel</a>
-    </form>
+  {% set flashes = get_flashed_messages(with_categories=true) %}
+  {% call auth_card('Forgot your password?', 'Enter your email. We\u2019ll send a 6-digit code.') %}
+    {{ render_flashes(flashes) }}
+    {% if step == 'otp' %}
+      {{ form_field('email','Email', type='email', value=masked_email, attrs={'readonly':''}) }}
+      <hr class="my-4">
+      <p class="visually-hidden" aria-live="polite">Code sent to {{ masked_email }}</p>
+      <h2 class="h6 mb-3">Enter the 6-digit code sent to {{ masked_email }}</h2>
+      {{ otp_inputs('code') }}
+      <div class="d-flex align-items-center gap-2 mb-3">
+        {{ btn.secondary('Resend', {'type':'button','disabled':'disabled'}) }}
+        {{ countdown_badge('01:00') }}
+      </div>
+      <div class="mb-3">
+        {{ btn.link('Change email', {'href': url_for('auth.forgot'), 'class':'p-0 small'}) }}
+      </div>
+      {{ btn.primary('Continue') }}
+    {% else %}
+      <form method="post" autocomplete="off">
+        {{ form.hidden_tag() }}
+        {{ form_field('email','Email', type='email', help='We\u2019ll send a 6-digit code.', attrs={'placeholder':'name@example.com','required':'','autocomplete':'off'}) }}
+        {{ btn.primary('Continue', {'type':'submit'}) }}
+      </form>
+    {% endif %}
+  {% endcall %}
+  <div class="text-center mt-3">
+    <a href="{{ url_for('auth.login') }}">Back to Sign In</a>
   </div>
-</div>
 {% endblock %}

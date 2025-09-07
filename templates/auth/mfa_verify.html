@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Two-Step Verification{% endblock %}
-{% from '_components/otp_inputs.html' import otp_input %}
+{% from '_components/otp_inputs.html' import otp_inputs %}
 {% from '_components/buttons.html' import primary as primary_button %}
 {% block content %}
 <div class="card mx-auto" style="max-width:480px;">
@@ -9,7 +9,7 @@
     <p class="mb-4">We sent a 6-digit code to {{ masked_email }}.</p>
     <form method="post" autocomplete="off">
       {{ form.hidden_tag() }}
-      {{ otp_input('code') }}
+      {{ otp_inputs('code', 6, '6-digit code') }}
       {{ primary_button('Verify') }}
     </form>
     {% if email_option %}
