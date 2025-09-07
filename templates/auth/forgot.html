@@ -1,15 +1,18 @@
 {% extends 'base.html' %}
 {% block title %}Find Your Account{% endblock %}
-{% from 'components/forms.html' import text_input %}
+{% from '_components/form.html' import text_input %}
+{% from '_components/buttons.html' import primary as primary_button %}
 {% block content %}
-<div class="container py-5">
-  <h1>Find Your Account</h1>
-  <p>Please enter your email address or username to search for your account.</p>
-  <form method="post" autocomplete="off">
-    {{ form.hidden_tag() }}
-    {{ text_input('identifier', 'Email or Username', attrs={'required': ''}, error=form.identifier.errors[0] if form.identifier.errors else None) }}
-    <button type="submit" class="btn btn-brand">Search</button>
-    <a href="{{ url_for('auth.login') }}" class="btn btn-secondary ms-2">Cancel</a>
-  </form>
+<div class="card mx-auto" style="max-width:480px;">
+  <div class="card-body">
+    <h1 class="h4 mb-3">Find Your Account</h1>
+    <p>Please enter your email address or username to search for your account.</p>
+    <form method="post" autocomplete="off">
+      {{ form.hidden_tag() }}
+      {{ text_input('identifier', 'Email or Username', attrs={'required': ''}, error=form.identifier.errors[0] if form.identifier.errors else None) }}
+      {{ primary_button('Search') }}
+      <a href="{{ url_for('auth.login') }}" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+  </div>
 </div>
 {% endblock %}

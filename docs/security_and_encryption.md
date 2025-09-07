@@ -12,6 +12,7 @@ links to the dedicated [Forgot Password / 2‑Step Verification flow](forget_pas
 
 - Session-based authentication with **Flask‑Login**.
 - Email and TOTP factors provide optional multi-factor authentication.
+- Verification emails display masked addresses and respect resend cooldowns enforced on the server.
 - Password resets force a fresh login and send a notification email.
 - Login, OTP request, and verification endpoints enforce per‑IP and per‑ID
   limits to deter brute force attempts.

@@ -1,0 +1,5 @@
+{% macro render_flashes(messages) -%}
+  {% for cat, msg in messages %}
+    <div class="alert alert-{{ 'danger' if cat == 'error' else cat }}" role="alert">{{ msg }}</div>
+  {% endfor %}
+{%- endmacro %}
