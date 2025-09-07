@@ -1,0 +1,22 @@
+{% from '_components/file_input.html' import file_input %}
+{% macro modal_upload(id, title, action, name) -%}
+<div class="modal fade" id="{{ id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="modal-content" method="post" action="{{ action }}" enctype="multipart/form-data">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ title }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        {{ file_input(name, 'Select file') }}
+        <div class="form-text">Recommended 200×200px, max 1MB.</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-brand">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+{%- endmacro %}

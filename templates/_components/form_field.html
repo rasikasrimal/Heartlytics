@@ -1,0 +1,7 @@
+{% macro form_field(type, name, label, value='', help='', attrs={}) -%}
+<div class="mb-3">
+  <label for="{{ name }}" class="form-label">{{ label }}</label>
+  <input type="{{ type }}" class="form-control" id="{{ name }}" name="{{ name }}" value="{{ value }}"{% for k,v in attrs.items() %} {{k}}="{{v}}"{% endfor %}>
+  {% if help %}<div class="form-text">{{ help }}</div>{% endif %}
+</div>
+{%- endmacro %}

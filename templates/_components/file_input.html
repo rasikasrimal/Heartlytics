@@ -1,0 +1,9 @@
+{% macro file_input(name, label) -%}
+<div class="mb-3">
+  <label for="{{ name }}" class="form-label">{{ label }}</label>
+  <input class="form-control" type="file" id="{{ name }}" name="{{ name }}" accept="image/*" data-file-preview="{{ name }}_preview">
+  <div class="mt-2">
+    <img id="{{ name }}_preview" class="img-thumbnail d-none" alt="preview">
+  </div>
+</div>
+{%- endmacro %}
