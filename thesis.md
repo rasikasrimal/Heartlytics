@@ -36,6 +36,7 @@ HeartLytics is a full‑stack Python/Flask platform that predicts heart disease 
   - [Prediction Inference](#prediction-inference)
   - [MFA Login with Step-Up Enforcement](#mfa-login-with-step-up-enforcement)
   - [Encrypted Write and Read](#encrypted-write-and-read)
+  - [BPMN Process for Prediction Pipeline](#bpmn-process-for-prediction-pipeline)
 - [Implementation Details and Configuration](#implementation-details-and-configuration)
 - [Testing and Evaluation](#testing-and-evaluation)
 - [Timeline and Project Management](#timeline-and-project-management)
@@ -115,12 +116,36 @@ RBAC governs access: SuperAdmin has full rights, Admin lacks Predict/Batch/Dashb
 ## Data Flow Diagrams
 ### Level-0 DFD
 ```mermaid
-flowchart LR
-    A[User] -->|Enter data/CSV| B[HeartLytics]
-    B -->|Clean & EDA| C[Model]
-    C -->|Predictions| B
-    B -->|Results & PDFs| A
+flowchart TD
+    %% External Entities
+    User[User]
+    Doctor[Doctor]
+    KMS[Key Management Service]
+
+    %% System Boundary
+    subgraph HeartLytics
+        Upload[Upload Patient CSV]
+        Encrypt[Encrypt Patient Data]
+        Predict[Run Risk Model]
+        Store[(Encrypted Database)]
+    end
+
+    %% Data Flows
+    User -->|Patient Data CSV| Upload
+    Doctor -->|Patient Data CSV| Upload
+    Upload -->|Cleaned Rows| Encrypt
+    Encrypt -->|Ciphertext| Store
+    Encrypt -->|Wrapped Keys| KMS
+    KMS -->|Data Keys| Encrypt
+    Upload -->|Structured Data| Predict
+    Store -->|Encrypted Records| Predict
+    Predict -->|Prediction Results| User
+    Predict -->|Prediction Results| Doctor
 ```
+
+The Level-0 data flow diagram presents HeartLytics as a system boundary containing core processes and storage. External actors such as users, doctors, and the key management service interact with these internal components through labeled flows of patient data, ciphertext, wrapped keys, and results.
+
+This context diagram is relevant because it highlights how raw patient information enters the platform, is encrypted and persisted, and ultimately returns as risk predictions. By labeling each flow, the diagram clarifies the responsibilities of each actor and emphasizes the central role of the encrypted database in safeguarding sensitive records.
 
 ### Level-1 DFD – Batch Upload
 ```mermaid
@@ -181,15 +206,23 @@ The login Level‑1 DFD captures both password verification and subsequent MFA c
 flowchart LR
     Submit[Patient Form]-->Validate[Sanitize Input]
     Validate-->GenDK[Generate Data Key]
-    GenDK-->AEAD[AES-256-GCM Encrypt]
-    AEAD-->Wrap[Wrap Key via KMS]
-    Wrap-->Store[Persist CT+Nonce+Tag+WrappedDK+KID+KVER]
+    GenDK-->Encrypt[AES-256-GCM Encrypt]
+    Encrypt-->Store[Persist CT+Nonce+Tag]
+    GenDK-->Wrap[Wrap Data Key]
+    Wrap-->KMS[(KMS/Keyring)]
+    KMS-->Wrap
+    Wrap-->Store
     Store-->PatientTable[(patient)]
-    PatientTable-->|Read| Unwrap[Unwrap Key]
+    PatientTable-->|Read| Fetch[Retrieve CT+Metadata]
+    Fetch-->Unwrap[Unwrap Data Key]
+    Unwrap-->KMS
+    KMS-->Unwrap
     Unwrap-->Decrypt[Decrypt via AEAD]
     Decrypt-->App[Return Plaintext]
 ```
-When a clinician submits a patient form, the **Submit** process first passes through **Validate**, which enforces schema and range checks to prevent malformed data. The sanitized payload is serialized to JSON and handed to **GenDK**, which derives a 256-bit random data key for that record. **AEAD** encrypts the serialized data with AES-256-GCM, generating ciphertext, a 96-bit nonce and a 128-bit authentication tag. The column name and key metadata (`table:column|kid|kver`) are supplied as associated data, binding the ciphertext to its context and preventing copy‑paste attacks. The plaintext data key is then sent to **Wrap**, which invokes the configured keyring: in development the `DevKeyring` uses an environment-sourced AES key, whereas production deployments would call AWS KMS, Google Cloud KMS or Azure Key Vault. The keyring returns a wrapped key and its key identifier. **Store** writes the ciphertext, nonce, tag, wrapped key, key identifier and key version to the `patient` table columns suffixed `_ct`, `_nonce`, `_tag`, `_wrapped_dk`, `_kid` and `_kver` respectively【99bcea†L586-L604】【ea2abb†L656-L688】. On reads, **Unwrap** contacts the keyring to unwrap the stored key, and **Decrypt** uses it with the stored nonce and tag to recover plaintext, which **App** then returns to calling components. This Level‑1 perspective highlights key security controls: each record has a unique data key and nonce to avoid AES‑GCM reuse attacks; associated data ties ciphertext to its table and column; wrapped keys enable cryptographic erasure if the master key is revoked; and failures in decryption or key unwrapping result in safe null returns. The flow also shows where role-based checks and audit logging can intercede—before encryption to ensure only authorized clinicians store data, and after decryption to record accesses. The design cleanly separates duties between the application, which handles data validation and AEAD operations, and the external key management service, which is responsible for protecting and rotating the master keys.
+When a clinician submits a patient form, the **Submit** process first passes through **Validate**, which enforces schema and range checks to prevent malformed data. The sanitized payload is serialized to JSON and handed to **GenDK**, which derives a fresh 256‑bit data key for that record. **Encrypt** applies AES‑256‑GCM to the payload, yielding ciphertext, a 96‑bit nonce, and a 128‑bit authentication tag. The table name, column and key metadata (`table:column|kid|kver`) flow in as associated data so the ciphertext is cryptographically bound to its storage context, blocking copy‑paste attacks across fields. In parallel, **Wrap** sends the plaintext data key to the external **KMS/Keyring**; in development the `DevKeyring` performs an AES wrap with a locally provisioned key, whereas production deployments invoke cloud KMS APIs over mutually authenticated channels. The KMS returns a wrapped data key and key identifier, which **Wrap** passes back. **Store** persists the ciphertext, nonce, tag, wrapped key, key id and key version to the `patient` table columns suffixed `_ct`, `_nonce`, `_tag`, `_wrapped_dk`, `_kid` and `_kver` respectively【99bcea†L586-L604】【ea2abb†L656-L688】. During reads, the application retrieves the encrypted columns (**Fetch**) and forwards the wrapped key to **Unwrap**, which again calls the KMS to recover the plaintext data key. **Decrypt** feeds the key, nonce and tag into AES‑GCM to reconstruct the original patient payload, and **App** returns it to upstream services. This Level‑1 view underscores several controls: unique data keys and nonces per record thwart AES‑GCM reuse; associated data ties ciphertext to its origin; envelope wrapping facilitates cryptographic erasure if a master key is revoked; and any failure to unwrap or authenticate results in safe null values. Role‑based checks and audit logging can intercede before encryption to ensure only authorized clinicians store data and after decryption to record access. The diagram demonstrates the separation of duties—application code manages validation and AEAD primitives, while the external KMS maintains master keys, enforces key usage via RBAC, and supports rotation workflows.
+Key rotation introduces a maintenance branch not shown in the patient request path. Operations staff provision a new master key, update the `KMS_KEY_ID` configuration and run a rewrap job that walks through **Fetch**, **Unwrap** and **Wrap** for every encrypted row, incrementing `kver` on success. Each batch logs progress to `audit_log`, capturing acting user, affected tables and row counts so anomalies can trigger rollbacks. Because data keys are unique per record, partially completed rotations do not jeopardize remaining rows; unrotated entries continue decrypting with the previous key until rewrapped. If the database were exfiltrated without KMS credentials, attackers would find only ciphertext and wrapped keys they cannot unwrap. Conversely, disabling or deleting the master key performs cryptographic erasure, fulfilling right‑to‑be‑forgotten requests without touching individual rows. KMS itself enforces strict IAM policies so only the application role can call `Encrypt` and `Decrypt`, while administrators use separate, audited roles for rotation operations. Together these controls ensure envelope encryption integrates smoothly with operational procedures and keeps the data path clear and auditable from user submission through KMS interaction back to the user interface.
+
 
 ## Data Model and Database Design
 ```mermaid
@@ -325,6 +358,36 @@ sequenceDiagram
     A-->>U: Return plaintext
 ```
 This sequence expands on the previous DFD by detailing temporal ordering and actor responsibilities. The application first serializes validated patient data and generates a random data key and nonce. AES‑256‑GCM encrypts the payload using associated data that ties the ciphertext to the table and column, thwarting relocation attacks. The plaintext data key is sent to the keyring—either a development key loaded from `DEV_KMS_MASTER_KEY` or an external KMS provider—where it is wrapped and tagged with a key identifier. The application persists the ciphertext, nonce, tag, wrapped key, key identifier and version in dedicated columns, enabling later decryption and rotation. On read, the process reverses: fields are fetched, the keyring unwraps the data key, and AES‑GCM decrypts the ciphertext, verifying the authentication tag before returning plaintext. Any discrepancy in tag or unwrapping triggers an exception, causing the property accessor to return `None`. The diagram demonstrates envelope encryption’s separation of concerns: the keyring never sees plaintext data, and the database never stores unwrapped keys. It also shows how key rotation can be achieved by rewrapping stored data keys with a new master key and updating the key version without touching ciphertext. This approach supports cryptographic erasure, complies with defense-in-depth requirements, and integrates seamlessly with the ORM property accessors that hide complexity from higher-level application code.
+
+### BPMN Process for Prediction Pipeline
+```mermaid
+flowchart LR
+  %% HeartLytics Prediction
+
+  subgraph User
+    start([Start])
+    submit[Submit Patient Data]
+    review[Review Prediction]
+    endNode([End])
+  end
+
+  subgraph System
+    encrypt[Encrypt Data with KMS]
+    valid{Data Valid?}
+    predict[Run Risk Model]
+    error[Return Validation Errors]
+  end
+
+  start --> submit --> encrypt --> valid
+  valid -- Yes --> predict --> review
+  valid -- No  --> error --> review
+  review --> endNode
+
+```
+
+This BPMN 2.0 diagram illustrates the end-to-end prediction workflow with separate swimlanes for the user and system. After the user submits patient data, the system encrypts the payload, validates its structure, and either executes the risk model or returns validation issues before the user reviews the outcome.
+
+By modeling the process in this way, HeartLytics delineates control flow responsibilities and highlights the validation gateway that guards against malformed input. The diagram shows how encryption precedes scoring and how both successful and failed paths converge at result review, reinforcing the application’s commitment to secure, accurate predictions.
 
 ## Implementation Details and Configuration
 Configuration resides in `config.py` with environment variables for database URI, model path, encryption flags, KMS provider and role strictness【6182c6†L32-L47】. Theme features read `SIMULATION_FEATURES` flags, while encryption toggles (`ENCRYPTION_ENABLED`, `READ_LEGACY_PLAINTEXT`) govern patient data handling. Gmail SMTP variables enable TLS email delivery for password resets and MFA codes. OTP settings (`OTP_TTL_MIN`, `OTP_MAX_ATTEMPTS`) harden the reset flow, while MFA settings (`MFA_EMAIL_CODE_LENGTH`, `MFA_EMAIL_TTL_MIN`, trust windows, resend cooldowns) tune second-factor behavior. A CLI (`flask roles`) manages user roles and can be extended for key rotation via `manage_keys.py`.
