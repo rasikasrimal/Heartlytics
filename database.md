@@ -70,7 +70,7 @@ DESC password_reset_request;
 | requester_ip | VARCHAR(45) |  |  |
 | user_agent | VARCHAR(200) |  |  |
 
-Requests expire after 10 minutes and may be removed by periodic cleanup.
+Requests expire after 10 minutes and are stored as SHA-256 hashes with a server-side pepper. Submitted codes are verified using constant-time comparisons to prevent timing attacks.
 
 ## patient
 

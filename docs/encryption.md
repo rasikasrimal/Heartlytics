@@ -78,3 +78,6 @@ Recent simulation enhancements add an inline auto-update loader and
 status acknowledgment on the results panel. These UI changes operate
 client-side and introduce no new encrypted fields or key management
 requirements.
+
+## Password reset codes
+Password reset verification codes are never stored in plaintext. The application hashes each six-digit code with a server-side pepper and compares submissions using constant-time checks. Codes expire after a short TTL and are deleted once used.
