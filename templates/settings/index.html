@@ -31,6 +31,7 @@
           <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
           {{ form.text_input('username', 'Display Name', value=current_user.username) }}
           {{ form.text_input('email', 'Email', type='email', value=current_user.email, attrs={'readonly':'readonly'}) }}
+          {{ form.text_input('nickname', 'Nickname', value=current_user.nickname or '') }}
           <div class="mb-3">
             <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#passwordModal">Change password</button>
           </div>
@@ -41,6 +42,41 @@
         </form>
       </div>
     </div>
+    <div class="card shadow-sm mb-4">
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="mb-0">Two-Step Verification</h5>
+          <small class="text-muted">{{ 'Enabled' if current_user.mfa_enabled else 'Available' }}</small>
+        </div>
+        <a href="{{ url_for('auth.mfa_setup') }}" class="btn btn-outline-secondary btn-sm">Manage</a>
+      </div>
+    </div>
+    <div class="card shadow-sm mb-4">
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="mb-0">Theme</h5>
+          <small class="text-muted">Dark mode</small>
+        </div>
+        <button id="theme-toggle-settings" class="btn btn-outline-secondary" type="button" aria-label="Toggle color theme">
+          <i class="bi bi-moon-fill"></i>
+        </button>
+      </div>
+    </div>
+    {% if current_user.role == 'SuperAdmin' %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <form method="post" action="{{ url_for('settings.update_branding') }}" enctype="multipart/form-data">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+          {{ form.text_input('app_name', 'App Name', value=app_name) }}
+          <div class="mb-3">
+            <label for="logo" class="form-label">Upload Logo</label>
+            <input type="file" name="logo" id="logo" class="form-control">
+          </div>
+          {{ btn.primary('Save Branding', {'type':'submit'}) }}
+        </form>
+      </div>
+    </div>
+    {% endif %}
     <div class="card shadow-sm">
       <div class="card-header d-flex justify-content-between align-items-center">
         <span>Activity Log</span>
@@ -122,6 +158,22 @@ document.addEventListener('DOMContentLoaded', function(){
   }
   np.addEventListener('input', check);
   cp.addEventListener('input', check);
+  const themeBtn = document.getElementById('theme-toggle-settings');
+  if(themeBtn){
+    function updateThemeIcon(){
+      const icon = themeBtn.querySelector('i');
+      if(icon){
+        icon.className = document.documentElement.dataset.bsTheme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+      }
+    }
+    themeBtn.addEventListener('click', () => {
+      const current = document.documentElement.dataset.bsTheme;
+      window.setTheme(current === 'dark' ? 'light' : 'dark');
+      updateThemeIcon();
+    });
+    window.addEventListener('themechange', updateThemeIcon);
+    updateThemeIcon();
+  }
 });
 </script>
 {% endblock %}
