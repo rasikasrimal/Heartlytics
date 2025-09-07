@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   group.addEventListener('paste', (e) => {
-    const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+    const text = e.clipboardData.getData('text').replace(/\D/g, '');
     if (text.length === inputs.length) {
       inputs.forEach((input, i) => input.value = text[i]);
       updateHidden();
