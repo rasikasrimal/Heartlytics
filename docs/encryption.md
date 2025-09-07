@@ -25,8 +25,7 @@ flowchart LR
     gen --> enc[Encrypt data]
     enc --> wrap[Wrap key with KMS]
     wrap --> store[Persist ciphertext and wrapped key]
-    store --> end([End])
-
+    store --> endNode([End])
 ```
 
 ## Design
