@@ -22,6 +22,7 @@ links to the dedicated [Forgot Password / 2‑Step Verification flow](forget_pas
 Role-based access control (RBAC) restricts modules to specific roles: User,
 Doctor, Admin and SuperAdmin. Server-side decorators check roles before any
 action is executed, and the top navigation hides links the user cannot access.
+The Settings blueprint now leverages these decorators to ensure only authorized roles may update profiles, passwords or branding.
 
 ```mermaid
 flowchart TB

@@ -138,3 +138,6 @@ The web application now provides a secure forgotten password flow using short-li
 
 ## Authentication Flow Enhancements
 The web application now employs peppered hashes for password reset codes, enforced cooldowns on resend attempts, and a user-friendly countdown UI to reduce lockouts. These measures improve both security and usability in recovery scenarios.
+
+## UI Update
+The Settings page now features a two-column layout with a large editable avatar and an accordion activity log, giving users a clearer view of profile information and recent actions.

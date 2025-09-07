@@ -100,3 +100,5 @@ Rate limits and cooldowns enforce trust boundaries between unauthenticated
 requests and privileged password changes. RBAC ensures users may only reset
 their own accounts after verification.
 
+After signing in, the updated Settings page provides a dedicated change password modal so users can maintain their credentials alongside other profile details.
+

@@ -5,6 +5,7 @@ users can toggle using the navbar button or the setting on the Settings page.
 The selection is stored in `localStorage` and a long-lived `theme` cookie so the
 server can render pages in the correct theme without a flash of incorrect
 colors.
+The refreshed Settings screen showcases these themes with a shaded avatar overlay and cards that adapt cleanly between modes.
 
 ## Usage
 

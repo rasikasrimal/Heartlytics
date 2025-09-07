@@ -1169,6 +1169,7 @@ def api_delete_outliers():
 # ---------------------------
 @app.get("/")
 @login_required
+@require_roles("SuperAdmin", "Doctor", "User")
 def index():
     defaults = {
         "patient_name": "Demo Patient",

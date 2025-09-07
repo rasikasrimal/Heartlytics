@@ -1,0 +1,18 @@
+{% macro activity_item(log, idx) -%}
+<div class="accordion-item">
+  <h2 class="accordion-header" id="log-h{{ idx }}">
+    <button class="accordion-button collapsed d-flex" type="button" data-bs-toggle="collapse" data-bs-target="#log-c{{ idx }}" aria-expanded="false" aria-controls="log-c{{ idx }}">
+      <i class="bi bi-{{ log.icon or 'clock-history' }} me-2"></i>
+      <span class="me-auto">{{ log.action }}</span>
+      <small class="text-muted">{{ log.timestamp }}</small>
+    </button>
+  </h2>
+  <div id="log-c{{ idx }}" class="accordion-collapse collapse" data-bs-parent="#activity-accordion">
+    <div class="accordion-body small">
+      <div><strong>IP:</strong> {{ log.ip or '—' }}</div>
+      <div><strong>User Agent:</strong> {{ log.user_agent or '—' }}</div>
+      <div class="mt-2"><strong>Notes:</strong> {{ log.notes or '' }}</div>
+    </div>
+  </div>
+</div>
+{%- endmacro %}

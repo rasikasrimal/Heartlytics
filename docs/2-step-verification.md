@@ -83,3 +83,6 @@ flowchart TD
 The DFD details data movement between external entities and internal processes. A user submits an email, which the backend checks against the user database before generating and emailing a hashed OTP. The OTP and cooldown flags reside in dedicated stores, while audit logs capture verification attempts. The external database provides TTL metadata used by the cooldown process.
 
 Security controls include hashing with pepper, TTL enforcement, audit logging, and cooldown flags that rate-limit resend attempts. Usability is addressed by clear prompts, feedback on delivery status, and mechanisms that prevent accidental or repeated requests while keeping the interface accessible.
+
+## Settings Integration
+The redesigned Settings page displays a multi-factor authentication badge and a “Manage” link, letting users review or update their 2-step verification without leaving the profile context.

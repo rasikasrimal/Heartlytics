@@ -2,15 +2,17 @@ from __future__ import annotations
 
 import json
 import os
-from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash, abort
+from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from services.security import csrf_protect
+from services.auth import role_required
 
 settings_bp = Blueprint("settings", __name__, url_prefix="/settings")
 
 
 @settings_bp.get("/")
 @login_required
+@role_required(["User", "Doctor", "Admin", "SuperAdmin"])
 def settings():
     """Display settings page with activity logs."""
     AuditLog = current_app.AuditLog
@@ -25,6 +27,7 @@ def settings():
 
 @settings_bp.post("/profile")
 @login_required
+@role_required(["User", "Doctor", "Admin", "SuperAdmin"])
 @csrf_protect
 def update_profile():
     """Update basic user profile information."""
@@ -52,6 +55,7 @@ def update_profile():
 
 @settings_bp.post("/password")
 @login_required
+@role_required(["User", "Doctor", "Admin", "SuperAdmin"])
 @csrf_protect
 def update_password():
     """Update the user's password after verifying current password."""
@@ -72,11 +76,10 @@ def update_password():
 
 @settings_bp.post("/branding")
 @login_required
+@role_required(["SuperAdmin"])
 @csrf_protect
 def update_branding():
     """Allow SuperAdmins to update app name and logo."""
-    if current_user.role != "SuperAdmin":
-        abort(403)
     name = request.form.get("app_name", "").strip() or current_app.config.get("APP_NAME")
     logo_file = request.files.get("logo")
     if logo_file and logo_file.filename:

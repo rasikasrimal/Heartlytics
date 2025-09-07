@@ -1,6 +1,7 @@
-{% macro avatar(src, alt='', size=160) -%}
-<div class="avatar-edit" style="width:{{ size }}px;height:{{ size }}px;">
-  <img src="{{ src }}" alt="{{ alt }}" class="rounded-circle w-100 h-100 object-fit-cover">
-  <span class="edit-icon position-absolute top-50 start-50 translate-middle"><i class="bi bi-pencil"></i></span>
-</div>
+{% macro avatar(src, alt='', size=160, modal_id='avatarModal') -%}
+<button type="button" class="avatar-wrapper border-0 p-0 bg-transparent" style="width:{{ size }}px;height:{{ size }}px;" data-bs-toggle="modal" data-bs-target="#{{ modal_id }}">
+  <img src="{{ src }}" alt="{{ alt }}">
+  <span class="avatar-overlay"></span>
+  <span class="avatar-pencil"><i class="bi bi-pencil"></i></span>
+</button>
 {%- endmacro %}

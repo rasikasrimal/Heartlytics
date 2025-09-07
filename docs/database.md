@@ -31,6 +31,8 @@ DESC audit_log;
 | old_value | VARCHAR(120) |  |  |
 | new_value | VARCHAR(120) |  |  |
 
+Settings exposes these entries through an accordion activity log that expands to show IP and user agent details for each action.
+
 ## cluster_summary
 
 ```sql

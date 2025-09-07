@@ -96,6 +96,7 @@
 | TC-038 | Avatar upload rejects non-image files. | User Settings | 🟡 Medium | 🔒 Security | ⏳ Not Run |
 | TC-039 | Password change with incorrect current password is rejected. | User Settings | 🟡 Medium | 🔒 Security | ⏳ Not Run |
 | TC-040 | Profile update with invalid email format is rejected. | User Settings | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-065 | Activity log accordion reveals IP and user agent when expanded. | User Settings | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 
 ## Simulations
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |

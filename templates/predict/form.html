@@ -7,9 +7,15 @@
   <div class="d-flex align-items-center flex-wrap gap-2">
     <div class="btn-group btn-group-sm" role="group" aria-label="Prediction mode">
       <a href="{{ url_for('index') }}" class="btn btn-outline-secondary active" aria-current="page">Single</a>
+      {% if can('Batch') %}
       <a href="{{ url_for('upload_form') }}" class="btn btn-outline-secondary">Batch</a>
+      {% endif %}
     </div>
+    {% if can('Batch') %}
     <small class="text-muted">Run a single prediction or upload a CSV batch.</small>
+    {% else %}
+    <small class="text-muted">Run a single prediction.</small>
+    {% endif %}
     <span class="badge text-bg-secondary">Model {{ model_name }} · {{ model_date }}</span>
   </div>
 </div>
@@ -136,6 +142,7 @@
     </form>
   </div>
 
+  {% if can('Batch') %}
   <!-- Right: CSV upload + guidance -->
   <div class="col-12 col-lg-6">
     <div class="card shadow-sm h-100">
@@ -180,6 +187,7 @@ resting_blood_pressure, cholesterol,
       </div>
     </div>
   </div>
+  {% endif %}
 </div>
 {% endblock %}
 
