@@ -6,10 +6,10 @@
 {% from '_components/alerts.html' import render_flashes %}
 {% block content %}
   {{ render_flashes(get_flashed_messages(with_categories=True)) }}
-  {% call auth_card('Forgot your password?', "Enter your email. We'll send a 6-digit code.") %}
+  {% call auth_card('Forgot your password?', "Enter your email or username. We'll send a 6-digit code.") %}
     <form method="post" autocomplete="off" novalidate>
       {{ form.hidden_tag() }}
-      {{ form_field('email', 'identifier', 'Email', value=form.identifier.data, help="We'll send a 6-digit code.", attrs={'placeholder':'name@example.com','required':'','autocomplete':'email'}) }}
+      {{ form_field('email', 'identifier', 'Email or Username', value=form.identifier.data, help="We'll send a 6-digit code.", attrs={'placeholder':'name@example.com','required':'','autocomplete':'email'}) }}
       {{ primary_button('Continue', attrs={'type':'submit'}) }}
     </form>
     <div class="mt-3 text-center">
