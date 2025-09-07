@@ -17,6 +17,7 @@ links to the dedicated [Forgot Password / 2‑Step Verification flow](forget_pas
 - Login, OTP request, and verification endpoints enforce per‑IP and per‑ID
   limits to deter brute force attempts.
 - Redesigned forgot-password page uses segmented OTP inputs and a visible countdown badge without exposing full email addresses.
+- Sign-up form features a client-side password strength meter and optional email verification using the same OTP component.
 
 ## Authorization
 

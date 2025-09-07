@@ -139,3 +139,4 @@ The web application now provides a secure forgotten password flow using short-li
 
 ## Authentication Flow Enhancements
 The web application now employs peppered hashes for password reset codes, enforced cooldowns on resend attempts, and a user-friendly countdown UI to reduce lockouts. These measures improve both security and usability in recovery scenarios.
+The account creation screen was likewise refreshed with inline password strength guidance and an optional email verification step that reuses the OTP component for consistent UX.

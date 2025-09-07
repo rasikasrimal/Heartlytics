@@ -1,8 +1,15 @@
-{% macro form_field(type, name, label, value='', help='', error=None, attrs={}) -%}
-<div class="mb-3">
+{% macro form_field(type, name, label, value='', help='', error=None, attrs={}, password_toggle=False, error_hidden=False) -%}
+<div class="mb-3" id="{{ name }}-field">
   <label for="{{ name }}" class="form-label">{{ label }}</label>
+  {% if password_toggle %}
+  <div class="input-group">
+    <input type="{{ type }}" class="form-control{% if error %} is-invalid{% endif %}" id="{{ name }}" name="{{ name }}" value="{{ value }}"{% for k,v in attrs.items() %} {{k}}="{{v}}"{% endfor %}>
+    <button class="btn btn-outline-secondary password-toggle" type="button" tabindex="-1" aria-label="Show password"><i class="bi bi-eye"></i></button>
+  </div>
+  {% else %}
   <input type="{{ type }}" class="form-control{% if error %} is-invalid{% endif %}" id="{{ name }}" name="{{ name }}" value="{{ value }}"{% for k,v in attrs.items() %} {{k}}="{{v}}"{% endfor %}>
+  {% endif %}
   {% if help %}<div class="form-text text-muted">{{ help }}</div>{% endif %}
-  {% if error %}<div class="invalid-feedback">{{ error }}</div>{% endif %}
+  {% if error %}<div class="invalid-feedback{% if error_hidden %} d-none{% endif %}">{{ error }}</div>{% endif %}
 </div>
 {%- endmacro %}

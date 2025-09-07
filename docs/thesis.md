@@ -627,7 +627,7 @@ def test_login_with_email_code(monkeypatch, client, app):
 Running `pytest` executes these tests to confirm encryption integrity, MFA verification, recovery code handling and email fallback functionality.
 
 ## Timeline and Project Management
-The project followed a structured Gantt plan spanning planning, development, testing and deployment phases with milestones such as Security & Encryption, RBAC Hardening, MFA rollout and UI Theming. Post‑deployment monitoring extends into maintenance.
+The project followed a structured Gantt plan spanning planning, development, testing and deployment phases with milestones such as Security & Encryption, RBAC Hardening, MFA rollout and UI Theming. Recent iterations added a redesigned sign-up page with strength-based password guidance and an email verification step. Post‑deployment monitoring extends into maintenance.
 
 ## Ethics, Privacy, and Compliance
 HeartLytics minimizes data retention and encrypts sensitive fields. Cookies store only non‑sensitive theme preferences; sessions timeout to reduce exposure. The system adheres to OWASP guidelines and enables cryptographic erasure via KMS key deletion. Deployments targeting EU residents must ensure GDPR compliance, user consent and breach notification procedures.

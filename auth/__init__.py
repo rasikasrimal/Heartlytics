@@ -150,6 +150,12 @@ def signup():
     return render_template("auth/signup.html", form=form)
 
 
+@auth_bp.route("/signup/verify")
+def signup_verify():
+    """Display email verification step after sign up."""
+    return render_template("auth/signup_verify.html")
+
+
 @auth_bp.route("/logout")
 def logout():
     """Log out the current user."""
