@@ -3,6 +3,31 @@
 This application uses application-level envelope encryption for select
 sensitive fields.
 
+## High-level diagrams
+
+### Data flow
+
+```mermaid
+flowchart LR
+    User[User] -->|submit data| App[Application]
+    App -->|request data key| KMS[KMS]
+    KMS -->|data key| App
+    App -->|store ciphertext + wrapped key| DB[(Database)]
+    DB -->|retrieve ciphertext + wrapped key| App
+    App -->|return response| User
+```
+
+### BPMN 2.0 process
+
+```mermaid
+flowchart LR
+    start([Start]) --> gen[Generate data key]
+    gen --> enc[Encrypt data]
+    enc --> wrap[Wrap key with KMS]
+    wrap --> store[Persist ciphertext and wrapped key]
+    store --> end([End])
+```
+
 ## Design
 
 * A random 256-bit data key is generated for each encryption operation.

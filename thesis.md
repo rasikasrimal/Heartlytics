@@ -36,6 +36,7 @@ HeartLytics is a full‑stack Python/Flask platform that predicts heart disease 
   - [Prediction Inference](#prediction-inference)
   - [MFA Login with Step-Up Enforcement](#mfa-login-with-step-up-enforcement)
   - [Encrypted Write and Read](#encrypted-write-and-read)
+  - [BPMN Process for Prediction Pipeline](#bpmn-process-for-prediction-pipeline)
 - [Implementation Details and Configuration](#implementation-details-and-configuration)
 - [Testing and Evaluation](#testing-and-evaluation)
 - [Timeline and Project Management](#timeline-and-project-management)
@@ -115,12 +116,36 @@ RBAC governs access: SuperAdmin has full rights, Admin lacks Predict/Batch/Dashb
 ## Data Flow Diagrams
 ### Level-0 DFD
 ```mermaid
-flowchart LR
-    A[User] -->|Enter data/CSV| B[HeartLytics]
-    B -->|Clean & EDA| C[Model]
-    C -->|Predictions| B
-    B -->|Results & PDFs| A
+flowchart TD
+    %% External Entities
+    User[User]
+    Doctor[Doctor]
+    KMS[Key Management Service]
+
+    %% System Boundary
+    subgraph HeartLytics
+        Upload[Upload Patient CSV]
+        Encrypt[Encrypt Patient Data]
+        Predict[Run Risk Model]
+        Store[(Encrypted Database)]
+    end
+
+    %% Data Flows
+    User -->|Patient Data CSV| Upload
+    Doctor -->|Patient Data CSV| Upload
+    Upload -->|Cleaned Rows| Encrypt
+    Encrypt -->|Ciphertext| Store
+    Encrypt -->|Wrapped Keys| KMS
+    KMS -->|Data Keys| Encrypt
+    Upload -->|Structured Data| Predict
+    Store -->|Encrypted Records| Predict
+    Predict -->|Prediction Results| User
+    Predict -->|Prediction Results| Doctor
 ```
+
+The Level-0 data flow diagram presents HeartLytics as a system boundary containing core processes and storage. External actors such as users, doctors, and the key management service interact with these internal components through labeled flows of patient data, ciphertext, wrapped keys, and results.
+
+This context diagram is relevant because it highlights how raw patient information enters the platform, is encrypted and persisted, and ultimately returns as risk predictions. By labeling each flow, the diagram clarifies the responsibilities of each actor and emphasizes the central role of the encrypted database in safeguarding sensitive records.
 
 ### Level-1 DFD – Batch Upload
 ```mermaid
@@ -333,6 +358,32 @@ sequenceDiagram
     A-->>U: Return plaintext
 ```
 This sequence expands on the previous DFD by detailing temporal ordering and actor responsibilities. The application first serializes validated patient data and generates a random data key and nonce. AES‑256‑GCM encrypts the payload using associated data that ties the ciphertext to the table and column, thwarting relocation attacks. The plaintext data key is sent to the keyring—either a development key loaded from `DEV_KMS_MASTER_KEY` or an external KMS provider—where it is wrapped and tagged with a key identifier. The application persists the ciphertext, nonce, tag, wrapped key, key identifier and version in dedicated columns, enabling later decryption and rotation. On read, the process reverses: fields are fetched, the keyring unwraps the data key, and AES‑GCM decrypts the ciphertext, verifying the authentication tag before returning plaintext. Any discrepancy in tag or unwrapping triggers an exception, causing the property accessor to return `None`. The diagram demonstrates envelope encryption’s separation of concerns: the keyring never sees plaintext data, and the database never stores unwrapped keys. It also shows how key rotation can be achieved by rewrapping stored data keys with a new master key and updating the key version without touching ciphertext. This approach supports cryptographic erasure, complies with defense-in-depth requirements, and integrates seamlessly with the ORM property accessors that hide complexity from higher-level application code.
+
+### BPMN Process for Prediction Pipeline
+```mermaid
+bpmn
+    title HeartLytics Prediction
+    lane User {
+        startEvent start
+        task submit "Submit Patient Data"
+        task review "Review Prediction"
+        endEvent end
+    }
+    lane System {
+        task encrypt "Encrypt Data with KMS"
+        gateway valid "Data Valid?"
+        task predict "Run Risk Model"
+        task error "Return Validation Errors"
+    }
+    start --> submit --> encrypt --> valid
+    valid -->|Yes| predict --> review
+    valid -->|No| error --> review
+    review --> end
+```
+
+This BPMN 2.0 diagram illustrates the end-to-end prediction workflow with separate swimlanes for the user and system. After the user submits patient data, the system encrypts the payload, validates its structure, and either executes the risk model or returns validation issues before the user reviews the outcome.
+
+By modeling the process in this way, HeartLytics delineates control flow responsibilities and highlights the validation gateway that guards against malformed input. The diagram shows how encryption precedes scoring and how both successful and failed paths converge at result review, reinforcing the application’s commitment to secure, accurate predictions.
 
 ## Implementation Details and Configuration
 Configuration resides in `config.py` with environment variables for database URI, model path, encryption flags, KMS provider and role strictness【6182c6†L32-L47】. Theme features read `SIMULATION_FEATURES` flags, while encryption toggles (`ENCRYPTION_ENABLED`, `READ_LEGACY_PLAINTEXT`) govern patient data handling. Gmail SMTP variables enable TLS email delivery for password resets and MFA codes. OTP settings (`OTP_TTL_MIN`, `OTP_MAX_ATTEMPTS`) harden the reset flow, while MFA settings (`MFA_EMAIL_CODE_LENGTH`, `MFA_EMAIL_TTL_MIN`, trust windows, resend cooldowns) tune second-factor behavior. A CLI (`flask roles`) manages user roles and can be extended for key rotation via `manage_keys.py`.
