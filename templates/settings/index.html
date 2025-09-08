@@ -24,7 +24,7 @@
         {{ avatar(url_for('static', filename='avatars/' ~ (current_user.avatar or 'None.jpg')), current_user.username) }}
         <p class="fw-semibold mt-3 mb-0">{{ current_user.username }}</p>
         <p class="text-muted small mb-0">{{ current_user.email }}</p>
-        <p class="text-muted small">{{ current_user.nickname }}</p>
+        <p class="text-muted small">{{ current_user.nickname or '' }}</p>
       </div>
     </div>
   </aside>
