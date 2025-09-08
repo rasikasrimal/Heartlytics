@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 
-from flask import Blueprint, current_app, flash, redirect, render_template, session, url_for, request
+from flask import Blueprint, current_app, flash, redirect, render_template, session, url_for, request, jsonify
 from flask_login import login_user, logout_user, current_user
 from sqlalchemy import or_
+
+from services.mfa import generate_code, hash_code, send_reset_email, verify_code
 
 from .forms import LoginForm, SignupForm
 
@@ -91,6 +93,24 @@ def login():
     return render_template("auth/login.html", form=form)
 
 
+@auth_bp.get("/check-username")
+def check_username():
+    """Return availability of a username."""
+    User = current_app.User
+    username = request.args.get("username", "").strip()
+    exists = User.query.filter_by(username=username).first() is not None
+    return jsonify({"available": not exists})
+
+
+@auth_bp.get("/check-email")
+def check_email():
+    """Return availability of an email."""
+    User = current_app.User
+    email = request.args.get("email", "").strip()
+    exists = User.query.filter_by(email=email).first() is not None
+    return jsonify({"available": not exists})
+
+
 @auth_bp.route("/signup", methods=["GET", "POST"])
 def signup():
     """Register a new user. Users activate immediately; Doctors/Admins await approval."""
@@ -104,11 +124,50 @@ def signup():
         db = current_app.db
         User = current_app.User
 
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            if User.query.filter_by(username=form.username.data).first():
+                return jsonify({"error": "username"}), 400
+            if User.query.filter_by(email=form.email.data).first():
+                return jsonify({"error": "email"}), 400
+
+            if form.nickname.data and User.query.filter_by(nickname=form.nickname.data).first():
+                return jsonify({"error": "nickname"}), 400
+
+            if current_user.is_authenticated and current_user.role == "SuperAdmin":
+                role = form.role.data
+                status = "approved"
+                requested_role = None
+            else:
+                requested_role = form.role.data if form.role.data != "User" else None
+                role = "User"
+                status = "approved" if requested_role is None else "pending"
+
+            user = User(
+                username=form.username.data,
+                nickname=form.nickname.data or None,
+                email=form.email.data,
+                role=role,
+                status=status,
+                requested_role=requested_role,
+                created_at=datetime.utcnow(),
+            )
+            user.set_password(form.password.data)
+
+            db.session.add(user)
+            db.session.commit()
+
+            code = generate_code()
+            session["signup_otp"] = hash_code(code)
+            session["signup_user"] = user.id
+            send_reset_email(user, code, current_app.config.get("OTP_TTL", 10), request)
+            return jsonify({"success": True})
+
         # Prevent duplicate usernames/emails.
-        if User.query.filter(
-            or_(User.username == form.username.data, User.email == form.email.data)
-        ).first():
-            flash("Username or email already exists", "error")
+        if User.query.filter_by(username=form.username.data).first():
+            flash("Username taken", "error")
+            return render_template("auth/signup.html", form=form)
+        if User.query.filter_by(email=form.email.data).first():
+            flash("Email already registered, sign in?", "error")
             return render_template("auth/signup.html", form=form)
         if form.nickname.data and User.query.filter_by(nickname=form.nickname.data).first():
             flash("Nickname already exists", "error")
@@ -148,6 +207,32 @@ def signup():
         return redirect(url_for("auth.login"))
 
     return render_template("auth/signup.html", form=form)
+
+
+@auth_bp.post("/signup/verify")
+def signup_verify():
+    """Verify the signup OTP and redirect to login."""
+
+    code = request.form.get("otp", "").strip()
+    hashed = session.get("signup_otp")
+    user_id = session.get("signup_user")
+    if not hashed or not user_id or not verify_code(code, hashed):
+        return jsonify({"error": "invalid"}), 400
+
+    db = current_app.db
+    User = current_app.User
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "invalid"}), 400
+
+    user.mfa_email_enabled = True
+    user.mfa_email_verified_at = datetime.utcnow()
+    db.session.commit()
+
+    session.pop("signup_otp", None)
+    session.pop("signup_user", None)
+    flash("Account verified. You can log in.", "success")
+    return jsonify({"success": True, "redirect": url_for("auth.login")})
 
 
 @auth_bp.route("/logout")

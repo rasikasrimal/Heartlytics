@@ -1,0 +1,8 @@
+{% macro alert(kind='info', text='') -%}
+<div class="alert alert-{{ 'danger' if kind == 'error' else kind }} shadow-sm" role="alert">{{ text }}</div>
+{%- endmacro %}
+{% macro render_flashes(messages) -%}
+  {% for cat, msg in messages %}
+    {{ alert(cat, msg) }}
+  {% endfor %}
+{%- endmacro %}

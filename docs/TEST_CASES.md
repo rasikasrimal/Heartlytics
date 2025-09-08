@@ -11,6 +11,7 @@
 | TC-006 | Logout endpoint terminates session. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-007 | Unauthenticated user is redirected to login when accessing dashboard. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-008 | Signup rejects duplicate email addresses. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-088 | Signup rejects duplicate usernames. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-009 | Password must include upper, lower, number and special character. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-040 | Legacy password hashes upgrade to Argon2id on login. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-070 | Forgot password flow resets account password via emailed code. | Authentication & Roles | 🔴 High | 🧪 Functional | ⏳ Not Run |
@@ -18,6 +19,11 @@
 | TC-072 | Verification code expires after 10 minutes. | Authentication & Roles | 🟡 Medium | 🔒 Security | ⏳ Not Run |
 | TC-081 | Resend button disabled during 60s countdown. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-082 | Invalid verification codes decrement remaining attempts. | Authentication & Roles | 🟡 Medium | 🔒 Security | ⏳ Not Run |
+| TC-083 | MFA verify page masks email address. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-084 | Segmented OTP inputs auto-advance and support paste. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-085 | Countdown badge shows mm:ss while resend is disabled. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
+| TC-086 | Signup form disables submit until fields are valid. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-087 | Successful signup transitions to email verification card. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-073 | `/debug/mail` sends test email and lists recent events. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-074 | Password reset requires re-login; no automatic session. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-075 | User with TOTP enabled must enter valid code after password. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
@@ -65,6 +71,7 @@
 | TC-060 | Nav shows only permitted items for each role. | Navigation | 🔴 High | 🧪 Functional | ⏳ Not Run |
 | TC-061 | Theme toggle and user menu remain keyboard accessible after redesign. | Navigation | 🟡 Medium | 🧪 Accessibility | ⏳ Not Run |
 | TC-062 | Animations disable when `prefers-reduced-motion` is set. | Motion | 🟡 Medium | 🧪 Accessibility | ⏳ Not Run |
+| TC-063 | Dark theme uses GitHub-style slate surfaces with blue accents. | Navigation | 🟢 Low | 🧪 Visual | ⏳ Not Run |
 
 ## Doctor Dashboard
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |

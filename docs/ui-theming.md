@@ -2,7 +2,10 @@
 
 HeartLytics supports light and dark color themes. The default is **light** and
 users can toggle using the navbar button or the setting on the Settings page.
-The selection is stored in `localStorage` and a long-lived `theme` cookie so the
+The dark mode now uses a GitHub-style slate palette (#0d1117 body,
+#010409 navbar, #161b22 cards) with blue accents (#58a6ff) for links and
+calls to action, mirroring GitHub's readability. The
+selection is stored in `localStorage` and a long-lived `theme` cookie so the
 server can render pages in the correct theme without a flash of incorrect
 colors.
 
@@ -16,3 +19,5 @@ blend with the page.
 If a new visualization library is introduced, listen for the `themechange` event
 on `window` and apply colors from CSS variables such as `--bs-body-bg` and
 `--bs-body-color`.
+
+Auth pages, including the redesigned forgot-password flow, consume reusable Bootstrap components so card backgrounds, buttons, and countdown badges adapt automatically to the selected theme. The refreshed signup page uses these components as well, so its strength meter and verification step respect light and dark modes.

@@ -12,9 +12,15 @@ links to the dedicated [Forgot Password / 2‑Step Verification flow](forget_pas
 
 - Session-based authentication with **Flask‑Login**.
 - Email and TOTP factors provide optional multi-factor authentication.
+- Verification emails display masked addresses and respect resend cooldowns enforced on the server.
 - Password resets force a fresh login and send a notification email.
 - Login, OTP request, and verification endpoints enforce per‑IP and per‑ID
   limits to deter brute force attempts.
+- Redesigned forgot-password page uses segmented OTP inputs and a visible countdown badge without exposing full email addresses.
+- Signup form now includes a password strength meter and email verification using the same OTP component.
+- Usernames and emails must be unique at signup, while nicknames may duplicate.
+- Interfaces render in a GitHub-style dark theme with slate backgrounds and
+  blue accents to maintain contrast and focus visibility.
 
 ## Authorization
 

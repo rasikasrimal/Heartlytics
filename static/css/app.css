@@ -1,0 +1,28 @@
+.otp-input {
+  letter-spacing: 0.3em;
+}
+.avatar-edit .edit-icon {
+  display: none;
+  color: #fff;
+}
+.avatar-edit:hover .edit-icon {
+  display: block;
+}
+
+/* Settings UI additions */
+.avatar-wrapper .edit-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: .5rem;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.avatar-wrapper:hover .edit-overlay {opacity:1;}
+.card-footer.position-sticky {
+  background: var(--bs-body-bg);
+}

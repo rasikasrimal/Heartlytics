@@ -38,12 +38,16 @@ gantt
 - **Deployment** marks the production release.
 - **Post-Deployment** includes monitoring and ongoing maintenance.
 - Recent iteration adds cleaning-log normalization, a compact batch prediction notice, and a theme toggle on auth pages.
+- Latest update introduces server-side masked OTP emails and resend countdowns.
 - Latest update introduces an email-based forgot password flow with OTP verification.
 - Latest update introduces a spaced, role-aware navigation bar and a shared motion token system.
+- Latest update redesigns the forgot-password page with a Bootstrap card, segmented OTP inputs, and a visual resend countdown.
+- Latest update refreshes the signup page with a card layout, password strength meter, and email verification step.
 - Simulations now feature inline auto-update feedback with subtle loader and timestamped confirmation.
 - Forgot-password emails now send via Gmail SMTP with `/debug/mail` diagnostics and rate-limited OTP handling.
 - Password resets require re-authentication and send change notifications.
 - Optional TOTP-based two-step verification with recovery codes is now available.
 - Email-based MFA codes can be enabled as a fallback to TOTP.
 - Improved forgot-password flow with hashed codes and resend countdown.
+- Dark theme refreshed to a GitHub-style slate palette with blue accents.
 

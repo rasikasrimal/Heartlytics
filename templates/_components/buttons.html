@@ -1,0 +1,9 @@
+{% macro primary(text, attrs={}) -%}
+  <button class="btn btn-primary"{% for k,v in attrs.items() %} {{k}}="{{v}}"{% endfor %}>{{ text }}</button>
+{%- endmacro %}
+{% macro secondary(text, attrs={}) -%}
+  <button class="btn btn-outline-secondary"{% for k,v in attrs.items() %} {{k}}="{{v}}"{% endfor %}>{{ text }}</button>
+{%- endmacro %}
+{% macro link(text, href='#', attrs={}) -%}
+  <a class="btn btn-link" href="{{ href }}"{% for k,v in attrs.items() %} {{k}}="{{v}}"{% endfor %}>{{ text }}</a>
+{%- endmacro %}

@@ -1,4 +1,10 @@
 {% extends 'base.html' %}
+{% from '_components/auth_card.html' import auth_card %}
+{% from '_components/form_field.html' import form_field %}
+{% from '_components/password_strength.html' import password_strength %}
+{% from '_components/otp_inputs.html' import otp_inputs %}
+{% from '_components/alerts.html' import render_flashes %}
+{% from '_components/buttons.html' import primary %}
 
 {% block title %}Sign Up{% endblock %}
 
@@ -9,129 +15,70 @@
 {% endblock %}
 
 {% block flashes %}
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="mb-3">
-        {% for cat, msg in messages %}
-          <div class="alert alert-{{ 'danger' if cat == 'error' else cat }} shadow-sm" role="alert">{{ msg }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="mb-3">{{ render_flashes(messages) }}</div>
+  {% endif %}
+{% endwith %}
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center fade-in">
-  <div class="col-md-6">
-    <h2 class="mb-3">Sign Up</h2>
-    <form method="post" action="{{ url_for('auth.signup') }}">
-      {{ form.csrf_token }}
-      <div class="mb-3">
-        {{ form.username.label(class='form-label') }}
-        {{ form.username(class='form-control') }}
-        {% for err in form.username.errors %}
-        <div class="text-danger small">{{ err }}</div>
-        {% endfor %}
-      </div>
-      <div class="mb-3">
-        {{ form.nickname.label(class='form-label') }}
-        {{ form.nickname(class='form-control') }}
-        {% for err in form.nickname.errors %}
-        <div class="text-danger small">{{ err }}</div>
-        {% endfor %}
-      </div>
-      <div class="mb-3">
-        {{ form.email.label(class='form-label') }}
-        {{ form.email(class='form-control') }}
-        {% for err in form.email.errors %}
-        <div class="text-danger small">{{ err }}</div>
-        {% endfor %}
-      </div>
-      <div class="mb-3">
-        {{ form.password.label(class='form-label') }}
-        {{ form.password(class='form-control') }}
-        <div class="progress mt-2" style="height: 5px;">
-          <div id="passwordStrength" class="progress-bar" role="progressbar"></div>
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6" id="signupSection">
+      {% call auth_card('Create your account') %}
+      <form id="signupForm" method="post" action="{{ url_for('auth.signup') }}" novalidate>
+        {{ form.csrf_token }}
+        {{ form_field('text', form.username.id, form.username.label.text, value=form.username.data or '', attrs={'required':True, 'autocomplete':'username'}) }}
+        {{ form_field('text', form.nickname.id, form.nickname.label.text, value=form.nickname.data or '', attrs={'autocomplete':'nickname'}) }}
+        {{ form_field('email', form.email.id, form.email.label.text, value=form.email.data or '', attrs={'required':True, 'autocomplete':'email'}) }}
+        {{ form_field('password', form.password.id, form.password.label.text, help='Use 8+ characters with numbers and symbols', attrs={'required':True, 'autocomplete':'new-password', 'aria-describedby': form.password.id + 'Help'}, slot='<button type="button" class="btn btn-outline-secondary password-toggle position-absolute top-50 end-0 translate-middle-y me-2" aria-label="Show password"><i class="bi bi-eye"></i></button>') }}
+        {{ password_strength(form.password.id) }}
+        {{ form_field('password', form.confirm.id, form.confirm.label.text, attrs={'required':True, 'autocomplete':'new-password'}, slot='<button type="button" class="btn btn-outline-secondary password-toggle position-absolute top-50 end-0 translate-middle-y me-2" aria-label="Show password"><i class="bi bi-eye"></i></button>') }}
+        <div class="mb-3">
+          {{ form.role.label(class='form-label') }}
+          {{ form.role(class='form-select', id=form.role.id, required=true) }}
         </div>
-        <ul class="password-hints list-unstyled small mt-2 mb-0">
-          <li><span id="lengthHint" class="text-danger">❌</span> Minimum 8 characters</li>
-          <li><span id="uppercaseHint" class="text-danger">❌</span> At least one uppercase letter</li>
-          <li><span id="lowercaseHint" class="text-danger">❌</span> At least one lowercase letter</li>
-          <li><span id="numberHint" class="text-danger">❌</span> At least one number</li>
-          <li><span id="specialHint" class="text-danger">❌</span> At least one special character (!@#$%^&*)</li>
-        </ul>
-        {% for err in form.password.errors %}
-        <div class="text-danger small">{{ err }}</div>
-        {% endfor %}
-      </div>
-      <div class="mb-3">
-        {{ form.confirm.label(class='form-label') }}
-        {{ form.confirm(class='form-control') }}
-        {% for err in form.confirm.errors %}
-        <div class="text-danger small">{{ err }}</div>
-        {% endfor %}
-      </div>
-      <div class="mb-3">
-        {{ form.role.label(class='form-label') }}
-        {{ form.role(class='form-select') }}
-        {% for err in form.role.errors %}
-        <div class="text-danger small">{{ err }}</div>
-        {% endfor %}
-      </div>
-      {{ form.submit(class='btn btn-primary') }}
-    </form>
+        <p class="small text-muted mb-3">By creating an account, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
+        <div class="d-grid mb-3">
+          {{ primary('Create account', attrs={'id':'createAccount', 'type':'submit'}) }}
+        </div>
+        <p class="text-center mb-0">Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a></p>
+      </form>
+      {% endcall %}
+    </div>
+  </div>
+  <div class="row justify-content-center d-none" id="verifySection">
+    <div class="col-md-6">
+      {% call auth_card('Verify your email') %}
+      <p class="text-muted small">Enter the 6-digit code sent to your email.</p>
+      <form id="verifyForm" method="post" action="{{ url_for('auth.signup_verify') }}" novalidate>
+        {{ form.csrf_token }}
+        {{ otp_inputs(name='otp') }}
+        <div class="invalid-feedback text-center mb-3" id="otpError"></div>
+        <div class="d-grid mb-3">
+          {{ primary('Send OTP', attrs={'id':'sendOtp', 'type':'button'}) }}
+        </div>
+        <div class="d-grid mb-3">
+          {{ primary('Verify', attrs={'id':'verifyBtn', 'type':'submit', 'disabled':True}) }}
+        </div>
+      </form>
+      {% endcall %}
+    </div>
+  </div>
 </div>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:11">
+  <div id="signupToast" class="toast text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">Account created — check your email</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const pwd = document.getElementById('{{ form.password.id }}');
-  const strength = document.getElementById('passwordStrength');
-  const hints = {
-    length: document.getElementById('lengthHint'),
-    uppercase: document.getElementById('uppercaseHint'),
-    lowercase: document.getElementById('lowercaseHint'),
-    number: document.getElementById('numberHint'),
-    special: document.getElementById('specialHint')
-  };
-
-  function updateStrength() {
-    const val = pwd.value;
-    const checks = {
-      length: val.length >= 8,
-      uppercase: /[A-Z]/.test(val),
-      lowercase: /[a-z]/.test(val),
-      number: /\d/.test(val),
-      special: /[!@#$%^&*]/.test(val)
-    };
-    let score = 0;
-    Object.entries(checks).forEach(([key, passed]) => {
-      hints[key].textContent = passed ? '✅' : '❌';
-      hints[key].classList.toggle('text-success', passed);
-      hints[key].classList.toggle('text-danger', !passed);
-      if (passed) score++;
-    });
-    const percent = (score / 5) * 100;
-    strength.style.width = percent + '%';
-    strength.className = 'progress-bar';
-    if (score <= 2) strength.classList.add('bg-danger');
-    else if (score <= 4) strength.classList.add('bg-warning');
-    else strength.classList.add('bg-success');
-
-    if (score === 5) {
-      pwd.classList.add('is-valid');
-      pwd.classList.remove('is-invalid');
-    } else {
-      pwd.classList.add('is-invalid');
-      pwd.classList.remove('is-valid');
-    }
-  }
-
-  pwd.addEventListener('input', updateStrength);
-});
-</script>
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 {% endblock %}
-

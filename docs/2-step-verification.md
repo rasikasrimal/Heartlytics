@@ -41,6 +41,14 @@ The BPMN diagram shows how a user requests a one-time code, receives it via emai
 
 Security features include hashed OTP storage with pepper, rate limiting on resend attempts, delivery failure and expiration error paths, and a 30-second cooldown timer to prevent abuse. Usability considerations encompass a visible countdown, disabled resend button during cooldown, and accessible forms for entering email and code.
 
+The forgot-password interface uses a compact authentication card with segmented six-box code inputs and Bootstrap 5 components. Each box auto-advances on input and accepts pasted codes across all fields. A muted countdown badge visually indicates when the disabled resend button will become active.
+
+The redesigned sign-up page reuses this segmented OTP component for its email verification step and offers a dedicated "Send OTP" button that dispatches the six-digit code to the specified email, providing a consistent experience.
+
+All authentication screens now honor the GitHub-style dark theme with
+slate backgrounds and blue highlights, maintaining consistent contrast and
+focus styles across the password reset and signup flows.
+
 ## Detailed Data Flow Diagram (DFD)
 
 ```mermaid
