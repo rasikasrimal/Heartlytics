@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 
-from flask import Blueprint, current_app, flash, redirect, render_template, session, url_for, request
+from flask import Blueprint, current_app, flash, redirect, render_template, session, url_for, request, jsonify
 from flask_login import login_user, logout_user, current_user
 from sqlalchemy import or_
+
+from services.mfa import generate_code, hash_code, send_reset_email
 
 from .forms import LoginForm, SignupForm
 
@@ -104,11 +106,50 @@ def signup():
         db = current_app.db
         User = current_app.User
 
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            if User.query.filter_by(username=form.username.data).first():
+                return jsonify({"error": "username"}), 400
+            if User.query.filter_by(email=form.email.data).first():
+                return jsonify({"error": "email"}), 400
+
+            if form.nickname.data and User.query.filter_by(nickname=form.nickname.data).first():
+                return jsonify({"error": "nickname"}), 400
+
+            if current_user.is_authenticated and current_user.role == "SuperAdmin":
+                role = form.role.data
+                status = "approved"
+                requested_role = None
+            else:
+                requested_role = form.role.data if form.role.data != "User" else None
+                role = "User"
+                status = "approved" if requested_role is None else "pending"
+
+            user = User(
+                username=form.username.data,
+                nickname=form.nickname.data or None,
+                email=form.email.data,
+                role=role,
+                status=status,
+                requested_role=requested_role,
+                created_at=datetime.utcnow(),
+            )
+            user.set_password(form.password.data)
+
+            db.session.add(user)
+            db.session.commit()
+
+            code = generate_code()
+            session["signup_otp"] = hash_code(code)
+            session["signup_user"] = user.id
+            send_reset_email(user, code, current_app.config.get("OTP_TTL", 10), request)
+            return jsonify({"success": True})
+
         # Prevent duplicate usernames/emails.
-        if User.query.filter(
-            or_(User.username == form.username.data, User.email == form.email.data)
-        ).first():
-            flash("Username or email already exists", "error")
+        if User.query.filter_by(username=form.username.data).first():
+            flash("Username taken", "error")
+            return render_template("auth/signup.html", form=form)
+        if User.query.filter_by(email=form.email.data).first():
+            flash("Email already registered, sign in?", "error")
             return render_template("auth/signup.html", form=form)
         if form.nickname.data and User.query.filter_by(nickname=form.nickname.data).first():
             flash("Nickname already exists", "error")
