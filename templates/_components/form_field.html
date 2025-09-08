@@ -1,8 +1,15 @@
-{% macro form_field(type, name, label, value='', help='', error=None, attrs={}) -%}
+{% macro form_field(type, name, label, value='', help='', error=None, attrs={}, slot='') -%}
 <div class="mb-3">
   <label for="{{ name }}" class="form-label">{{ label }}</label>
+  {% if slot %}
+  <div class="position-relative">
+    <input type="{{ type }}" class="form-control{% if error %} is-invalid{% endif %}" id="{{ name }}" name="{{ name }}" value="{{ value }}"{% for k,v in attrs.items() %} {{k}}="{{v}}"{% endfor %}>
+    {{ slot|safe }}
+  </div>
+  {% else %}
   <input type="{{ type }}" class="form-control{% if error %} is-invalid{% endif %}" id="{{ name }}" name="{{ name }}" value="{{ value }}"{% for k,v in attrs.items() %} {{k}}="{{v}}"{% endfor %}>
-  {% if help %}<div class="form-text text-muted">{{ help }}</div>{% endif %}
+  {% endif %}
+  {% if help %}<div class="form-text text-muted" id="{{ name }}Help">{{ help }}</div>{% endif %}
   {% if error %}<div class="invalid-feedback">{{ error }}</div>{% endif %}
 </div>
 {%- endmacro %}

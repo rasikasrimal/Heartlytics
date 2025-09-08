@@ -43,6 +43,8 @@ Security features include hashed OTP storage with pepper, rate limiting on resen
 
 The forgot-password interface uses a compact authentication card with segmented six-box code inputs and Bootstrap 5 components. Each box auto-advances on input and accepts pasted codes across all fields. A muted countdown badge visually indicates when the disabled resend button will become active.
 
+The redesigned sign-up page reuses this segmented OTP component for its email verification step, providing a consistent experience.
+
 ## Detailed Data Flow Diagram (DFD)
 
 ```mermaid
