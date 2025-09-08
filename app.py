@@ -814,6 +814,21 @@ with app.app_context():
 
     # ensure uid, requested_role and updated_at columns exist for existing user tables
     user_cols = [c["name"] for c in insp.get_columns("user")]
+
+    if "email_verified_at" not in user_cols:
+        db.session.execute(
+            text("ALTER TABLE user ADD COLUMN email_verified_at DATETIME")
+        )
+        db.session.commit()
+        db.session.execute(
+            text(
+                "UPDATE user SET email_verified_at = CURRENT_TIMESTAMP WHERE email_verified_at IS NULL"
+            )
+        )
+        db.session.commit()
+    if not insp.has_table("email_verification"):
+        EmailVerification.__table__.create(db.engine)
+
     if "requested_role" not in user_cols:
         db.session.execute(
             text("ALTER TABLE user ADD COLUMN requested_role VARCHAR(20)")
