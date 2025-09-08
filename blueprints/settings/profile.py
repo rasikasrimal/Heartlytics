@@ -32,7 +32,10 @@ def update_profile():
     User = current_app.User
     current_user.username = request.form.get("username", current_user.username)
     current_user.email = request.form.get("email", current_user.email)
-    nickname = request.form.get("nickname", "").strip() or None
+    raw_nick = request.form.get("nickname", "").strip()
+    nickname = raw_nick or None
+    if raw_nick.lower() == "none":
+        nickname = None
     if nickname and db.session.query(User).filter(User.nickname == nickname, User.id != current_user.id).first():
         flash("Nickname already taken", "error")
         return redirect(url_for("settings.settings"))
