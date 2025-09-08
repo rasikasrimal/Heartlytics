@@ -49,4 +49,5 @@ gantt
 - Optional TOTP-based two-step verification with recovery codes is now available.
 - Email-based MFA codes can be enabled as a fallback to TOTP.
 - Improved forgot-password flow with hashed codes and resend countdown.
+- Migration introduces `email_verified_at` and `email_verification` schema, backfilling legacy users and auto-verifying SuperAdmin-created accounts.
 

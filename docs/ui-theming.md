@@ -18,3 +18,4 @@ on `window` and apply colors from CSS variables such as `--bs-body-bg` and
 `--bs-body-color`.
 
 Auth pages, including the redesigned sign-up, email verification, and forgot-password flows, consume reusable Bootstrap components so card backgrounds, buttons, and countdown badges adapt automatically to the selected theme.
+Shared Jinja macros now centralize form fields and button styles, keeping new flows like SuperAdmin user creation consistent with the site's theming.

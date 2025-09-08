@@ -147,6 +147,10 @@ def signup():
         )
         user.set_password(form.password.data)
 
+        if current_user.is_authenticated and current_user.role == "SuperAdmin":
+            # Superadmin-created accounts skip email verification
+            user.email_verified_at = datetime.utcnow()
+
         db.session.add(user)
         db.session.commit()
 

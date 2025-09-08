@@ -13,7 +13,14 @@ def init_theme(app):
 
     @app.before_request
     def _load_theme_from_cookie():
-        g.theme = request.cookies.get("theme", "light")
+        raw = request.headers.get("Cookie", "")
+        theme = "light"
+        for part in raw.split(";"):
+            part = part.strip()
+            if part.startswith("theme="):
+                theme = part.split("=", 1)[1]
+                break
+        g.theme = theme
 
     @app.context_processor
     def _inject_theme():

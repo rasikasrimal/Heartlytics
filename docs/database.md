@@ -16,6 +16,7 @@ The password reset feature introduces a `password_reset_request` table storing s
 Email-based MFA uses an `mfa_email_challenge` table recording hashed codes, attempts, and resend timestamps.
 The redesigned forgot-password interface and segmented OTP inputs are client-side only and do not alter the database schema.
 The new sign-up flow requires email verification, adding an `email_verification` table for pending codes and an `email_verified_at` column on `user`.
+Existing rows are backfilled with the current timestamp during migration to avoid locking out legacy accounts, and SuperAdmin-created users are inserted with `email_verified_at` already set.
 
 ## audit_log
 

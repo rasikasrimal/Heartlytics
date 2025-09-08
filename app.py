@@ -771,18 +771,6 @@ def enforce_session_timeout():
     session["last_active"] = now.isoformat()
 
 
-@app.errorhandler(403)
-def forbidden(_):
-    """Render a user-friendly forbidden page."""
-    return (
-        render_template(
-            "error.html",
-            title="Forbidden",
-            message="Access denied. You do not have permission to view this page.",
-        ),
-        403,
-    )
-
 with app.app_context():
     db.create_all()
     insp = inspect(db.engine)
@@ -1187,6 +1175,7 @@ def api_delete_outliers():
 # ---------------------------
 @app.get("/")
 @login_required
+@require_module_access("Predict")
 def index():
     defaults = {
         "patient_name": "Demo Patient",

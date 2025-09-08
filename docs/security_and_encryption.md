@@ -18,6 +18,7 @@ links to the dedicated [Forgot Password / 2‑Step Verification flow](forget_pas
   limits to deter brute force attempts.
 - Redesigned forgot-password page uses segmented OTP inputs and a visible countdown badge without exposing full email addresses.
 - Sign-up form features a client-side password strength meter and requires email verification using the same OTP component.
+- Email verification codes are stored hashed with expirations in the `email_verification` table; migration backfills `email_verified_at` for existing users and SuperAdmin-created accounts are stamped verified immediately.
 
 ## Authorization
 

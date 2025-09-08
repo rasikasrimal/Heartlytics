@@ -24,6 +24,8 @@
 | TC-086 | Signup button stays disabled until form fields are valid. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-087 | Password strength meter reflects complexity rules. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-088 | Signup requires email verification before login. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-089 | SuperAdmin-created account is stamped verified and can log in immediately. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
+| TC-090 | Migration backfills `email_verified_at` for legacy users. | Authentication & Roles | 🔴 High | 🧪 Functional | ⏳ Not Run |
 | TC-073 | `/debug/mail` sends test email and lists recent events. | Authentication & Roles | 🟢 Low | 🧪 Functional | ⏳ Not Run |
 | TC-074 | Password reset requires re-login; no automatic session. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-075 | User with TOTP enabled must enter valid code after password. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
