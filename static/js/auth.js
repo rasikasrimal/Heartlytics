@@ -27,8 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const submit = document.getElementById('createAccount');
     const usernameError = username.closest('.mb-3').querySelector('.invalid-feedback');
     const emailError = email.closest('.mb-3').querySelector('.invalid-feedback');
-    const existingUsernames = ['existingUser'];
-    const existingEmails = ['user@example.com'];
     const bars = document.querySelectorAll('#' + password.id + '-bars [data-bar]');
     const caption = document.getElementById(password.id + '-caption');
     const hints = {};
@@ -71,14 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return match;
     }
 
-    function validateUnique(input, list, errorEl, message) {
-      const exists = list.includes(input.value.trim());
-      input.classList.toggle('is-invalid', exists);
-      input.classList.toggle('is-valid', !exists && input.value.trim() !== '');
-      if (errorEl) errorEl.textContent = exists ? message : '';
-      return !exists;
-    }
-
     function validateEmailFormat() {
       const ok = email.checkValidity();
       email.classList.toggle('is-invalid', !ok);
@@ -90,10 +80,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkForm() {
       const passOk = updatePassword();
       const matchOk = validateConfirm(passOk);
-      const userOk = username.value && validateUnique(username, existingUsernames, usernameError, 'Username already taken');
+      const userOk = username.value.trim() !== '';
+      username.classList.toggle('is-invalid', !userOk && username.value.trim() !== '');
+      username.classList.toggle('is-valid', userOk);
+      if (usernameError && userOk) usernameError.textContent = '';
       const emailFormatOk = validateEmailFormat();
-      const emailUniqueOk = email.value && validateUnique(email, existingEmails, emailError, 'Email already registered');
-      const ready = userOk && emailFormatOk && emailUniqueOk && role.value && passOk && matchOk;
+      if (emailFormatOk && emailError) emailError.textContent = '';
+      const ready = userOk && emailFormatOk && role.value && passOk && matchOk;
       submit.disabled = !ready;
     }
 
@@ -105,14 +98,32 @@ document.addEventListener('DOMContentLoaded', () => {
       confirm.addEventListener(evt, checkForm);
     });
 
-    signupForm.addEventListener('submit', e => {
+    signupForm.addEventListener('submit', async e => {
       e.preventDefault();
-      const toastEl = document.getElementById('signupToast');
-      if (toastEl && typeof bootstrap !== 'undefined') {
-        new bootstrap.Toast(toastEl).show();
+      submit.disabled = true;
+      const resp = await fetch(signupForm.action, {
+        method: 'POST',
+        body: new FormData(signupForm),
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+      submit.disabled = false;
+      if (resp.ok) {
+        const toastEl = document.getElementById('signupToast');
+        if (toastEl && typeof bootstrap !== 'undefined') {
+          new bootstrap.Toast(toastEl).show();
+        }
+        document.getElementById('signupSection').classList.add('d-none');
+        document.getElementById('verifySection').classList.remove('d-none');
+      } else {
+        const data = await resp.json().catch(() => ({}));
+        if (data.error === 'username') {
+          username.classList.add('is-invalid');
+          if (usernameError) usernameError.textContent = 'Username taken';
+        } else if (data.error === 'email') {
+          email.classList.add('is-invalid');
+          if (emailError) emailError.textContent = 'Email already registered';
+        }
       }
-      document.getElementById('signupSection').classList.add('d-none');
-      document.getElementById('verifySection').classList.remove('d-none');
     });
   }
 
