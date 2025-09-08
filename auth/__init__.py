@@ -93,6 +93,24 @@ def login():
     return render_template("auth/login.html", form=form)
 
 
+@auth_bp.get("/check-username")
+def check_username():
+    """Return availability of a username."""
+    User = current_app.User
+    username = request.args.get("username", "").strip()
+    exists = User.query.filter_by(username=username).first() is not None
+    return jsonify({"available": not exists})
+
+
+@auth_bp.get("/check-email")
+def check_email():
+    """Return availability of an email."""
+    User = current_app.User
+    email = request.args.get("email", "").strip()
+    exists = User.query.filter_by(email=email).first() is not None
+    return jsonify({"available": not exists})
+
+
 @auth_bp.route("/signup", methods=["GET", "POST"])
 def signup():
     """Register a new user. Users activate immediately; Doctors/Admins await approval."""

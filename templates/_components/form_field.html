@@ -10,6 +10,6 @@
   <input type="{{ type }}" class="form-control{% if error %} is-invalid{% endif %}" id="{{ name }}" name="{{ name }}" value="{{ value }}"{% for k,v in attrs.items() %} {{k}}="{{v}}"{% endfor %}>
   {% endif %}
   {% if help %}<div class="form-text text-muted" id="{{ name }}Help">{{ help }}</div>{% endif %}
-  {% if error %}<div class="invalid-feedback">{{ error }}</div>{% endif %}
+  <div class="invalid-feedback" aria-live="polite">{% if error %}{{ error }}{% endif %}</div>
 </div>
 {%- endmacro %}
