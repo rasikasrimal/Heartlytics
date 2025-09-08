@@ -8,7 +8,7 @@ from flask import Blueprint, current_app, flash, redirect, render_template, sess
 from flask_login import login_user, logout_user, current_user
 from sqlalchemy import or_
 
-from services.mfa import generate_code, hash_code, send_reset_email
+from services.mfa import generate_code, hash_code, send_reset_email, verify_code
 
 from .forms import LoginForm, SignupForm
 
@@ -207,6 +207,32 @@ def signup():
         return redirect(url_for("auth.login"))
 
     return render_template("auth/signup.html", form=form)
+
+
+@auth_bp.post("/signup/verify")
+def signup_verify():
+    """Verify the signup OTP and redirect to login."""
+
+    code = request.form.get("otp", "").strip()
+    hashed = session.get("signup_otp")
+    user_id = session.get("signup_user")
+    if not hashed or not user_id or not verify_code(code, hashed):
+        return jsonify({"error": "invalid"}), 400
+
+    db = current_app.db
+    User = current_app.User
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "invalid"}), 400
+
+    user.mfa_email_enabled = True
+    user.mfa_email_verified_at = datetime.utcnow()
+    db.session.commit()
+
+    session.pop("signup_otp", None)
+    session.pop("signup_user", None)
+    flash("Account verified. You can log in.", "success")
+    return jsonify({"success": True, "redirect": url_for("auth.login")})
 
 
 @auth_bp.route("/logout")

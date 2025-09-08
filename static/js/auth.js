@@ -252,14 +252,36 @@ document.addEventListener('DOMContentLoaded', () => {
   if (otpGroup) {
     const verifyBtn = document.getElementById('verifyBtn');
     const sendOtp = document.getElementById('sendOtp');
+    const verifyForm = document.getElementById('verifyForm');
     const hidden = otpGroup.querySelector('input[type="hidden"]');
+    const errorEl = document.getElementById('otpError');
     otpGroup.addEventListener('input', () => {
       verifyBtn.disabled = hidden.value.length !== 6;
+      if (errorEl) errorEl.textContent = '';
     });
     if (sendOtp) {
+      const emailInput = document.getElementById('email');
       sendOtp.addEventListener('click', () => {
-        if (email.value) {
-          console.log('OTP sent to', email.value);
+        if (emailInput && emailInput.value) {
+          console.log('OTP sent to', emailInput.value);
+        }
+      });
+    }
+    if (verifyForm) {
+      verifyForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        verifyBtn.disabled = true;
+        const resp = await fetch(verifyForm.action, {
+          method: 'POST',
+          body: new FormData(verifyForm),
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        verifyBtn.disabled = false;
+        if (resp.ok) {
+          const data = await resp.json().catch(() => ({}));
+          window.location.href = data.redirect || '/auth/login';
+        } else if (errorEl) {
+          errorEl.textContent = 'Invalid code';
         }
       });
     }
