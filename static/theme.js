@@ -5,11 +5,11 @@
   function applyTheme(theme){
     const root = document.documentElement;
     root.dataset.bsTheme = theme;
-    root.classList.toggle('theme-dark', theme === 'dark');
+    document.body.classList.toggle('theme-dark', theme === 'dark');
     document.cookie = `theme=${theme}; ${COOKIE_ATTRS}`;
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta){
-      const bg = getComputedStyle(root).getPropertyValue('--bs-body-bg').trim();
+      const bg = getComputedStyle(document.body).getPropertyValue('--bs-body-bg').trim();
       meta.content = bg || '#ffffff';
     }
     const btn = document.getElementById('theme-toggle');

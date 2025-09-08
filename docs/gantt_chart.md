@@ -49,5 +49,5 @@ gantt
 - Optional TOTP-based two-step verification with recovery codes is now available.
 - Email-based MFA codes can be enabled as a fallback to TOTP.
 - Improved forgot-password flow with hashed codes and resend countdown.
-- Dark theme overhauled to a pure-black/ash palette with teal accents.
+- Dark theme refreshed to a GitHub-style slate palette with blue accents.
 

@@ -7,7 +7,7 @@
 **Date:** 2025-08-01
 
 ## Abstract
-HeartLytics is a full‑stack Python/Flask platform that predicts heart disease risk while enforcing strict security, encryption and user experience guarantees. The system ingests single records or CSV batches, cleans and analyzes data, executes a trained Random Forest model, and surfaces results through role‑aware dashboards and PDF reports. Application‑level envelope encryption protects patient identifiers, while Bootstrap 5 theming now uses a neutral pure-black/ash palette with teal accents for accessible light and dark modes. Comprehensive multi‑factor authentication, e‑mail backup codes, and recovery flows ensure that only verified users can access protected resources. Extensive tests and a phased project plan demonstrate the feasibility of deploying HeartLytics as a secure clinical decision‑support prototype.
+HeartLytics is a full‑stack Python/Flask platform that predicts heart disease risk while enforcing strict security, encryption and user experience guarantees. The system ingests single records or CSV batches, cleans and analyzes data, executes a trained Random Forest model, and surfaces results through role‑aware dashboards and PDF reports. Application‑level envelope encryption protects patient identifiers, while Bootstrap 5 theming now uses a GitHub-style slate palette with blue accents for accessible light and dark modes. Comprehensive multi‑factor authentication, e‑mail backup codes, and recovery flows ensure that only verified users can access protected resources. Extensive tests and a phased project plan demonstrate the feasibility of deploying HeartLytics as a secure clinical decision‑support prototype.
 
 ## Table of Contents
 - [Working Topic](#working-topic)

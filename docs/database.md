@@ -4,8 +4,7 @@ This document lists the tables in the application's database and includes `DESC`
 
 User interface theme preferences are stored in client-side cookies and
 `localStorage`; no database tables persist this information. The recent
-switch to a pure-black/ash dark theme likewise requires no schema
-changes.
+switch to a GitHub-style dark theme likewise requires no schema changes.
 Cleaning-log normalization and the auth-page theme toggle are handled
 in application logic and likewise require no schema changes.
 The new simulations auto-update loader and timestamped status also run

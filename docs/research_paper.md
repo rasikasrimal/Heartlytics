@@ -26,7 +26,7 @@ Recent work shows strong performance for supervised ML models in heart disease p
 8. Mask destination emails during verification to protect user privacy.
 9. Redesign the forgot-password interface using Bootstrap 5 cards and segmented OTP inputs for improved accessibility.
 10. Introduce a two-stage signup experience with password strength feedback and email verification.
-11. Overhaul dark mode to a neutral pure-black/ash palette with a teal accent for links and buttons.
+11. Overhaul dark mode to a GitHub-style slate palette with blue accents for links and buttons.
 
 ## Dataset and Exploratory Data Analysis (EDA)
 
