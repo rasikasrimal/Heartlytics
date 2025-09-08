@@ -3,10 +3,8 @@
 This document lists the tables in the application's database and includes `DESC` commands to inspect each table. Key columns are annotated to highlight primary keys (PK) and foreign keys (FK) linking related tables.
 
 User interface theme preferences are stored in client-side cookies and
-`localStorage`; no database tables persist this information.
-
-Recent theming updates (transparent charts and table header styling) do
-not introduce any new columns.
+`localStorage`; no database tables persist this information. The recent
+switch to a GitHub-style dark theme likewise requires no schema changes.
 Cleaning-log normalization and the auth-page theme toggle are handled
 in application logic and likewise require no schema changes.
 The new simulations auto-update loader and timestamped status also run

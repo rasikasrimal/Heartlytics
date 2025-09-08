@@ -17,6 +17,10 @@ encryption details see [Security and Encryption](security_and_encryption.md).
 
 The UI presents the flow in a single Bootstrap authentication card. The first step collects an email address with helper text. After submission, a subtle divider reveals a six‑box OTP entry interface with auto‑tab and paste support. The sign-up flow reuses this segmented OTP component for post-registration email verification.
 
+All screens respect the GitHub-style dark theme with slate backgrounds and
+blue accents, ensuring consistent contrast and focus indicators throughout
+the reset process.
+
 ## BPMN 2.0
 
 ```mermaid

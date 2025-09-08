@@ -2,7 +2,10 @@
 
 HeartLytics supports light and dark color themes. The default is **light** and
 users can toggle using the navbar button or the setting on the Settings page.
-The selection is stored in `localStorage` and a long-lived `theme` cookie so the
+The dark mode now uses a GitHub-style slate palette (#0d1117 body,
+#010409 navbar, #161b22 cards) with blue accents (#58a6ff) for links and
+calls to action, mirroring GitHub's readability. The
+selection is stored in `localStorage` and a long-lived `theme` cookie so the
 server can render pages in the correct theme without a flash of incorrect
 colors.
 

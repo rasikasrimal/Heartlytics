@@ -4,7 +4,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f8fafc">
+    <meta name="theme-color" content="{{ '#0d1117' if theme == 'dark' else '#f8fafc' }}">
     <title>{{ app_name }} - {% block title %}Heart Disease Risk{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +21,7 @@
     <script src="{{ url_for('static', filename='js/otp.js') }}" defer></script>
     {% block head %}{% endblock %}
   </head>
-    <body class="d-flex flex-column min-vh-100">
+    <body class="{{ 'theme-dark' if theme == 'dark' }} d-flex flex-column min-vh-100">
     {% block navbar %}
       {% include 'components/navbar.html' %}
     {% endblock %}

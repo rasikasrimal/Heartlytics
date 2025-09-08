@@ -71,6 +71,7 @@
 | TC-060 | Nav shows only permitted items for each role. | Navigation | 🔴 High | 🧪 Functional | ⏳ Not Run |
 | TC-061 | Theme toggle and user menu remain keyboard accessible after redesign. | Navigation | 🟡 Medium | 🧪 Accessibility | ⏳ Not Run |
 | TC-062 | Animations disable when `prefers-reduced-motion` is set. | Motion | 🟡 Medium | 🧪 Accessibility | ⏳ Not Run |
+| TC-063 | Dark theme uses GitHub-style slate surfaces with blue accents. | Navigation | 🟢 Low | 🧪 Visual | ⏳ Not Run |
 
 ## Doctor Dashboard
 | Test Case ID | Test Case Description | Module | Priority | Test Type | Status |

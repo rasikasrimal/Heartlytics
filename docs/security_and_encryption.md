@@ -19,6 +19,8 @@ links to the dedicated [Forgot Password / 2‑Step Verification flow](forget_pas
 - Redesigned forgot-password page uses segmented OTP inputs and a visible countdown badge without exposing full email addresses.
 - Signup form now includes a password strength meter and email verification using the same OTP component.
 - Usernames and emails must be unique at signup, while nicknames may duplicate.
+- Interfaces render in a GitHub-style dark theme with slate backgrounds and
+  blue accents to maintain contrast and focus visibility.
 
 ## Authorization
 
