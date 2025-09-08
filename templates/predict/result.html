@@ -16,7 +16,7 @@
           {% if risk_band %}<span class="badge bg-secondary fs-6 ms-2">{{ risk_band }} risk band</span>{% endif %}
         </div>
         {% if pos_prob is not none %}
-          <h5 class="mb-2">Risk Probability</h5>
+          <h5 class="mb-2">Risk Percentage</h5>
           <div class="progress progress-hover mb-4" role="progressbar" aria-valuenow="{{ risk_pct_val }}" aria-valuemin="0" aria-valuemax="100" data-bs-toggle="tooltip" title="{{ risk_band }} Risk ({{ risk_pct }})">
             <div class="progress-bar progress-bar-striped progress-bar-animated bg-{{ 'success' if risk_band=='Low' else 'warning' if risk_band=='Moderate' else 'danger' }} fw-semibold" data-target="{{ risk_pct_val }}" style="width:0;">{{ risk_pct }}</div>
           </div>
