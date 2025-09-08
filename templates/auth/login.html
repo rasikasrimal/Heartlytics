@@ -1,38 +1,77 @@
 {% extends 'base.html' %}
 {% block title %}Login{% endblock %}
-{% from 'components/forms.html' import text_input, password_input %}
 {% block navbar %}
 <nav class="navbar justify-content-end p-3">
   {% include 'components/theme_toggle.html' %}
 </nav>
 {% endblock %}
 
-{% block main_classes %}container flex-grow-1{% endblock %}
+{% block main_classes %}p-0 flex-grow-1{% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-center min-vh-100">
-  <div class="row w-100 justify-content-center align-items-center g-4">
-    <div class="col-lg-5 text-center">
-      <img src="{{ url_for('static', filename=app_logo) }}" alt="logo" style="max-width: 120px;">
-      <h1 class="mt-3 fw-bold">{{ app_name }}</h1>
-      <p class="lead">Predictive insights for a healthier heart.</p>
-    </div>
-    <div class="col-lg-5">
-      <div class="card shadow-sm p-4">
-        <form method="post" autocomplete="off">
-          {{ form.hidden_tag() }}
-          {{ text_input('identifier', 'Email or Username', value=form.identifier.data, attrs={'required': '', 'autocomplete': 'off'}, error=form.identifier.errors[0] if form.identifier.errors else None) }}
-          {{ password_input('password', 'Password', attrs={'required': '', 'autocomplete': 'off'}, error=form.password.errors[0] if form.password.errors else None) }}
-          <button type="submit" class="btn btn-brand w-100 mb-3">Login</button>
-          <div class="d-flex justify-content-between">
-            <a href="{{ url_for('auth.forgot') }}" class="small">Forgot password?</a>
-            <a href="{{ url_for('auth.signup') }}" class="small">Create new account</a>
+<!-- Section: Design Block -->
+<section class="">
+  <!-- Jumbotron -->
+  <div class="px-4 py-5 px-md-5 text-center text-lg-start" style="background-color: hsl(0, 0%, 96%)">
+    <div class="container">
+      <div class="row gx-lg-5 align-items-center">
+        <div class="col-lg-6 mb-5 mb-lg-0">
+          <h1 class="my-5 display-3 fw-bold ls-tight">
+            The best offer <br />
+            <span class="text-primary">for your business</span>
+          </h1>
+          <p style="color: hsl(217, 10%, 50.8%)">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Eveniet, itaque accusantium odio, soluta, corrupti aliquam
+            quibusdam tempora at cupiditate quis eum maiores libero
+            veritatis? Dicta facilis sint aliquid ipsum atque?
+          </p>
+        </div>
+
+        <div class="col-lg-6 mb-5 mb-lg-0">
+          <div class="card">
+            <div class="card-body py-5 px-md-5">
+              <form method="post" autocomplete="off">
+                {{ form.hidden_tag() }}
+
+                <!-- Email input -->
+                <div class="form-outline mb-4">
+                  <input type="text" id="formIdentifier" name="identifier" class="form-control{% if form.identifier.errors %} is-invalid{% endif %}" {% if form.identifier.data %}value="{{ form.identifier.data }}"{% endif %} autocomplete="off" required />
+                  <label class="form-label" for="formIdentifier">Email or Username</label>
+                  {% if form.identifier.errors %}
+                  <div class="invalid-feedback">{{ form.identifier.errors[0] }}</div>
+                  {% endif %}
+                </div>
+
+                <!-- Password input -->
+                <div class="form-outline mb-4">
+                  <input type="password" id="formPassword" name="password" class="form-control{% if form.password.errors %} is-invalid{% endif %}" autocomplete="off" required />
+                  <label class="form-label" for="formPassword">Password</label>
+                  {% if form.password.errors %}
+                  <div class="invalid-feedback">{{ form.password.errors[0] }}</div>
+                  {% endif %}
+                </div>
+
+                <!-- Submit button -->
+                <button type="submit" class="btn btn-primary btn-block mb-4">
+                  Login
+                </button>
+
+                <!-- Links -->
+                <div class="d-flex justify-content-between">
+                  <a href="{{ url_for('auth.forgot') }}" class="small">Forgot password?</a>
+                  <a href="{{ url_for('auth.signup') }}" class="small">Create new account</a>
+                </div>
+              </form>
+            </div>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
+  <!-- Jumbotron -->
+</section>
+<!-- Section: Design Block -->
 {% endblock %}
 
 {% block scripts %}
