@@ -29,19 +29,19 @@
       {% call auth_card('Create your account') %}
       <form id="signupForm" method="post" action="{{ url_for('auth.signup') }}" novalidate>
         {{ form.csrf_token }}
-        {{ form_field('text', form.username.id, form.username.label.text, value=form.username.data or '', error='', attrs={'required':True, 'autocomplete':'username'}) }}
+        {{ form_field('text', form.username.id, form.username.label.text, value=form.username.data or '', attrs={'required':True, 'autocomplete':'username'}) }}
         {{ form_field('text', form.nickname.id, form.nickname.label.text, value=form.nickname.data or '', attrs={'autocomplete':'nickname'}) }}
-        {{ form_field('email', form.email.id, form.email.label.text, value=form.email.data or '', error='', attrs={'required':True, 'autocomplete':'email'}) }}
-        {{ form_field('password', form.password.id, form.password.label.text, help='Use 8+ characters with numbers and symbols', error='', attrs={'required':True, 'autocomplete':'new-password', 'aria-describedby': form.password.id + 'Help'}, slot='<button type="button" class="btn btn-outline-secondary password-toggle position-absolute top-50 end-0 translate-middle-y me-2" aria-label="Show password"><i class="bi bi-eye"></i></button>') }}
+        {{ form_field('email', form.email.id, form.email.label.text, value=form.email.data or '', attrs={'required':True, 'autocomplete':'email'}) }}
+        {{ form_field('password', form.password.id, form.password.label.text, help='Use 8+ characters with numbers and symbols', attrs={'required':True, 'autocomplete':'new-password', 'aria-describedby': form.password.id + 'Help'}, slot='<button type="button" class="btn btn-outline-secondary password-toggle position-absolute top-50 end-0 translate-middle-y me-2" aria-label="Show password"><i class="bi bi-eye"></i></button>') }}
         {{ password_strength(form.password.id) }}
-        {{ form_field('password', form.confirm.id, form.confirm.label.text, error='', attrs={'required':True, 'autocomplete':'new-password'}, slot='<button type="button" class="btn btn-outline-secondary password-toggle position-absolute top-50 end-0 translate-middle-y me-2" aria-label="Show password"><i class="bi bi-eye"></i></button>') }}
+        {{ form_field('password', form.confirm.id, form.confirm.label.text, attrs={'required':True, 'autocomplete':'new-password'}, slot='<button type="button" class="btn btn-outline-secondary password-toggle position-absolute top-50 end-0 translate-middle-y me-2" aria-label="Show password"><i class="bi bi-eye"></i></button>') }}
         <div class="mb-3">
           {{ form.role.label(class='form-label') }}
           {{ form.role(class='form-select', id=form.role.id, required=true) }}
         </div>
         <p class="small text-muted mb-3">By creating an account, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
         <div class="d-grid mb-3">
-          {{ primary('Create account', attrs={'id':'createAccount', 'type':'submit', 'disabled':True}) }}
+          {{ primary('Create account', attrs={'id':'createAccount', 'type':'submit'}) }}
         </div>
         <p class="text-center mb-0">Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a></p>
       </form>
@@ -52,8 +52,10 @@
     <div class="col-md-6">
       {% call auth_card('Verify your email') %}
       <p class="text-muted small">Enter the 6-digit code sent to your email.</p>
-      <form id="verifyForm" novalidate>
+      <form id="verifyForm" method="post" action="{{ url_for('auth.signup_verify') }}" novalidate>
+        {{ form.csrf_token }}
         {{ otp_inputs(name='otp') }}
+        <div class="invalid-feedback text-center mb-3" id="otpError"></div>
         <div class="d-grid mb-3">
           {{ primary('Send OTP', attrs={'id':'sendOtp', 'type':'button'}) }}
         </div>

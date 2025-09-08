@@ -37,6 +37,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const strengthLabels = ['Very weak','Weak','Fair','Good','Strong'];
 
+    const usernameGroup = username.closest('.mb-3');
+    const emailGroup = email.closest('.mb-3');
+    usernameGroup.style.position = 'relative';
+    emailGroup.style.position = 'relative';
+    const usernameSpinner = document.createElement('div');
+    usernameSpinner.className = 'spinner-border spinner-border-sm position-absolute top-50 end-0 translate-middle-y me-2 d-none';
+    usernameSpinner.setAttribute('role', 'status');
+    usernameSpinner.setAttribute('aria-hidden', 'true');
+    usernameGroup.appendChild(usernameSpinner);
+    const emailSpinner = document.createElement('div');
+    emailSpinner.className = 'spinner-border spinner-border-sm position-absolute top-50 end-0 translate-middle-y me-2 d-none';
+    emailSpinner.setAttribute('role', 'status');
+    emailSpinner.setAttribute('aria-hidden', 'true');
+    emailGroup.appendChild(emailSpinner);
+
+    const usernameCache = new Map();
+    const emailCache = new Map();
+
+    const debounce = (fn, delay = 400) => {
+      let timer;
+      return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), delay);
+      };
+    };
+
+    let usernameValid = false;
+    let emailValid = false;
+
     function updatePassword() {
       const val = password.value;
       const checks = {
@@ -71,35 +100,129 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function validateEmailFormat() {
       const ok = email.checkValidity();
-      email.classList.toggle('is-invalid', !ok);
-      email.classList.toggle('is-valid', ok && email.value.trim() !== '');
-      if (emailError) emailError.textContent = ok ? '' : 'Enter a valid email address';
+      if (!ok) {
+        email.classList.add('is-invalid');
+        email.classList.remove('is-valid');
+        if (emailError) emailError.textContent = 'Enter a valid email address.';
+      } else {
+        email.classList.remove('is-invalid');
+        if (emailError) emailError.textContent = '';
+      }
       return ok;
     }
 
-    function checkForm() {
-      const passOk = updatePassword();
-      const matchOk = validateConfirm(passOk);
-      const userOk = username.value.trim() !== '';
-      username.classList.toggle('is-invalid', !userOk && username.value.trim() !== '');
-      username.classList.toggle('is-valid', userOk);
-      if (usernameError && userOk) usernameError.textContent = '';
-      const emailFormatOk = validateEmailFormat();
-      if (emailFormatOk && emailError) emailError.textContent = '';
-      const ready = userOk && emailFormatOk && role.value && passOk && matchOk;
-      submit.disabled = !ready;
+    function setUsernameState(available) {
+      usernameValid = available;
+      username.classList.toggle('is-valid', available);
+      username.classList.toggle('is-invalid', !available && username.value.trim() !== '');
+      if (usernameError) usernameError.textContent = available ? '' : 'username already taken';
     }
 
-    ['input', 'change'].forEach(evt => {
-      username.addEventListener(evt, checkForm);
-      email.addEventListener(evt, checkForm);
-      role.addEventListener(evt, checkForm);
-      password.addEventListener(evt, checkForm);
-      confirm.addEventListener(evt, checkForm);
+    const usernameAvailability = async () => {
+      const value = username.value.trim();
+      if (!value) {
+        username.classList.remove('is-valid', 'is-invalid');
+        if (usernameError) usernameError.textContent = '';
+        usernameValid = false;
+        return false;
+      }
+      if (usernameCache.has(value)) {
+        setUsernameState(usernameCache.get(value));
+        return usernameCache.get(value);
+      }
+      usernameSpinner.classList.remove('d-none');
+      try {
+        const resp = await fetch(`/auth/check-username?username=${encodeURIComponent(value)}`);
+        const data = await resp.json();
+        const ok = !!data.available;
+        usernameCache.set(value, ok);
+        setUsernameState(ok);
+        return ok;
+      } catch {
+        usernameValid = false;
+        return false;
+      } finally {
+        usernameSpinner.classList.add('d-none');
+      }
+    };
+
+    const debouncedUsername = debounce(usernameAvailability);
+    username.addEventListener('input', () => {
+      usernameValid = false;
+      username.classList.remove('is-valid', 'is-invalid');
+      if (usernameError) usernameError.textContent = '';
+      debouncedUsername();
+    });
+    username.addEventListener('blur', debouncedUsername);
+
+    function setEmailState(available) {
+      emailValid = available;
+      email.classList.toggle('is-valid', available);
+      email.classList.toggle('is-invalid', !available && email.value.trim() !== '');
+      if (emailError) emailError.textContent = available ? '' : 'email already registered — Sign in?';
+    }
+
+    const emailAvailability = async () => {
+      const value = email.value.trim();
+      if (!value) {
+        email.classList.remove('is-valid', 'is-invalid');
+        if (emailError) emailError.textContent = '';
+        emailValid = false;
+        return false;
+      }
+      if (!validateEmailFormat()) {
+        emailValid = false;
+        return false;
+      }
+      if (emailCache.has(value)) {
+        setEmailState(emailCache.get(value));
+        return emailCache.get(value);
+      }
+      emailSpinner.classList.remove('d-none');
+      try {
+        const resp = await fetch(`/auth/check-email?email=${encodeURIComponent(value)}`);
+        const data = await resp.json();
+        const ok = !!data.available;
+        emailCache.set(value, ok);
+        setEmailState(ok);
+        return ok;
+      } catch {
+        emailValid = false;
+        return false;
+      } finally {
+        emailSpinner.classList.add('d-none');
+      }
+    };
+
+    const debouncedEmail = debounce(emailAvailability);
+    email.addEventListener('input', () => {
+      emailValid = false;
+      if (!validateEmailFormat()) return;
+      email.classList.remove('is-valid');
+      if (emailError) emailError.textContent = '';
+      debouncedEmail();
+    });
+    email.addEventListener('blur', debouncedEmail);
+
+    function formIsValid() {
+      const passOk = updatePassword();
+      const matchOk = validateConfirm(passOk);
+      const roleOk = !!role.value;
+      return usernameValid && emailValid && passOk && matchOk && roleOk;
+    }
+
+    password.addEventListener('input', () => {
+      const passOk = updatePassword();
+      validateConfirm(passOk);
+    });
+    confirm.addEventListener('input', () => {
+      validateConfirm(updatePassword());
     });
 
     signupForm.addEventListener('submit', async e => {
       e.preventDefault();
+      await Promise.all([usernameAvailability(), emailAvailability()]);
+      if (!formIsValid()) return;
       submit.disabled = true;
       const resp = await fetch(signupForm.action, {
         method: 'POST',
@@ -117,11 +240,9 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         const data = await resp.json().catch(() => ({}));
         if (data.error === 'username') {
-          username.classList.add('is-invalid');
-          if (usernameError) usernameError.textContent = 'Username taken';
+          setUsernameState(false);
         } else if (data.error === 'email') {
-          email.classList.add('is-invalid');
-          if (emailError) emailError.textContent = 'Email already registered';
+          setEmailState(false);
         }
       }
     });
@@ -131,14 +252,36 @@ document.addEventListener('DOMContentLoaded', () => {
   if (otpGroup) {
     const verifyBtn = document.getElementById('verifyBtn');
     const sendOtp = document.getElementById('sendOtp');
+    const verifyForm = document.getElementById('verifyForm');
     const hidden = otpGroup.querySelector('input[type="hidden"]');
+    const errorEl = document.getElementById('otpError');
     otpGroup.addEventListener('input', () => {
       verifyBtn.disabled = hidden.value.length !== 6;
+      if (errorEl) errorEl.textContent = '';
     });
     if (sendOtp) {
+      const emailInput = document.getElementById('email');
       sendOtp.addEventListener('click', () => {
-        if (email.value) {
-          console.log('OTP sent to', email.value);
+        if (emailInput && emailInput.value) {
+          console.log('OTP sent to', emailInput.value);
+        }
+      });
+    }
+    if (verifyForm) {
+      verifyForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        verifyBtn.disabled = true;
+        const resp = await fetch(verifyForm.action, {
+          method: 'POST',
+          body: new FormData(verifyForm),
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        verifyBtn.disabled = false;
+        if (resp.ok) {
+          const data = await resp.json().catch(() => ({}));
+          window.location.href = data.redirect || '/auth/login';
+        } else if (errorEl) {
+          errorEl.textContent = 'Invalid code';
         }
       });
     }
