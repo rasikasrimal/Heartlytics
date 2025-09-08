@@ -15,6 +15,8 @@ entirely on the client and do not impact the database schema.
 The password reset feature introduces a `password_reset_request` table storing short-lived verification codes.
 Email-based MFA uses an `mfa_email_challenge` table recording hashed codes, attempts, and resend timestamps.
 The redesigned forgot-password interface and segmented OTP inputs are client-side only and do not alter the database schema.
+Similarly, the signup flow's email verification card is purely UI and introduces no new tables.
+The `user` table enforces uniqueness on both `username` and `email` fields, while `nickname` remains non-unique.
 
 ## audit_log
 

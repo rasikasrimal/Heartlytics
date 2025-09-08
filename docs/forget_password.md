@@ -15,7 +15,7 @@ encryption details see [Security and Encryption](security_and_encryption.md).
 - On success the password reset form is displayed; otherwise retry with respect
   to cooldown and attempt limits.
 
-The UI presents the flow in a single Bootstrap authentication card. The first step collects an email address with helper text. After submission, a subtle divider reveals a six‑box OTP entry interface with auto‑tab and paste support. A disabled resend button is paired with a muted mm:ss countdown badge and a link to change the email if necessary.
+The UI presents the flow in a single Bootstrap authentication card. The first step collects an email address with helper text. After submission, a subtle divider reveals a six‑box OTP entry interface with auto‑tab and paste support. The sign-up flow reuses this segmented OTP component for post-registration email verification.
 
 ## BPMN 2.0
 
