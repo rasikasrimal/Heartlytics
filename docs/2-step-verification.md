@@ -45,6 +45,10 @@ The forgot-password interface uses a compact authentication card with segmented 
 
 The redesigned sign-up page reuses this segmented OTP component for its email verification step and offers a dedicated "Send OTP" button that dispatches the six-digit code to the specified email, providing a consistent experience.
 
+All authentication screens now honor the pure-black/ash dark theme with teal
+highlights, maintaining consistent contrast and focus styles across the
+password reset and signup flows.
+
 ## Detailed Data Flow Diagram (DFD)
 
 ```mermaid

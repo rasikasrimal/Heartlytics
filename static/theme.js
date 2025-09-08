@@ -5,6 +5,7 @@
   function applyTheme(theme){
     const root = document.documentElement;
     root.dataset.bsTheme = theme;
+    root.classList.toggle('theme-dark', theme === 'dark');
     document.cookie = `theme=${theme}; ${COOKIE_ATTRS}`;
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta){

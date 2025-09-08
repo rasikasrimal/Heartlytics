@@ -2,7 +2,9 @@
 
 HeartLytics supports light and dark color themes. The default is **light** and
 users can toggle using the navbar button or the setting on the Settings page.
-The selection is stored in `localStorage` and a long-lived `theme` cookie so the
+The dark mode now employs a neutral pure-black/ash palette with a teal accent
+for links and calls to action, mirroring ChatGPT-style readability. The
+selection is stored in `localStorage` and a long-lived `theme` cookie so the
 server can render pages in the correct theme without a flash of incorrect
 colors.
 
