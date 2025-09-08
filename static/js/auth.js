@@ -25,6 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirm = signupForm.querySelector('#confirm');
     const role = signupForm.querySelector('#role');
     const submit = document.getElementById('createAccount');
+    const usernameError = username.closest('.mb-3').querySelector('.invalid-feedback');
+    const emailError = email.closest('.mb-3').querySelector('.invalid-feedback');
+    const existingUsernames = ['existingUser'];
+    const existingEmails = ['user@example.com'];
     const bars = document.querySelectorAll('#' + password.id + '-bars [data-bar]');
     const caption = document.getElementById(password.id + '-caption');
     const hints = {};
@@ -67,10 +71,29 @@ document.addEventListener('DOMContentLoaded', () => {
       return match;
     }
 
+    function validateUnique(input, list, errorEl, message) {
+      const exists = list.includes(input.value.trim());
+      input.classList.toggle('is-invalid', exists);
+      input.classList.toggle('is-valid', !exists && input.value.trim() !== '');
+      if (errorEl) errorEl.textContent = exists ? message : '';
+      return !exists;
+    }
+
+    function validateEmailFormat() {
+      const ok = email.checkValidity();
+      email.classList.toggle('is-invalid', !ok);
+      email.classList.toggle('is-valid', ok && email.value.trim() !== '');
+      if (emailError) emailError.textContent = ok ? '' : 'Enter a valid email address';
+      return ok;
+    }
+
     function checkForm() {
       const passOk = updatePassword();
       const matchOk = validateConfirm(passOk);
-      const ready = username.value && email.value && role.value && passOk && matchOk;
+      const userOk = username.value && validateUnique(username, existingUsernames, usernameError, 'Username already taken');
+      const emailFormatOk = validateEmailFormat();
+      const emailUniqueOk = email.value && validateUnique(email, existingEmails, emailError, 'Email already registered');
+      const ready = userOk && emailFormatOk && emailUniqueOk && role.value && passOk && matchOk;
       submit.disabled = !ready;
     }
 
@@ -96,9 +119,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const otpGroup = document.querySelector('[data-otp-group]');
   if (otpGroup) {
     const verifyBtn = document.getElementById('verifyBtn');
+    const sendOtp = document.getElementById('sendOtp');
     const hidden = otpGroup.querySelector('input[type="hidden"]');
     otpGroup.addEventListener('input', () => {
       verifyBtn.disabled = hidden.value.length !== 6;
     });
+    if (sendOtp) {
+      sendOtp.addEventListener('click', () => {
+        if (email.value) {
+          console.log('OTP sent to', email.value);
+        }
+      });
+    }
   }
 });

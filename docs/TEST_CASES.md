@@ -11,6 +11,7 @@
 | TC-006 | Logout endpoint terminates session. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-007 | Unauthenticated user is redirected to login when accessing dashboard. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-008 | Signup rejects duplicate email addresses. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
+| TC-088 | Signup rejects duplicate usernames. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-009 | Password must include upper, lower, number and special character. | Authentication & Roles | 🟡 Medium | 🧪 Functional | ⏳ Not Run |
 | TC-040 | Legacy password hashes upgrade to Argon2id on login. | Authentication & Roles | 🔴 High | 🔒 Security | ⏳ Not Run |
 | TC-070 | Forgot password flow resets account password via emailed code. | Authentication & Roles | 🔴 High | 🧪 Functional | ⏳ Not Run |
