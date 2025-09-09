@@ -91,42 +91,42 @@ honors `prefers-reduced-motion` for accessibility.
 
 ## 📂 Project Structure
 ```text
-heart-app/
+Heartlytics/
 ├── app.py               # Application entry point
 ├── config.py            # Configuration classes
 ├── helpers.py           # Shared utility functions
+├── navigation.py        # Navbar helpers and role checks
 ├── outlier_detection.py # Outlier detection helpers
+├── manage_keys.py       # Development key management
 ├── auth/                # Authentication blueprint and forms
 ├── doctor/              # Doctor dashboard
-├── routes/              # Core Flask blueprints
+├── user/                # User dashboard
+├── superadmin/          # Administration tools
+├── routes/              # Core Flask routes
 │   ├── __init__.py
-│   ├── predict.py
-│   └── settings.py
-├── services/            # Business logic and ML helpers
+│   ├── debug.py
+│   └── predict.py
+├── blueprints/          # Additional blueprint packages
+│   └── settings/
+├── services/            # Business logic and helpers
 │   ├── auth.py
+│   ├── crypto/
 │   ├── data.py
+│   ├── email.py
+│   ├── mfa.py
+│   ├── otp.py
 │   ├── pdf.py
 │   ├── security.py
-│   └── simulation.py
+│   ├── simulation.py
+│   └── theme.py
 ├── simulations/         # What-if risk modules
-├── superadmin/          # Superadmin dashboard and management
-├── user/                # Basic user dashboard
 ├── templates/           # Jinja2 templates
-│   ├── base.html
-│   ├── error.html
-│   └── predict/
-│       ├── form.html
-│       └── result.html
-├── static/              # CSS, images and sample files
-│   ├── styles.css
-│   ├── logo.svg
-│   └── sample.csv
-├── ml/                  # Trained model artifacts
-│   └── model.pkl
+├── static/              # CSS, JS, images and sample files
+├── docs/                # Project documentation
 ├── tests/               # Pytest suites
-│   ├── test_predict.py
-│   └── ...
-├── research_paper.tex   # Research paper content
+├── ml/                  # Trained model artifacts
+├── migrations/          # Database migrations
+├── utils/               # Utility scripts
 └── requirements.txt     # Python dependencies
 ```
 
@@ -141,12 +141,18 @@ heart-app/
 
 ---
 
+## 🧱 Software Engineering
+
+Heartlytics follows a modular Flask architecture organized by blueprints and a dedicated service layer. Iterative development, extensive testing, and security-focused design guide implementation. See [docs/software_engineering.md](docs/software_engineering.md) for methodology and architectural details.
+
+---
+
 ## 🚀 Quickstart
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/rasikasrimal/heart-disease-risk-app.git
-cd heart-disease-risk-app
+git clone https://github.com/rasikasrimal/Heartlytics.git
+cd Heartlytics
 ```
 
 ### 2. Create a virtual environment
