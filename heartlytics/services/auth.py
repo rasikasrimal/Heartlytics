@@ -15,7 +15,7 @@ from typing import Iterable
 
 from flask import abort, current_app
 from flask_login import current_user
-from auth.rbac import rbac_can
+from ..auth.rbac import rbac_can
 
 
 def role_required(roles: Iterable[str]):

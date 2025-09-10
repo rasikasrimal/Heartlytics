@@ -9,7 +9,7 @@ from flask import current_app, render_template, request, session, redirect, url_
 import re
 from sqlalchemy import or_
 
-from services import mfa
+from ..services import mfa
 
 from . import auth_bp
 from .forms import ForgotPasswordForm, VerifyCodeForm, ResetPasswordForm

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-from services.simulation import simulate_risk_over_time
+from ..services.simulation import simulate_risk_over_time
 
 
 def age_risk_projection(model, baseline: Dict[str, object], start_age: int, end_age: int) -> List[Dict[str, float]]:

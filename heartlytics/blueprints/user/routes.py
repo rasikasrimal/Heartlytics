@@ -5,7 +5,7 @@ from __future__ import annotations
 from flask import render_template
 from flask_login import login_required
 
-from auth.decorators import require_roles
+from ...auth.decorators import require_roles
 
 from . import user_bp
 

@@ -1,9 +1,4 @@
-from __future__ import annotations
-
-"""Blueprint for simulation pages and modules."""
-
-from flask import Blueprint
-
-simulations_bp = Blueprint("simulations", __name__, template_folder="templates", url_prefix="/simulations")
-
-from . import routes  # noqa: E402,F401
+import sys
+from importlib import import_module
+_module = import_module("heartlytics.simulations")
+sys.modules[__name__] = _module

@@ -3,7 +3,7 @@ from __future__ import annotations
 """Navigation configuration and helpers."""
 
 from typing import List, Dict
-from auth.rbac import rbac_can
+from .auth.rbac import rbac_can
 
 NAV_ITEMS: List[Dict[str, str]] = [
     {"module": "Predict", "label": "Predict", "endpoint": "index", "icon": "bi bi-lightning-charge"},

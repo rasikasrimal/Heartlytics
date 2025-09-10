@@ -7,8 +7,8 @@ from flask_login import login_required
 
 import pandas as pd
 
-from auth.decorators import require_roles
-from services.data import INPUT_COLUMNS
+from ..auth.decorators import require_roles
+from ..services.data import INPUT_COLUMNS
 
 from . import simulations_bp
 from .angina_curve import simulate_angina_sensitivity

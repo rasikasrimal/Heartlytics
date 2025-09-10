@@ -92,17 +92,21 @@ honors `prefers-reduced-motion` for accessibility.
 ## 📂 Project Structure
 ```text
 Heartlytics/
-├── app.py               # Application entry point
-├── config.py            # Configuration classes
-├── helpers.py           # Shared utility functions
-├── navigation.py        # Navbar helpers and role checks
-├── outlier_detection.py # Outlier detection helpers
-├── manage_keys.py       # Development key management
-├── auth/                # Authentication blueprint and forms
-├── doctor/              # Doctor dashboard
-├── user/                # User dashboard
-├── superadmin/          # Administration tools
-├── routes/              # Core Flask routes
+├── app.py               # Compatibility wrapper
+├── heartlytics/
+│   ├── app.py           # Core application module
+│   ├── config.py        # Configuration classes
+│   ├── navigation.py    # Navbar helpers and role checks
+│   ├── outlier_detection.py # Outlier detection helpers
+│   ├── extensions.py    # Initialized extensions
+│   ├── models.py        # ORM model exports
+│   ├── utils/
+│   │   ├── helpers.py       # Shared utility functions
+│   │   └── manage_keys.py   # Development key management
+│   ├── auth/               # Authentication blueprint and forms
+│   ├── blueprints/         # Consolidated view blueprints
+│   ├── services/           # Business logic and helpers
+│   └── simulations/        # Simulation modules
 │   ├── __init__.py
 │   ├── debug.py
 │   └── predict.py

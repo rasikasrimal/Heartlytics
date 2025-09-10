@@ -10,9 +10,9 @@ from flask_login import login_required, current_user, login_user
 
 from . import auth_bp
 from .forms import TOTPSetupForm, TOTPVerifyForm, MFADisableForm, EmailCodeForm
-from services.mfa import hash_code
+from ..services.mfa import hash_code
 from .totp import random_base32, provisioning_uri, verify_totp
-from utils.mask import mask_email
+from ..utils.mask import mask_email
 
 
 @auth_bp.route("/mfa/setup", methods=["GET", "POST"])

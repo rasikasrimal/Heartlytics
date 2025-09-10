@@ -16,8 +16,8 @@ from sqlalchemy import func, or_
 from datetime import datetime, timedelta
 import secrets
 
-from auth.decorators import require_roles
-from services.security import csrf_protect
+from ...auth.decorators import require_roles
+from ...services.security import csrf_protect
 
 superadmin_bp = Blueprint("superadmin", __name__, url_prefix="/superadmin")
 

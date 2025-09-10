@@ -6,7 +6,7 @@ from typing import Dict, Iterable, List
 
 import pandas as pd
 
-from services.data import INPUT_COLUMNS
+from ..services.data import INPUT_COLUMNS
 
 
 def simulate_angina_sensitivity(

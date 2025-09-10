@@ -12,15 +12,15 @@ from flask import (
 )
 from flask_login import login_required
 
-from auth.decorators import require_module_access
+from ...auth.decorators import require_module_access
 
-from services.security import csrf_protect
-from services.data import (
+from ...services.security import csrf_protect
+from ...services.data import (
     INPUT_COLUMNS,
     NUMERIC_COLS,
     CATEGORICAL_COLS,
 )
-from services.simulation import simulate_risk_over_time
+from ...services.simulation import simulate_risk_over_time
 
 
 predict_bp = Blueprint("predict", __name__, url_prefix="/")

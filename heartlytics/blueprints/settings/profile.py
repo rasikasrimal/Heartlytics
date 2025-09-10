@@ -4,7 +4,7 @@ import json
 import os
 from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
-from services.security import csrf_protect
+from ...services.security import csrf_protect
 
 settings_bp = Blueprint("settings", __name__, url_prefix="/settings")
 
