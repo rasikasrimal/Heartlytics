@@ -177,6 +177,7 @@ if os.path.exists(app.config["BRANDING_FILE"]):
 
 @app.context_processor
 def inject_branding():
+    """Expose branding configuration values to templates."""
     return {
         "app_name": current_app.config.get("APP_NAME", "HeartLytics"),
         "app_logo": current_app.config.get("APP_LOGO", "logo.svg"),
@@ -185,6 +186,7 @@ def inject_branding():
 
 @app.context_processor
 def inject_rbac_helpers():
+    """Provide RBAC helper lambdas for use in Jinja templates."""
     return {
         "can": lambda module: current_user.is_authenticated and rbac_can(current_user, module),
         "is_superadmin": lambda: current_user.is_authenticated and is_superadmin(current_user),
@@ -193,11 +195,13 @@ def inject_rbac_helpers():
 
 @app.context_processor
 def inject_nav():
+    """Insert navigation items for the current user into template context."""
     return {"nav_items": get_nav_items(current_user)}
 
 # Security headers
 @app.after_request
 def set_security_headers(resp):
+    """Add common security-related HTTP headers to the response."""
     resp.headers['X-Content-Type-Options'] = 'nosniff'
     resp.headers['X-Frame-Options'] = 'DENY'
     resp.headers['Referrer-Policy'] = 'no-referrer'
@@ -207,6 +211,7 @@ def set_security_headers(resp):
 
 @app.errorhandler(403)
 def handle_forbidden(e):
+    """Return a JSON or HTML 403 response based on client preferences."""
     if request.accept_mimetypes.accept_json and not request.accept_mimetypes.accept_html:
         return jsonify({"error": "forbidden"}), 403
     return render_template("errors/403.html"), 403
@@ -887,6 +892,7 @@ with app.app_context():
 
 
 def run_kmeans():
+    """Cluster existing predictions for later dashboard summaries."""
     rows = Prediction.query.all()
     if len(rows) < 3:
         return
@@ -1107,6 +1113,7 @@ def admin_dashboard_alias():
 @login_required
 @csrf_protect_api
 def api_delete_prediction(pid: int):
+    """Remove a single prediction record by database ID."""
     pred = Prediction.query.get(pid)
     if not pred:
         return jsonify({"ok": False, "error": "Not found"}), 404
@@ -1122,6 +1129,7 @@ def api_delete_prediction(pid: int):
 @login_required
 @csrf_protect_api
 def api_delete_prediction_legacy(pid: int):
+    """Legacy POST endpoint to delete a prediction by ID."""
     pred = Prediction.query.get(pid)
     if not pred:
         return jsonify({"ok": False, "error": "Not found"}), 404
@@ -1137,6 +1145,7 @@ def api_delete_prediction_legacy(pid: int):
 @login_required
 @csrf_protect_api
 def api_delete_all_predictions():
+    """Delete all prediction records from the database."""
     try:
         deleted = Prediction.query.delete()
         db.session.commit()
@@ -1150,6 +1159,7 @@ def api_delete_all_predictions():
 @login_required
 @csrf_protect_api
 def api_delete_outliers():
+    """Delete multiple predictions identified as outliers."""
     try:
         ids = request.get_json(force=True).get("ids", [])
     except Exception:
@@ -1170,6 +1180,7 @@ def api_delete_outliers():
 @app.get("/")
 @login_required
 def index():
+    """Display single prediction form with default patient data."""
     defaults = {
         "patient_name": "Demo Patient",
         "age": 50,
@@ -1196,6 +1207,7 @@ def index():
 @login_required
 @require_module_access("Dashboard")
 def dashboard():
+    """Show aggregated prediction statistics and cluster insights."""
     rows = Prediction.query.order_by(Prediction.created_at.asc()).all()
     data = [r.to_dict() for r in rows]
     return render_template(
@@ -1262,6 +1274,7 @@ def dashboard_pdf():
 @login_required
 @require_module_access("Dashboard")
 def dashboard_pdf_generate():
+    """Generate a PDF report for dashboard prediction data."""
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import A4, landscape
     from reportlab.lib.units import cm
@@ -2150,15 +2163,19 @@ def _apply_user_mapping(df: pd.DataFrame, mapping: dict) -> pd.DataFrame:
 @login_required
 @require_module_access("Batch")
 def upload_form():
-    return render_template("uploads/form.html",
-                           required_cols=sorted(list(REQUIRED_INTERNAL_COLUMNS)),
-                           model_name=model_name)
+    """Render the initial batch CSV upload form."""
+    return render_template(
+        "uploads/form.html",
+        required_cols=sorted(list(REQUIRED_INTERNAL_COLUMNS)),
+        model_name=model_name,
+    )
 
 @app.post("/upload")
 @login_required
 @require_module_access("Batch")
 @csrf_protect
 def upload_post():
+    """Process the uploaded CSV file and prepare it for mapping."""
     file = request.files.get("file")
     if not file or file.filename == "":
         if request.args.get("ajax") == "1":
@@ -2210,6 +2227,7 @@ def upload_post():
 @login_required
 @require_module_access("Batch")
 def upload_columns_map(uid: str):
+    """Show interface for mapping CSV columns to expected fields."""
     p = _paths(uid)
     if not os.path.exists(p["raw"]):
         return render_template("error.html", title="Session expired",
@@ -2325,6 +2343,7 @@ def upload_preprocess(uid: str):
 @login_required
 @csrf_protect_api
 def upload_preprocess_task(uid: str, task: str):
+    """Apply a preprocessing task (e.g., impute, dedupe) to the dataset."""
     p = _paths(uid)
     if not os.path.exists(p["mapped"]):
         return jsonify({"ok": False, "error": "No mapped dataset"}), 404
@@ -2401,6 +2420,7 @@ def upload_preprocess_task(uid: str, task: str):
 @login_required
 @csrf_protect_api
 def upload_preprocess_finish(uid: str):
+    """Finalize preprocessing, build EDA, and persist results."""
     p = _paths(uid)
     if not os.path.exists(p["mapped"]):
         return jsonify({"ok": False, "error": "No mapped dataset"}), 404
@@ -2437,6 +2457,7 @@ def upload_preprocess_finish(uid: str):
 @app.get("/upload/<uid>/eda")
 @login_required
 def upload_eda(uid: str):
+    """Render EDA results and cleaning log for an uploaded dataset."""
     p = _paths(uid)
     if not os.path.exists(p["clean"]) and not os.path.exists(p["results"]):
         return render_template(
@@ -2747,6 +2768,7 @@ def upload_predict(uid: str):
 @app.get("/upload/<uid>/download/results")
 @login_required
 def upload_download_results(uid: str):
+    """Send the batch prediction results CSV to the client."""
     p = _paths(uid)
     if not os.path.exists(p["results"]):
         return render_template("error.html", title="Not found",
@@ -2756,6 +2778,7 @@ def upload_download_results(uid: str):
 @app.get("/upload/<uid>/pdf")
 @login_required
 def upload_bulk_pdf(uid: str):
+    """Create a PDF report for all predictions in the batch."""
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.units import cm
     from reportlab.pdfgen import canvas

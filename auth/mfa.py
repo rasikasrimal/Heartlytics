@@ -18,6 +18,7 @@ from utils.mask import mask_email
 @auth_bp.route("/mfa/setup", methods=["GET", "POST"])
 @login_required
 def mfa_setup():
+    """Register a TOTP secret and generate recovery codes."""
     if current_user.mfa_enabled:
         flash("Two-step verification already enabled", "info")
         return redirect(url_for("index"))
@@ -47,6 +48,7 @@ def mfa_setup():
 @auth_bp.route("/mfa/recovery", methods=["GET"])
 @login_required
 def mfa_recovery_codes():
+    """Display one-time recovery codes after MFA setup."""
     codes = session.get("recovery_codes")
     if not codes:
         return redirect(url_for("index"))
@@ -56,6 +58,7 @@ def mfa_recovery_codes():
 @auth_bp.route("/mfa/recovery/regenerate", methods=["POST"])
 @login_required
 def mfa_regenerate_codes():
+    """Produce a new set of recovery codes for an MFA-enabled account."""
     if not current_user.mfa_enabled:
         return redirect(url_for("index"))
     codes = [secrets.token_hex(8) for _ in range(10)]
@@ -68,6 +71,7 @@ def mfa_regenerate_codes():
 
 @auth_bp.route("/mfa/verify", methods=["GET", "POST"])
 def mfa_verify():
+    """Validate a TOTP or recovery code during login."""
     user_id = session.get("mfa_user_id")
     if not user_id:
         return redirect(url_for("auth.login"))
@@ -110,6 +114,7 @@ def mfa_verify():
 
 @auth_bp.route("/mfa/email", methods=["GET", "POST"])
 def mfa_email():
+    """Handle email-based MFA challenges."""
     user_id = session.get("mfa_user_id")
     if not user_id:
         return redirect(url_for("auth.login"))
@@ -183,6 +188,7 @@ def mfa_email():
 @auth_bp.route("/mfa/disable", methods=["GET", "POST"])
 @login_required
 def mfa_disable():
+    """Remove MFA protection after verifying password and code."""
     if not current_user.mfa_enabled:
         return redirect(url_for("index"))
     form = MFADisableForm()
