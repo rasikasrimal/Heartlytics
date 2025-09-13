@@ -90,11 +90,15 @@ class ResetPasswordForm(FlaskForm):
 
 
 class TOTPSetupForm(FlaskForm):
+    """Collect the initial TOTP code when enabling MFA."""
+
     code = StringField("Authentication Code", validators=[DataRequired(), Length(min=6, max=6)])
     submit = SubmitField("Enable")
 
 
 class TOTPVerifyForm(FlaskForm):
+    """Validate a TOTP or recovery code during login."""
+
     code = StringField(
         "Authentication Code",
         validators=[DataRequired(), Length(min=6, max=16)],
@@ -103,6 +107,8 @@ class TOTPVerifyForm(FlaskForm):
 
 
 class MFADisableForm(FlaskForm):
+    """Confirm credentials to disable MFA on an account."""
+
     password = PasswordField("Current Password", validators=[DataRequired()])
     code = StringField(
         "Authentication or Recovery Code",
