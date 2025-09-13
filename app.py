@@ -2761,6 +2761,7 @@ def upload_predict(uid: str):  # Run batch predictions on uploaded data
 @app.get("/upload/<uid>/download/results")
 @login_required
 def upload_download_results(uid: str):
+    """Send the batch prediction results CSV to the client."""
     p = _paths(uid)
     if not os.path.exists(p["results"]):
         return render_template("error.html", title="Not found",
@@ -2770,6 +2771,7 @@ def upload_download_results(uid: str):
 @app.get("/upload/<uid>/pdf")
 @login_required
 def upload_bulk_pdf(uid: str):
+    """Create a PDF report for all predictions in the batch."""
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.units import cm
     from reportlab.pdfgen import canvas

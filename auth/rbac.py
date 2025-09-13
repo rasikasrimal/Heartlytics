@@ -23,6 +23,7 @@ POLICY = {
 
 
 def is_superadmin(user) -> bool:
+    """Return True if the given user has the SuperAdmin role."""
     return getattr(user, "role", None) == Role.SUPERADMIN.value
 
 

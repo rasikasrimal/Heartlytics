@@ -16,6 +16,7 @@ from .forms import ForgotPasswordForm, VerifyCodeForm, ResetPasswordForm
 
 
 def _mask_email(email: str) -> str:
+    """Obfuscate an email address for logging or UI display."""
     try:
         local, domain = email.split("@")
     except ValueError:
@@ -24,7 +25,9 @@ def _mask_email(email: str) -> str:
         return local[0] + "*" * (len(local) - 1) + "@" + domain
     return f"{local[0]}••••{local[-1]}@{domain}"
 
+
 def _rate_limited(key: str, limit: int) -> bool:
+    """Track actions per session key and return True when ``limit`` is exceeded."""
     rl = session.setdefault("rate_limits", {})
     data = rl.get(key)
     now = datetime.utcnow()
@@ -37,7 +40,9 @@ def _rate_limited(key: str, limit: int) -> bool:
     session["rate_limits"] = rl
     return False
 
+
 def _get_request() -> 'PasswordResetRequest | None':
+    """Fetch the pending password reset request referenced in the session."""
     request_id = session.get("pr_id")
     if not request_id:
         return None
@@ -103,6 +108,7 @@ def forgot():
 
 @auth_bp.route("/forgot/verify", methods=["GET", "POST"])
 def verify_forgot():
+    """Step 2: confirm the verification code from the email."""
     pr = _get_request()
     form = VerifyCodeForm()
     if form.validate_on_submit() and pr:
@@ -151,6 +157,7 @@ def verify_forgot():
 
 @auth_bp.route("/forgot/resend", methods=["POST"])
 def resend_code():
+    """Issue a new verification code if resend conditions are met."""
     pr = _get_request()
     if not pr:
         flash("Request a new code.", "error")
@@ -193,6 +200,7 @@ def resend_code():
 
 @auth_bp.route("/forgot/reset", methods=["GET", "POST"])
 def reset_password():
+    """Step 3: allow the user to set a new password."""
     pr = _get_request()
     if not pr or not session.get("pr_verified"):
         return redirect(url_for("auth.forgot"))
