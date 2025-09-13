@@ -176,7 +176,7 @@ if os.path.exists(app.config["BRANDING_FILE"]):
 
 
 @app.context_processor
-def inject_branding():
+def inject_branding():  # Inject branding data into all templates
     return {
         "app_name": current_app.config.get("APP_NAME", "HeartLytics"),
         "app_logo": current_app.config.get("APP_LOGO", "logo.svg"),
@@ -184,7 +184,7 @@ def inject_branding():
 
 
 @app.context_processor
-def inject_rbac_helpers():
+def inject_rbac_helpers():  # Inject RBAC helper functions into templates
     return {
         "can": lambda module: current_user.is_authenticated and rbac_can(current_user, module),
         "is_superadmin": lambda: current_user.is_authenticated and is_superadmin(current_user),
@@ -192,12 +192,12 @@ def inject_rbac_helpers():
 
 
 @app.context_processor
-def inject_nav():
+def inject_nav():  # Inject navigation data into templates
     return {"nav_items": get_nav_items(current_user)}
 
 # Security headers
 @app.after_request
-def set_security_headers(resp):
+def set_security_headers(resp):  # Add security headers to all responses
     resp.headers['X-Content-Type-Options'] = 'nosniff'
     resp.headers['X-Frame-Options'] = 'DENY'
     resp.headers['Referrer-Policy'] = 'no-referrer'
@@ -206,7 +206,7 @@ def set_security_headers(resp):
 
 
 @app.errorhandler(403)
-def handle_forbidden(e):
+def handle_forbidden(e):  # Handle 403 Forbidden errors
     if request.accept_mimetypes.accept_json and not request.accept_mimetypes.accept_html:
         return jsonify({"error": "forbidden"}), 403
     return render_template("errors/403.html"), 403
@@ -226,7 +226,7 @@ UNITS = {
 app.jinja_env.globals.update(SEX_MAP=SEX_MAP, YESNO=YESNO, UNITS=UNITS)
 
 
-def load_research_paper(path: str = "research_paper.tex") -> dict:
+def load_research_paper(path: str = "research_paper.tex") -> dict:  # Load and parse LaTeX research paper
     """Parse the LaTeX manuscript into structured HTML-friendly data."""
     base_dir = os.path.dirname(os.path.abspath(__file__))
     full_path = os.path.abspath(os.path.join(base_dir, path))
@@ -550,14 +550,17 @@ class Patient(db.Model):
     entered_by_user_id = db.Column(
         db.Integer, db.ForeignKey("user.id"), nullable=False
     )
+    # Legacy field for backward compatibility
     patient_data_legacy = db.Column("patient_data", db.JSON)
-    patient_data_ct = db.Column(db.LargeBinary)
-    patient_data_nonce = db.Column(db.LargeBinary)
-    patient_data_tag = db.Column(db.LargeBinary)
-    patient_data_wrapped_dk = db.Column(db.LargeBinary)
-    patient_data_kid = db.Column(db.String(64))
-    patient_data_kver = db.Column(db.Integer)
-    prediction_result = db.Column(db.String(50))
+    # Encrypted fields
+    patient_data_ct = db.Column(db.LargeBinary)           # Ciphertext
+    patient_data_nonce = db.Column(db.LargeBinary)        # Nonce
+    patient_data_tag = db.Column(db.LargeBinary)          # Authentication Tag
+    patient_data_wrapped_dk = db.Column(db.LargeBinary)   # Wrapped Data Key
+    # Key metadata
+    patient_data_kid = db.Column(db.String(64))          # Key ID
+    patient_data_kver = db.Column(db.Integer)            # Key Version
+    prediction_result = db.Column(db.String(50))         # Prediction Result
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     entered_by = db.relationship("User", backref="patients")
@@ -565,6 +568,7 @@ class Patient(db.Model):
     @property
     def patient_data(self):
         if self.patient_data_ct:
+            # Reconstruct envelope blob from database fields
             blob = {
                 "ciphertext": self.patient_data_ct,
                 "nonce": self.patient_data_nonce,
@@ -573,8 +577,10 @@ class Patient(db.Model):
                 "kid": self.patient_data_kid,
                 "kver": self.patient_data_kver,
             }
+            # Create context string for cryptographic binding
             context = f"{self.__tablename__}:patient_data|{self.patient_data_kid}|{self.patient_data_kver}"
             try:
+                # Decrypt envelope and deserialize JSON data
                 data = envelope.decrypt_field(blob, context)
                 return json.loads(data.decode())
             except Exception:
@@ -586,11 +592,14 @@ class Patient(db.Model):
     @patient_data.setter
     def patient_data(self, value):
         if current_app.config.get("ENCRYPTION_ENABLED") and value is not None:
+            # Serialize data to JSON bytes for encryption
             data = json.dumps(value).encode()
+            # Encrypt data using envelope encryption with context binding
             blob = envelope.encrypt_field(
                 data,
                 f"{self.__tablename__}:patient_data|{get_keyring().current_kid()}|1",
             )
+            # Store envelope components in database fields
             self.patient_data_ct = blob["ciphertext"]
             self.patient_data_nonce = blob["nonce"]
             self.patient_data_tag = blob["tag"]
@@ -656,6 +665,7 @@ class Prediction(db.Model):
     @property
     def patient_name(self):
         if self.patient_name_ct:
+            # Reconstruct envelope blob from database fields
             blob = {
                 "ciphertext": self.patient_name_ct,
                 "nonce": self.patient_name_nonce,
@@ -664,8 +674,10 @@ class Prediction(db.Model):
                 "kid": self.patient_name_kid,
                 "kver": self.patient_name_kver,
             }
+            # Create context string for cryptographic binding
             context = f"{self.__tablename__}:patient_name|{self.patient_name_kid}|{self.patient_name_kver}"
             try:
+                # Decrypt envelope and decode string data
                 return envelope.decrypt_field(blob, context).decode()
             except Exception:
                 return None
@@ -676,10 +688,12 @@ class Prediction(db.Model):
     @patient_name.setter
     def patient_name(self, value):
         if current_app.config.get("ENCRYPTION_ENABLED") and value is not None:
+            # Encrypt patient name using envelope encryption with context binding
             blob = envelope.encrypt_field(
                 value.encode(),
                 f"{self.__tablename__}:patient_name|{get_keyring().current_kid()}|1",
             )
+            # Store envelope components in database fields
             self.patient_name_ct = blob["ciphertext"]
             self.patient_name_nonce = blob["nonce"]
             self.patient_name_tag = blob["tag"]
@@ -734,13 +748,13 @@ app.Patient = Patient
 
 
 @login_manager.user_loader
-def load_user(user_id: str):
+def load_user(user_id: str):  # Load user for Flask-Login
     """Return the :class:`User` instance for the given ``user_id``."""
     return User.query.get(int(user_id))
 
 
 @app.before_request
-def enforce_session_timeout():
+def enforce_session_timeout():  # Enforce session timeout for security
     """Log out users after a period of inactivity."""
     if not current_user.is_authenticated:
         return
@@ -754,7 +768,7 @@ def enforce_session_timeout():
 
 
 @app.errorhandler(403)
-def forbidden(_):
+def forbidden(_):  # Handle 403 errors with JSON response
     """Render a user-friendly forbidden page."""
     return (
         render_template(
@@ -886,7 +900,7 @@ with app.app_context():
         db.session.commit()
 
 
-def run_kmeans():
+def run_kmeans():  # Run K-means clustering on prediction data
     rows = Prediction.query.all()
     if len(rows) < 3:
         return
@@ -977,7 +991,7 @@ def run_kmeans():
 
 @app.get("/api/kmeans")
 @login_required
-def api_kmeans():
+def api_kmeans():  # API endpoint for K-means clustering
     """Run K-Means clustering on selected features and return cluster info."""
     rows = Prediction.query.all()
     if not rows:
@@ -1056,7 +1070,7 @@ MODEL_PATH = app.config["MODEL_PATH"]
 if not os.path.exists(MODEL_PATH):
     print("model.pkl not found at", MODEL_PATH)
 
-def load_model(path: str):
+def load_model(path: str):  # Load machine learning model from file
     with open(path, "rb") as f:
         return pickle.load(f)
 
@@ -1099,14 +1113,14 @@ app.register_blueprint(debug_bp)
 @app.route("/admin/")
 @login_required
 @require_roles("Admin", "SuperAdmin")
-def admin_dashboard_alias():
+def admin_dashboard_alias():  # Redirect admin route to superadmin dashboard
     """Redirect legacy /admin/ path to unified dashboard."""
     return redirect(url_for("superadmin.dashboard"))
 
 @app.delete("/api/predictions/<int:pid>")
 @login_required
 @csrf_protect_api
-def api_delete_prediction(pid: int):
+def api_delete_prediction(pid: int):  # API endpoint to delete single prediction
     pred = Prediction.query.get(pid)
     if not pred:
         return jsonify({"ok": False, "error": "Not found"}), 404
@@ -1121,7 +1135,7 @@ def api_delete_prediction(pid: int):
 @app.post("/api/predictions/<int:pid>/delete")
 @login_required
 @csrf_protect_api
-def api_delete_prediction_legacy(pid: int):
+def api_delete_prediction_legacy(pid: int):  # Legacy API endpoint to delete prediction
     pred = Prediction.query.get(pid)
     if not pred:
         return jsonify({"ok": False, "error": "Not found"}), 404
@@ -1136,7 +1150,7 @@ def api_delete_prediction_legacy(pid: int):
 @app.delete("/api/predictions")
 @login_required
 @csrf_protect_api
-def api_delete_all_predictions():
+def api_delete_all_predictions():  # API endpoint to delete all predictions
     try:
         deleted = Prediction.query.delete()
         db.session.commit()
@@ -1149,7 +1163,7 @@ def api_delete_all_predictions():
 @app.delete("/api/outliers")
 @login_required
 @csrf_protect_api
-def api_delete_outliers():
+def api_delete_outliers():  # API endpoint to delete outlier predictions
     try:
         ids = request.get_json(force=True).get("ids", [])
     except Exception:
@@ -1169,7 +1183,7 @@ def api_delete_outliers():
 # ---------------------------
 @app.get("/")
 @login_required
-def index():
+def index():  # Main application homepage
     defaults = {
         "patient_name": "Demo Patient",
         "age": 50,
@@ -1195,7 +1209,7 @@ def index():
 @app.get("/dashboard")
 @login_required
 @require_module_access("Dashboard")
-def dashboard():
+def dashboard():  # Main dashboard with analytics
     rows = Prediction.query.order_by(Prediction.created_at.asc()).all()
     data = [r.to_dict() for r in rows]
     return render_template(
@@ -1208,7 +1222,7 @@ def dashboard():
 @app.route("/outliers", methods=["GET", "POST"])
 @login_required
 @require_module_access("Dashboard")
-def outlier_handling():
+def outlier_handling():  # Handle outlier detection and management
     """Interactive page to run and compare multiple outlier detectors."""
     rows = Prediction.query.order_by(Prediction.created_at.asc()).all()
     data = [r.to_dict() for r in rows]
@@ -1232,7 +1246,7 @@ def outlier_handling():
 @app.get("/dashboard/pdf")
 @login_required
 @require_module_access("Dashboard")
-def dashboard_pdf():
+def dashboard_pdf():  # Generate PDF report for dashboard
     """Render PDF generation options page with preview data."""
     rows = Prediction.query.order_by(Prediction.created_at.asc()).all()
     data = [
@@ -1261,7 +1275,7 @@ def dashboard_pdf():
 @app.post("/dashboard/pdf")
 @login_required
 @require_module_access("Dashboard")
-def dashboard_pdf_generate():
+def dashboard_pdf_generate():  # Generate and download PDF report
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import A4, landscape
     from reportlab.lib.units import cm
@@ -1743,7 +1757,7 @@ def dashboard_pdf_generate():
 @app.get("/dashboard/csv")
 @login_required
 @require_module_access("Dashboard")
-def dashboard_csv():
+def dashboard_csv():  # Export dashboard data as CSV
     import csv
 
     rows = Prediction.query.order_by(Prediction.created_at.asc()).all()
@@ -1775,7 +1789,7 @@ def dashboard_csv():
 @app.get("/dashboard/clean-csv")
 @login_required
 @require_module_access("Dashboard")
-def dashboard_clean_csv():
+def dashboard_clean_csv():  # Export cleaned dashboard data as CSV
     rows = Prediction.query.order_by(Prediction.created_at.asc()).all()
     data = [r.to_dict() for r in rows]
     if data:
@@ -1795,7 +1809,7 @@ def dashboard_clean_csv():
 @app.get("/research")
 @login_required
 @require_module_access("Research")
-def research_paper():
+def research_paper():  # Display research paper viewer
     paper = load_research_paper()
     return render_template("research/index.html", paper=paper)
 
@@ -1804,7 +1818,7 @@ def research_paper():
 # ---------------------------
 @app.get("/report/<int:pid>")
 @login_required
-def report(pid: int):
+def report(pid: int):  # Generate individual patient PDF report
     pred = Prediction.query.get_or_404(pid)
     buf = generate_prediction_pdf(pred, SEX_MAP, YESNO)
     return send_file(buf, as_attachment=True, download_name=f"report_{pred.id}.pdf", mimetype="application/pdf")
@@ -1813,7 +1827,7 @@ def report(pid: int):
 # CSV Upload / Cleaning / EDA / Batch Predict
 # ============================
 
-def _safe_read_csv(fobj) -> pd.DataFrame:
+def _safe_read_csv(fobj) -> pd.DataFrame:  # Safely read CSV file with error handling
     try:
         return pd.read_csv(fobj)
     except UnicodeDecodeError:
@@ -1822,7 +1836,7 @@ def _safe_read_csv(fobj) -> pd.DataFrame:
 
 # ---------- EDA helpers ----------
 
-def _winsorize_series(s: pd.Series, lower=0.01, upper=0.99):
+def _winsorize_series(s: pd.Series, lower=0.01, upper=0.99):  # Winsorize outliers in data series
     s_num = pd.to_numeric(s, errors="coerce")
     ql, qu = s_num.quantile([lower, upper])
     clipped = s_num.clip(ql, qu)
@@ -1830,7 +1844,7 @@ def _winsorize_series(s: pd.Series, lower=0.01, upper=0.99):
     return clipped, n_changed, float(ql), float(qu)
 
 
-def _strip_count_from_stats(stats: dict) -> dict:
+def _strip_count_from_stats(stats: dict) -> dict:  # Remove count fields from statistics
     if not isinstance(stats, dict):
         return stats
     for k, v in list(stats.items()):
@@ -1840,7 +1854,7 @@ def _strip_count_from_stats(stats: dict) -> dict:
     return stats
 
 
-def build_eda_payload(df: pd.DataFrame) -> dict:
+def build_eda_payload(df: pd.DataFrame) -> dict:  # Build exploratory data analysis payload
     # Positive probability distribution (if available)
     prob_dist = None
     if "positive_probability" in df.columns:
@@ -2063,13 +2077,13 @@ def build_eda_payload(df: pd.DataFrame) -> dict:
 # ============================
 # Upload session helpers
 # ============================
-def _make_upload_dir() -> tuple[str, str]:
+def _make_upload_dir() -> tuple[str, str]:  # Create unique upload directory
     uid = uuid.uuid4().hex[:12]
     path = os.path.join(UPLOADS_DIR, uid)
     os.makedirs(path, exist_ok=True)
     return uid, path
 
-def _paths(uid: str) -> dict:
+def _paths(uid: str) -> dict:  # Get file paths for upload session
     base = os.path.join(UPLOADS_DIR, uid)
     return {
         "base": base,
@@ -2082,7 +2096,7 @@ def _paths(uid: str) -> dict:
     }
 
 # ========= Column mapping helpers =========
-def _best_guess_mapping(upload_cols: list[str]) -> dict:
+def _best_guess_mapping(upload_cols: list[str]) -> dict:  # Auto-map uploaded columns to internal columns
     rev = {k: v for k, v in COLUMN_ALIASES.items()}
     def norm(h): return str(h).strip().lower().replace(" ", "_")
     uploaded_to_internal = {}
@@ -2149,7 +2163,7 @@ def _apply_user_mapping(df: pd.DataFrame, mapping: dict) -> pd.DataFrame:
 @app.get("/upload")
 @login_required
 @require_module_access("Batch")
-def upload_form():
+def upload_form():  # Display CSV upload form
     return render_template("uploads/form.html",
                            required_cols=sorted(list(REQUIRED_INTERNAL_COLUMNS)),
                            model_name=model_name)
@@ -2158,7 +2172,7 @@ def upload_form():
 @login_required
 @require_module_access("Batch")
 @csrf_protect
-def upload_post():
+def upload_post():  # Handle CSV file upload
     file = request.files.get("file")
     if not file or file.filename == "":
         if request.args.get("ajax") == "1":
@@ -2209,7 +2223,7 @@ def upload_post():
 @app.get("/upload/<uid>/columns")
 @login_required
 @require_module_access("Batch")
-def upload_columns_map(uid: str):
+def upload_columns_map(uid: str):  # Display column mapping interface
     p = _paths(uid)
     if not os.path.exists(p["raw"]):
         return render_template("error.html", title="Session expired",
@@ -2271,7 +2285,7 @@ def upload_columns_map(uid: str):
 @login_required
 @require_module_access("Batch")
 @csrf_protect
-def upload_columns_map_submit(uid: str):
+def upload_columns_map_submit(uid: str):  # Process column mapping submission
     p = _paths(uid)
     if not os.path.exists(p["raw"]):
         return render_template("error.html", title="Session expired",
@@ -2307,7 +2321,7 @@ def upload_columns_map_submit(uid: str):
 
 @app.get("/upload/<uid>/preprocess")
 @login_required
-def upload_preprocess(uid: str):
+def upload_preprocess(uid: str):  # Display data preprocessing interface
     p = _paths(uid)
     if not os.path.exists(p["mapped"]):
         return render_template(
@@ -2324,7 +2338,7 @@ def upload_preprocess(uid: str):
 @app.post("/upload/<uid>/preprocess/<task>")
 @login_required
 @csrf_protect_api
-def upload_preprocess_task(uid: str, task: str):
+def upload_preprocess_task(uid: str, task: str):  # Execute data preprocessing task
     p = _paths(uid)
     if not os.path.exists(p["mapped"]):
         return jsonify({"ok": False, "error": "No mapped dataset"}), 404
@@ -2400,7 +2414,7 @@ def upload_preprocess_task(uid: str, task: str):
 @app.post("/upload/<uid>/preprocess/finish")
 @login_required
 @csrf_protect_api
-def upload_preprocess_finish(uid: str):
+def upload_preprocess_finish(uid: str):  # Complete data preprocessing
     p = _paths(uid)
     if not os.path.exists(p["mapped"]):
         return jsonify({"ok": False, "error": "No mapped dataset"}), 404
@@ -2436,7 +2450,7 @@ def upload_preprocess_finish(uid: str):
 
 @app.get("/upload/<uid>/eda")
 @login_required
-def upload_eda(uid: str):
+def upload_eda(uid: str):  # Display exploratory data analysis results
     p = _paths(uid)
     if not os.path.exists(p["clean"]) and not os.path.exists(p["results"]):
         return render_template(
@@ -2611,7 +2625,7 @@ def upload_download_clean(uid: str):
 @app.post("/upload/<uid>/predict")
 @login_required
 @csrf_protect
-def upload_predict(uid: str):
+def upload_predict(uid: str):  # Run batch predictions on uploaded data
     p = _paths(uid)
     if not os.path.exists(p["clean"]):
         return render_template("error.html", title="Not found",
@@ -2817,14 +2831,14 @@ def upload_bulk_pdf(uid: str):
 # ---------------------------
 
 @app.cli.group()
-def roles():
+def roles():  # Display role management interface
     """Manage user roles."""
 
 
 @roles.command("set")
 @click.argument("email")
 @click.argument("role")
-def roles_set(email: str, role: str) -> None:
+def roles_set(email: str, role: str) -> None:  # Set user role via CLI
     """Set ``email`` user to ``role``."""
     from click import echo
 

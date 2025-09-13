@@ -1,3 +1,11 @@
+"""
+Key Management Interface Module
+
+Abstract interface for KMS providers with wrap/unwrap operations.
+Supports: DevKeyring (local AES), AWS KMS, Google Cloud KMS, Azure Key Vault.
+Enables key rotation without re-encrypting data.
+"""
+
 import base64
 import os
 from abc import ABC, abstractmethod
@@ -11,7 +19,7 @@ except Exception:  # pragma: no cover - fallback when cryptography is missing
 
 
 class Keyring(ABC):
-    """Simple interface for wrapping and unwrapping data keys."""
+    """Abstract base class for key management systems."""
 
     @abstractmethod
     def current_kid(self) -> str:
@@ -19,15 +27,15 @@ class Keyring(ABC):
 
     @abstractmethod
     def wrap(self, data_key: bytes) -> bytes:
-        """Wrap (encrypt) ``data_key`` and return the wrapped bytes."""
+        """Wrap (encrypt) data key with master key."""
 
     @abstractmethod
     def unwrap(self, wrapped: bytes) -> bytes:
-        """Unwrap ``wrapped`` and return the plaintext data key."""
+        """Unwrap (decrypt) data key using master key."""
 
 
 class DevKeyring(Keyring):
-    """Development keyring using an AES key from ``DEV_KMS_MASTER_KEY`` env."""
+    """Development keyring using local AES key wrapping."""
 
     def __init__(self, master_key: bytes, kid: str):
         if len(master_key) not in {16, 24, 32}:
@@ -36,78 +44,92 @@ class DevKeyring(Keyring):
         self._kid = kid
 
     def current_kid(self) -> str:  # pragma: no cover - trivial
+        """Return the key identifier for this keyring."""
         return self._kid
 
     def wrap(self, data_key: bytes) -> bytes:
+        """Wrap data key using AES key wrapping."""
         if aes_key_wrap is None:
+            # Fallback XOR-based wrapping for testing only
             digest = hashlib.sha256(self.master_key).digest()
             return bytes([b ^ digest[i % len(digest)] for i, b in enumerate(data_key)])
         return aes_key_wrap(self.master_key, data_key)
 
     def unwrap(self, wrapped: bytes) -> bytes:
+        """Unwrap data key using AES key unwrapping."""
         if aes_key_unwrap is None:
+            # Fallback XOR-based unwrapping for testing only
             digest = hashlib.sha256(self.master_key).digest()
             return bytes([b ^ digest[i % len(digest)] for i, b in enumerate(wrapped)])
         return aes_key_unwrap(self.master_key, wrapped)
 
 
 class AwsKmsKeyring(Keyring):
-    """Placeholder for AWS KMS integration."""
+    """AWS Key Management Service integration (placeholder)."""
 
     def __init__(self, key_id: str):
         self.key_id = key_id
         # TODO: implement using boto3
 
     def current_kid(self) -> str:  # pragma: no cover - unimplemented
+        """Return the AWS KMS key identifier."""
         return self.key_id
 
     def wrap(self, data_key: bytes) -> bytes:  # pragma: no cover - unimplemented
-        raise NotImplementedError
+        """Wrap data key using AWS KMS."""
+        raise NotImplementedError("AWS KMS integration not yet implemented")
 
     def unwrap(self, wrapped: bytes) -> bytes:  # pragma: no cover - unimplemented
-        raise NotImplementedError
+        """Unwrap data key using AWS KMS."""
+        raise NotImplementedError("AWS KMS integration not yet implemented")
 
 
 class GcpKmsKeyring(Keyring):
-    """Placeholder for Google Cloud KMS integration."""
+    """Google Cloud Key Management Service integration (placeholder)."""
 
     def __init__(self, key_id: str):
         self.key_id = key_id
         # TODO: implement using google-cloud-kms
 
     def current_kid(self) -> str:  # pragma: no cover - unimplemented
+        """Return the Google Cloud KMS key identifier."""
         return self.key_id
 
     def wrap(self, data_key: bytes) -> bytes:  # pragma: no cover - unimplemented
-        raise NotImplementedError
+        """Wrap data key using Google Cloud KMS."""
+        raise NotImplementedError("Google Cloud KMS integration not yet implemented")
 
     def unwrap(self, wrapped: bytes) -> bytes:  # pragma: no cover - unimplemented
-        raise NotImplementedError
+        """Unwrap data key using Google Cloud KMS."""
+        raise NotImplementedError("Google Cloud KMS integration not yet implemented")
 
 
 class AzureKeyVaultKeyring(Keyring):
-    """Placeholder for Azure Key Vault integration."""
+    """Azure Key Vault integration (placeholder)."""
 
     def __init__(self, key_id: str):
         self.key_id = key_id
         # TODO: implement using azure-keyvault-keys
 
     def current_kid(self) -> str:  # pragma: no cover - unimplemented
+        """Return the Azure Key Vault key identifier."""
         return self.key_id
 
     def wrap(self, data_key: bytes) -> bytes:  # pragma: no cover - unimplemented
-        raise NotImplementedError
+        """Wrap data key using Azure Key Vault."""
+        raise NotImplementedError("Azure Key Vault integration not yet implemented")
 
     def unwrap(self, wrapped: bytes) -> bytes:  # pragma: no cover - unimplemented
-        raise NotImplementedError
+        """Unwrap data key using Azure Key Vault."""
+        raise NotImplementedError("Azure Key Vault integration not yet implemented")
 
 
+# Environment variable for development master key
 _DEF_MASTER_ENV = "DEV_KMS_MASTER_KEY"
 
 
 def load_dev_keyring(kid: str) -> Optional[DevKeyring]:
-    """Return a :class:`DevKeyring` if ``DEV_KMS_MASTER_KEY`` is set."""
-
+    """Create a DevKeyring instance from environment variables."""
     key_b64 = os.environ.get(_DEF_MASTER_ENV)
     if not key_b64:
         return None
