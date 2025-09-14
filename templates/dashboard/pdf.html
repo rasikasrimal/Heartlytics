@@ -75,6 +75,16 @@
         <div class="collapse mt-2" id="advFilters">
           <textarea class="form-control" id="customWhere" name="custom_where" rows="2" placeholder="e.g., age > 60 AND cholesterol > 250"></textarea>
           <div class="invalid-feedback">Invalid query</div>
+          <div class="small text-muted mt-2">
+            <strong>Columns:</strong>
+            id, created_at, age, sex (0/1 or 'Male'/'Female'), chest_pain_type, resting_bp, cholesterol,
+            fasting_blood_sugar, Restecg, max_heart_rate, exercise_induced_angina (0/1 or 'Yes'/'No'),
+            oldpeak, st_slope_type, num_major_vessels, thalassemia_type, prediction (0/1 or 'Yes'/'No'), confidence (0–1)
+            <br>
+            <em>Examples:</em> sex = 1 AND age >= 70; sex = 'Male' AND age >= 70;
+            chest_pain_type = 'asymptomatic';
+            (CASE WHEN prediction=1 THEN confidence ELSE 1-confidence END) >= 0.7
+          </div>
         </div>
       </div></div>
       <div class="card"><div class="card-body">
@@ -180,7 +190,33 @@ pctSlider.noUiSlider.on('change',update);
 [genderMale,genderFemale,diseaseYes,diseaseNo,sortBy].forEach(el=>el.addEventListener('change',update));
 customWhere.addEventListener('input',update);
 resetBtn.addEventListener('click',()=>{datePicker.setDate([minDate,maxDate],true);pctSlider.noUiSlider.set([0,100]);genderMale.checked=genderFemale.checked=diseaseYes.checked=diseaseNo.checked=true;sortBy.value='id';customWhere.value='';customWhere.classList.remove('is-invalid');visibleCols=new Set(columnDefs.map(c=>c.key));document.querySelectorAll('#colChecks input').forEach(cb=>cb.checked=true);columnsInput.value=Array.from(visibleCols).join(',');update();});
-function matchAdvanced(r){const clause=customWhere.value.trim();if(!clause){customWhere.classList.remove('is-invalid');return true;}try{let expr=clause.replace(/>=/g,'__GTE__').replace(/<=/g,'__LTE__').replace(/!=/g,'__NE__');expr=expr.replace(/=/g,'==');expr=expr.replace(/__GTE__/g,'>=').replace(/__LTE__/g,'<=').replace(/__NE__/g,'!=');expr=expr.replace(/\bAND\b/gi,'&&').replace(/\bOR\b/gi,'||');const fn=new Function('r',`with(r){ return ${expr}; }`);const res=fn(r);customWhere.classList.remove('is-invalid');return!!res;}catch(e){customWhere.classList.add('is-invalid');return false;}}
+function matchAdvanced(r){
+  const clause = customWhere.value.trim();
+  if (!clause) { customWhere.classList.remove('is-invalid'); return true; }
+  try {
+    let expr = clause
+      .replace(/>=/g,'__GTE__')
+      .replace(/<=/g,'__LTE__')
+      .replace(/!=/g,'__NE__');
+    expr = expr.replace(/=/g,'==');
+    expr = expr.replace(/__GTE__/g,'>=')
+               .replace(/__LTE__/g,'<=')
+               .replace(/__NE__/g,'!=');
+    expr = expr.replace(/\bAND\b/gi,'&&').replace(/\bOR\b/gi,'||');
+    // Allow numeric sex in preview: sex == 1/0 → 'Male'/'Female'
+    expr = expr.replace(/\bsex\s*==\s*1\b/gi, "sex=='Male'")
+               .replace(/\bsex\s*==\s*0\b/gi, "sex=='Female'")
+               .replace(/\bsex\s*!=\s*1\b/gi, "sex!='Male'")
+               .replace(/\bsex\s*!=\s*0\b/gi, "sex!='Female'");
+    const fn = new Function('r', `with(r){ return ${expr}; }`);
+    const res = fn(r);
+    customWhere.classList.remove('is-invalid');
+    return !!res;
+  } catch (e) {
+    customWhere.classList.add('is-invalid');
+    return false;
+  }
+}
 function filterRecords(){const s=startDate.value?new Date(startDate.value):null;const e=endDate.value?new Date(endDate.value):null;const endInclusive=e?new Date(e.setHours(23,59,59,999)):null;console.log(`Filter range: start=${s?s.toISOString():'none'}, end=${endInclusive?endInclusive.toISOString():'none'}`);const min=Number(minPct.value);const max=Number(maxPct.value);const genders=[];if(genderMale.checked)genders.push('Male');if(genderFemale.checked)genders.push('Female');const diseases=[];if(diseaseYes.checked)diseases.push('Yes');if(diseaseNo.checked)diseases.push('No');return records.filter(r=>{const d=new Date(r.date);const dateOk=(!s||d>=s)&&(!endInclusive||d<=endInclusive);const pctOk=r.risk_pct>=min&&r.risk_pct<=max;const genderOk=genders.includes(r.sex);const diseaseOk=diseases.includes(r.pred_label);const advOk=matchAdvanced(r);return dateOk&&pctOk&&genderOk&&diseaseOk&&advOk;});}
 function sortRows(rows){const col=currentSort.col;const dir=currentSort.dir==='asc'?1:-1;return[...rows].sort((a,b)=>{const va=a[col];const vb=b[col];if(typeof va==='number'&&typeof vb==='number')return(va-vb)*dir;return String(va).localeCompare(String(vb))*dir;});}
 function renderTable(rows){const thead=document.querySelector('#preview-table thead tr');const tbody=document.querySelector('#preview-table tbody');thead.innerHTML='';visibleCols.forEach(key=>{const col=columnDefs.find(c=>c.key===key);const th=document.createElement('th');th.textContent=col.label;th.dataset.col=key;th.addEventListener('click',()=>{if(currentSort.col===key){currentSort.dir=currentSort.dir==='asc'?'desc':'asc';}else{currentSort.col=key;currentSort.dir='asc';sortBy.value=key;}currentRows=sortRows(currentRows);renderTable(currentRows);renderPagination();});thead.appendChild(th);});tbody.innerHTML='';const start=(currentPage-1)*pageSize;const pageRows=rows.slice(start,start+pageSize);pageRows.forEach(r=>{const tr=document.createElement('tr');visibleCols.forEach(k=>{let val=r[k];if(k==='risk_pct')val=`${r[k].toFixed(1)}%`;const td=document.createElement('td');if(k==='id'&&r.pred_label==='Yes'){td.classList.add('id-risk');}td.textContent=val;tr.appendChild(td);});tbody.appendChild(tr);});}

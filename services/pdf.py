@@ -218,6 +218,18 @@ def generate_dashboard_pdf(
         if key in columns:
             idx = columns.index(key)
             table_styles.append(("ALIGN", (idx, 1), (idx, -1), "LEFT"))
+    # Emphasize ID cells for positive predictions (Pred = Yes)
+    if "id" in columns:
+        id_idx = columns.index("id")
+        # Data rows start at row 1 in the table (row 0 is header)
+        for row_idx, r in enumerate(rows_list, start=1):
+            try:
+                if int(getattr(r, "prediction", 0)) == 1:
+                    table_styles.append(("FONTNAME", (id_idx, row_idx), (id_idx, row_idx), "Helvetica-Bold"))
+                    table_styles.append(("TEXTCOLOR", (id_idx, row_idx), (id_idx, row_idx), _colors.red))
+            except Exception:
+                pass
+
     table.setStyle(_TableStyle(table_styles))
 
     elements = []

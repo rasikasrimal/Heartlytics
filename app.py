@@ -1515,9 +1515,83 @@ def dashboard_pdf_generate():  # Generate and download PDF report
         query = query.filter(Prediction.prediction.in_(disease_vals))
     if where_clause:
         from sqlalchemy import text
+        import re as _re
+
+        def _coerce_where_clause(s: str) -> str:
+            if not s:
+                return s
+            q = s
+            # Normalize common aliases to actual column names
+            q = _re.sub(r"\bgender\b", "sex", q, flags=_re.IGNORECASE)
+            q = _re.sub(r"\bpred_label\b", "prediction", q, flags=_re.IGNORECASE)
+            q = _re.sub(r"\bpred\b", "prediction", q, flags=_re.IGNORECASE)
+
+            def _strip_quotes(v: str) -> str:
+                v = v.strip()
+                if len(v) >= 2 and ((v[0] == v[-1] == '"') or (v[0] == v[-1] == "'")):
+                    return v[1:-1]
+                return v
+
+            # sex = 'Male'/'Female' -> sex = 1/0; also supports !=
+            def _repl_sex_eq(m):
+                col, op, val = m.group('col'), m.group('op'), _strip_quotes(m.group('val'))
+                if val.lower() == 'male':
+                    return f"{col} {op} 1"
+                if val.lower() == 'female':
+                    return f"{col} {op} 0"
+                return m.group(0)
+
+            q = _re.sub(r"(?i)\b(?P<col>sex)\s*(?P<op>=|!=)\s*(?P<val>'[^']*'|\"[^\"]*\")", _repl_sex_eq, q)
+
+            # sex IN ('Male','Female') style
+            def _repl_sex_in(m):
+                col, vals = m.group('col'), m.group('vals')
+                items = [x.strip() for x in vals.split(',') if x.strip()]
+                mapped = []
+                for it in items:
+                    v = _strip_quotes(it)
+                    if v.lower() == 'male':
+                        mapped.append('1')
+                    elif v.lower() == 'female':
+                        mapped.append('0')
+                    else:
+                        mapped.append(it)
+                return f"{col} IN ({', '.join(mapped)})"
+
+            q = _re.sub(r"(?i)\b(?P<col>sex)\s+IN\s*\((?P<vals>[^)]*)\)", _repl_sex_in, q)
+
+            # prediction / exercise_induced_angina = 'Yes'/'No' -> 1/0
+            def _repl_yesno_eq(m):
+                col, op, val = m.group('col'), m.group('op'), _strip_quotes(m.group('val'))
+                if val.lower() == 'yes':
+                    return f"{col} {op} 1"
+                if val.lower() == 'no':
+                    return f"{col} {op} 0"
+                return m.group(0)
+
+            q = _re.sub(r"(?i)\b(?P<col>prediction|exercise_induced_angina)\s*(?P<op>=|!=)\s*(?P<val>'[^']*'|\"[^\"]*\")", _repl_yesno_eq, q)
+
+            def _repl_yesno_in(m):
+                col, vals = m.group('col'), m.group('vals')
+                items = [x.strip() for x in vals.split(',') if x.strip()]
+                mapped = []
+                for it in items:
+                    v = _strip_quotes(it)
+                    if v.lower() == 'yes':
+                        mapped.append('1')
+                    elif v.lower() == 'no':
+                        mapped.append('0')
+                    else:
+                        mapped.append(it)
+                return f"{col} IN ({', '.join(mapped)})"
+
+            q = _re.sub(r"(?i)\b(?P<col>prediction|exercise_induced_angina)\s+IN\s*\((?P<vals>[^)]*)\)", _repl_yesno_in, q)
+
+            return q
 
         try:
-            query = query.filter(text(where_clause))
+            where_clause_sql = _coerce_where_clause(where_clause)
+            query = query.filter(text(where_clause_sql))
         except Exception:
             pass
     rows_all = query.all()
