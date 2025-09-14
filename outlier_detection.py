@@ -94,6 +94,11 @@ def _iqr_rows(df: pd.DataFrame) -> pd.DataFrame:
     rows = res["rows"].copy()
     if "score" not in rows:
         rows["score"] = pd.NA
+    if "outlier_cols" not in rows:
+        rows["outlier_cols"] = ""
+    for col in ["id", "outlier_cols", "score"]:
+        if col not in rows:
+            rows[col] = pd.NA if col != "outlier_cols" else ""
     return rows[["id", "outlier_cols", "score"]]
 
 
@@ -114,9 +119,13 @@ def detect_zscore_outliers(df: pd.DataFrame, threshold: float = 3.0) -> pd.DataF
     mask = (z.abs() > threshold)
     row_mask = mask.any(axis=1)
     rows = df[row_mask].copy()
-    rows["outlier_cols"] = mask[row_mask].apply(
-        lambda r: ", ".join(feats.columns[r]), axis=1
-    )
+    cols_bool = mask.loc[row_mask]
+    if not cols_bool.empty:
+        rows["outlier_cols"] = cols_bool.apply(
+            lambda r: ", ".join(cols_bool.columns[r.values]), axis=1
+        ).astype(str)
+    else:
+        rows["outlier_cols"] = ""
     rows["score"] = z[row_mask].abs().max(axis=1).round(3)
     return rows[["id", "outlier_cols", "score"]]
 

@@ -29,7 +29,10 @@
     {% endif %}
 
     {% if cleaning_log|length > (predict_notice and 1 or 0) %}
-    <h2 class="h6 mt-3">Cleaning Log</h2>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <h2 class="h6 mb-0">Cleaning Log</h2>
+      <button class="btn btn-sm btn-outline-secondary" id="cleaning-log-view" type="button">View</button>
+    </div>
     {% set groups = cleaning_groups %}
     <div class="cleaning-log border rounded p-2 small table-scroll">
       <ul class="mb-0 ps-3">
@@ -374,25 +377,26 @@ window.addEventListener('load', function(){
     showModal(modalEl);
   });
 
-  // Cleaning log detail view
-  document.querySelectorAll('.log-view').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const idx = Number(btn.dataset.detail);
-      const det = logDetails[idx] && logDetails[idx].details ? logDetails[idx].details : [];
-      const body = document.querySelector('#viewModal .modal-body');
-      if (!det.length) { body.innerHTML = '<div class="text-muted">No details</div>'; }
-      else {
-        const cols = Object.keys(det[0]);
-        let html = '<div class="table-responsive"><table class="table table-sm table-striped"><thead><tr>';
-        html += cols.map(c=>`<th>${c}</th>`).join('') + '</tr></thead><tbody>';
-        html += det.map(r=>'<tr>'+cols.map(c=>`<td>${r[c]??''}</td>`).join('')+'</tr>').join('');
-        html += '</tbody></table></div>';
-        body.innerHTML = html;
-      }
-      document.getElementById('viewTitle').textContent = 'Details';
-      showModal(document.getElementById('viewModal'));
+  // Single "View" for entire cleaning log
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function renderFullCleaningLog(){
+    const byStep = { dup:[], invalid:[], impute:[], outliers:[], other:[] };
+    (logDetails || []).forEach(it => { const k = it.step || 'other'; (byStep[k]||byStep.other).push(it); });
+    const titles = { dup:'Duplicates removed', invalid:'Invalid values → NaN', impute:'Missing value imputation', outliers:'Outliers softened', other:'Other' };
+    let html = '';
+    ['dup','invalid','impute','outliers','other'].forEach(k => {
+      const arr = byStep[k]; if(!arr.length) return;
+      html += `<h6 class="mt-2">${esc(titles[k])}</h6>`;
+      html += '<ul class="small">' + arr.map(it => `<li>${esc(it.text||'')}</li>`).join('') + '</ul>';
     });
-  });
+    if(!html) html = '<div class="text-muted small">No cleaning log entries</div>';
+    const modalEl = document.getElementById('viewModal');
+    modalEl.querySelector('.modal-body').innerHTML = html;
+    document.getElementById('viewTitle').textContent = 'Cleaning Log';
+    showModal(modalEl);
+  }
+  const btnLog = document.getElementById('cleaning-log-view');
+  if (btnLog) btnLog.addEventListener('click', renderFullCleaningLog);
 });
 
 </script>

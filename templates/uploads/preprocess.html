@@ -168,4 +168,36 @@ document.addEventListener('click', function(e){
 
 });
 </script>
+<script>
+// Add inline help popovers for each step
+(function(){
+  function addHelp(h2, title, content){
+    if(!h2 || h2.querySelector('[data-bs-toggle="popover"]')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-link btn-sm p-0 align-baseline ms-1';
+    btn.setAttribute('data-bs-toggle', 'popover');
+    btn.setAttribute('data-bs-placement', 'top');
+    btn.setAttribute('title', title);
+    btn.setAttribute('data-bs-content', content);
+    btn.innerHTML = '<i class="bi bi-question-circle"></i>';
+    h2.appendChild(btn);
+    if (window.bootstrap && bootstrap.Popover){ new bootstrap.Popover(btn, { trigger: 'hover focus', container: 'body' }); }
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('h2.h6.mb-0').forEach(function(h2){
+      const t = (h2.textContent||'').trim();
+      if(t.startsWith('Duplicate handling')){
+        addHelp(h2, 'What it does', 'Removes exact duplicate rows using pandas drop_duplicates (keeps the first occurrence). Shows a sample of removed rows if any.');
+      } else if(t.startsWith('Invalid / implausible values')){
+        addHelp(h2, 'What it does', 'Replaces impossible or out-of-range values with NaN so they can be imputed. Examples: negative ages, zero/negative cholesterol, physiologically implausible measures.');
+      } else if(t.startsWith('Missing value imputation')){
+        addHelp(h2, 'What it does', 'Fills missing values. Numeric columns use the median; categorical columns use a simple model-based imputer to predict missing entries.');
+      } else if(t.startsWith('Outlier handling')){
+        addHelp(h2, 'How IQR softening works', 'For each numeric column, compute Q1 and Q3; IQR = Q3 − Q1. Values below Q1 − 1.5×IQR are clipped up; values above Q3 + 1.5×IQR are clipped down.');
+      }
+    });
+  });
+})();
+</script>
 {% endblock %}

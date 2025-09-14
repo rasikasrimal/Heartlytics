@@ -86,7 +86,11 @@
         <label for="notes" class="form-label">Doctor's notes</label>
         <textarea class="form-control" id="notes" name="doctor_notes" rows="3" placeholder="Optional"></textarea>
       </div>
-      <div id="conf-matrix" class="chart-sm mb-5 overflow-hidden"></div>
+      <div class="mb-2 d-flex justify-content-between align-items-center">
+        <h2 class="h6 mb-0">Risk probability distribution (KDE)</h2>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-view="#risk-dist" data-title="Risk probability distribution">View</button>
+      </div>
+      <div id="risk-dist" class="chart-sm mb-5 overflow-hidden"></div>
       <div class="d-flex justify-content-between align-items-center mb-2 mt-4">
 
         <div>Records: <span id="recordCount"></span></div>
@@ -180,11 +184,53 @@ function matchAdvanced(r){const clause=customWhere.value.trim();if(!clause){cust
 function filterRecords(){const s=startDate.value?new Date(startDate.value):null;const e=endDate.value?new Date(endDate.value):null;const endInclusive=e?new Date(e.setHours(23,59,59,999)):null;console.log(`Filter range: start=${s?s.toISOString():'none'}, end=${endInclusive?endInclusive.toISOString():'none'}`);const min=Number(minPct.value);const max=Number(maxPct.value);const genders=[];if(genderMale.checked)genders.push('Male');if(genderFemale.checked)genders.push('Female');const diseases=[];if(diseaseYes.checked)diseases.push('Yes');if(diseaseNo.checked)diseases.push('No');return records.filter(r=>{const d=new Date(r.date);const dateOk=(!s||d>=s)&&(!endInclusive||d<=endInclusive);const pctOk=r.risk_pct>=min&&r.risk_pct<=max;const genderOk=genders.includes(r.sex);const diseaseOk=diseases.includes(r.pred_label);const advOk=matchAdvanced(r);return dateOk&&pctOk&&genderOk&&diseaseOk&&advOk;});}
 function sortRows(rows){const col=currentSort.col;const dir=currentSort.dir==='asc'?1:-1;return[...rows].sort((a,b)=>{const va=a[col];const vb=b[col];if(typeof va==='number'&&typeof vb==='number')return(va-vb)*dir;return String(va).localeCompare(String(vb))*dir;});}
 function renderTable(rows){const thead=document.querySelector('#preview-table thead tr');const tbody=document.querySelector('#preview-table tbody');thead.innerHTML='';visibleCols.forEach(key=>{const col=columnDefs.find(c=>c.key===key);const th=document.createElement('th');th.textContent=col.label;th.dataset.col=key;th.addEventListener('click',()=>{if(currentSort.col===key){currentSort.dir=currentSort.dir==='asc'?'desc':'asc';}else{currentSort.col=key;currentSort.dir='asc';sortBy.value=key;}currentRows=sortRows(currentRows);renderTable(currentRows);renderPagination();});thead.appendChild(th);});tbody.innerHTML='';const start=(currentPage-1)*pageSize;const pageRows=rows.slice(start,start+pageSize);pageRows.forEach(r=>{const tr=document.createElement('tr');visibleCols.forEach(k=>{let val=r[k];if(k==='risk_pct')val=`${r[k].toFixed(1)}%`;const td=document.createElement('td');if(k==='id'&&r.pred_label==='Yes'){td.classList.add('id-risk');}td.textContent=val;tr.appendChild(td);});tbody.appendChild(tr);});}
-function renderConfusionMatrix(rows){try{const yPred=rows.map(r=>r.prediction);const yTrue=rows.map(r=>r.actual!==undefined?r.actual:r.prediction);let tn=0,fp=0,fn=0,tp=0;for(let i=0;i<yPred.length;i++){const yt=yTrue[i],yp=yPred[i];if(yt===0&&yp===0)tn++;else if(yt===0&&yp===1)fp++;else if(yt===1&&yp===0)fn++;else if(yt===1&&yp===1)tp++;}const z=[[tn,fp],[fn,tp]];const ann=[{x:0,y:0,text:String(tn),showarrow:false},{x:1,y:0,text:String(fp),showarrow:false},{x:0,y:1,text:String(fn),showarrow:false},{x:1,y:1,text:String(tp),showarrow:false}];const trace={z,x:['Pred 0','Pred 1'],y:['Actual 0','Actual 1'],type:'heatmap',colorscale:'Blues',showscale:false,hovertemplate:'%{y} vs %{x}<br>%{z}<extra></extra>'};const layout={margin:{l:80,r:20,t:20,b:80},height:320,annotations:ann};if(window._cmInited){Plotly.react('conf-matrix',[trace],layout);}else{Plotly.newPlot('conf-matrix',[trace],layout,{displayModeBar:false,responsive:true});window._cmInited=true;}}catch(e){console.warn('Confusion matrix:',e);}}
+function renderRiskDistribution(rows){
+  try{
+    const vals = rows.map(r=>Number(r.risk_pct)).filter(v=>!Number.isNaN(v));
+    if(!vals.length){
+      document.getElementById('risk-dist').innerHTML = '<div class="text-muted small">No data</div>';
+      return;
+    }
+    let sample = vals;
+    if(sample.length > 2000){
+      const step = Math.ceil(sample.length / 2000);
+      sample = sample.filter((_,i)=>i%step===0);
+    }
+    const n = sample.length;
+    const mean = sample.reduce((s,v)=>s+v,0)/n;
+    const variance = sample.reduce((s,v)=>s+(v-mean)*(v-mean),0)/n;
+    const sd = Math.sqrt(variance) || 1;
+    const bw = 1.06 * sd * Math.pow(n,-1/5);
+    const xs=[], ys=[];
+    for(let x=0;x<=100;x+=1){
+      let sum=0;
+      for(const v of sample){ const u=(x-v)/bw; sum+=Math.exp(-0.5*u*u); }
+      ys.push(sum/(n*bw*Math.sqrt(2*Math.PI)));
+      xs.push(x);
+    }
+    const hist = {x: vals, type:'histogram', histnorm:'probability density', nbinsx:20, xbins:{start:0,end:100,size:5}, marker:{color:'#93c5fd'}, opacity:0.35, name:'Histogram'};
+    const kde  = {x: xs, y: ys, type:'scatter', mode:'lines', line:{color:'#1d4ed8', width:2}, name:'KDE'};
+    const layout = {margin:{l:60,r:20,t:10,b:40}, height:320, xaxis:{title:'Risk %', range:[0,100]}, yaxis:{title:'Density'}};
+    if(window._rdInited){
+      Plotly.react('risk-dist',[hist,kde],layout);
+    } else {
+      Plotly.newPlot('risk-dist',[hist,kde],layout,{displayModeBar:false,responsive:true});
+      window._rdInited = true;
+    }
+  }catch(e){ console.warn('Risk distribution:', e); }
+}
 function renderPagination(){const totalPages=Math.ceil(currentRows.length/pageSize)||1;prevPage.disabled=currentPage<=1;nextPage.disabled=currentPage>=totalPages;}
 prevPage.addEventListener('click',()=>{if(currentPage>1){currentPage--;renderTable(currentRows);renderPagination();}});
 nextPage.addEventListener('click',()=>{const totalPages=Math.ceil(currentRows.length/pageSize);if(currentPage<totalPages){currentPage++;renderTable(currentRows);renderPagination();}});
-function update(){let rows=filterRecords();console.log(`Filtering ${records.length} rows -> ${rows.length} passed`);currentSort.col=sortBy.value;currentSort.dir='asc';currentRows=sortRows(rows);currentPage=1;recordCount.textContent=currentRows.length;renderTable(currentRows);renderPagination();renderConfusionMatrix(currentRows);}update();
+function update(){
+  let rows=filterRecords();
+  currentSort.col=sortBy.value;currentSort.dir='asc';
+  currentRows=sortRows(rows);currentPage=1;
+  recordCount.textContent=currentRows.length;
+  renderTable(currentRows);renderPagination();
+  renderRiskDistribution(currentRows);
+}
+update();
 
 </script>
 {% endblock %}

@@ -21,7 +21,11 @@
       <div class="card-body d-flex align-items-center">
         <div class="me-3 text-brand fs-1"><i class="bi bi-activity"></i></div>
         <div>
-          <div class="text-muted small">Total Predictions</div>
+          <div class="text-muted small">Total Predictions
+            <button type="button" class="btn btn-link btn-sm p-0 align-baseline ms-1" data-bs-toggle="popover" data-bs-placement="top" title="How it’s calculated" data-bs-content="Total number of predictions in the current view after filters. Date range shows first and last timestamps in the filtered data.">
+              <i class="bi bi-question-circle"></i>
+            </button>
+          </div>
           <div class="fs-3 fw-bold" id="kpi-total">—</div>
           <div class="small text-muted" id="kpi-date-range">—</div>
         </div>
@@ -33,7 +37,11 @@
       <div class="card-body d-flex align-items-center">
         <div class="me-3 text-brand fs-1"><i class="bi bi-heart-pulse-fill"></i></div>
         <div>
-          <div class="text-muted small">Positive Rate</div>
+          <div class="text-muted small">Positive Rate
+            <button type="button" class="btn btn-link btn-sm p-0 align-baseline ms-1" data-bs-toggle="popover" data-bs-placement="top" title="How it’s calculated" data-bs-content="Percentage of rows with predicted label Yes (1): (positives ÷ total) × 100. Uses model’s predicted label.">
+              <i class="bi bi-question-circle"></i>
+            </button>
+          </div>
           <div class="fs-3 fw-bold"><span id="kpi-pos-rate">—</span>%</div>
           <div class="small text-muted">Based on predicted label</div>
         </div>
@@ -45,7 +53,11 @@
       <div class="card-body d-flex align-items-center">
         <div class="me-3 text-brand fs-1"><i class="bi bi-graph-up"></i></div>
         <div>
-          <div class="text-muted small">Avg Risk Probability</div>
+          <div class="text-muted small">Avg Risk Probability
+            <button type="button" class="btn btn-link btn-sm p-0 align-baseline ms-1" data-bs-toggle="popover" data-bs-placement="top" title="How it’s calculated" data-bs-content="Mean of per-row risk probability: confidence if predicted Yes, else (1 − confidence). Shown as a percentage.">
+              <i class="bi bi-question-circle"></i>
+            </button>
+          </div>
           <div class="fs-3 fw-bold"><span id="kpi-avg-risk">—</span>%</div>
           <div class="small text-muted">Reconstructed from label + confidence</div>
         </div>
@@ -57,7 +69,11 @@
       <div class="card-body d-flex align-items-center">
         <div class="me-3 text-brand fs-1"><i class="bi bi-people-fill"></i></div>
         <div>
-          <div class="text-muted small">Patients at Risk</div>
+          <div class="text-muted small">Patients at Risk
+            <button type="button" class="btn btn-link btn-sm p-0 align-baseline ms-1" data-bs-toggle="popover" data-bs-placement="top" title="How it’s calculated" data-bs-content="Number of rows with predicted label Yes (1) after filters.">
+              <i class="bi bi-question-circle"></i>
+            </button>
+          </div>
           <div class="fs-3 fw-bold" id="kpi-at-risk">—</div>
           <div class="small text-muted">Based on predicted label</div>
         </div>
@@ -110,17 +126,7 @@
     </div>
   </div>
 
-  <div class="col-12 col-lg-6">
-    <div class="card shadow-sm h-100">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h2 class="h6 mb-0">Confusion matrix</h2>
-          <button class="btn btn-sm btn-outline-secondary" data-view="#conf-matrix" data-title="Confusion matrix">View</button>
-        </div>
-        <div id="conf-matrix" class="chart-sm"></div>
-      </div>
-    </div>
-  </div>
+  
 </div>
 
 <!-- Clustering Insights -->
@@ -378,8 +384,8 @@
     let shown = 0; // how many rows currently shown in the table
     const recordCountEl = document.getElementById('record-count');
     const filters = {}; // column -> {test:fn, text:string}
-    let sortKey = 'dt';
-    let sortAsc = false;
+    let sortKey = 'id';
+    let sortAsc = true;
     let filterMenu = null;
     const toggleHist = document.getElementById('toggle-hist');
 
@@ -539,7 +545,7 @@
           hideFilterMenu();
         } else if(btn.dataset.action === 'clear'){
           delete filters[key];
-          if(sortKey === key){ sortKey = 'dt'; sortAsc = false; }
+          if(sortKey === key){ sortKey = 'id'; sortAsc = true; }
           renderTable(true);
           hideFilterMenu();
         }
@@ -567,7 +573,7 @@
     // ---- Charts rendering ----
     function renderCharts(){
       if (!rows.length) {
-        ['risk-hist','boxplots','corr-heatmap','conf-matrix'].forEach(id => {
+        ['risk-hist','boxplots','corr-heatmap'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.innerHTML = '<div class="text-muted small">No data</div>';
         });
@@ -627,34 +633,7 @@
         }
       } catch(e){ console.warn('Heatmap:', e); }
 
-      // Confusion matrix
-      try {
-        const yPred = rows.map(r => r.prediction);
-        const yTrue = rows.map(r => r.actual !== undefined ? r.actual : r.prediction);
-        let tn=0, fp=0, fn=0, tp=0;
-        for(let i=0;i<yPred.length;i++){
-          const yt=yTrue[i], yp=yPred[i];
-          if(yt===0 && yp===0) tn++;
-          else if(yt===0 && yp===1) fp++;
-          else if(yt===1 && yp===0) fn++;
-          else if(yt===1 && yp===1) tp++;
-        }
-        const z=[[tn,fp],[fn,tp]];
-        const ann=[
-          {x:0,y:0,text:String(tn),showarrow:false},
-          {x:1,y:0,text:String(fp),showarrow:false},
-          {x:0,y:1,text:String(fn),showarrow:false},
-          {x:1,y:1,text:String(tp),showarrow:false}
-        ];
-        const trace={z,x:['Pred 0','Pred 1'],y:['Actual 0','Actual 1'],type:'heatmap',colorscale:'Blues',showscale:false,hovertemplate:'%{y} vs %{x}<br>%{z}<extra></extra>'};
-        const layout={margin:{l:80,r:20,t:20,b:80},height:320,annotations:ann};
-        if(window._cmInited){
-          Plotly.react('conf-matrix',[trace],layout);
-        }else{
-          Plotly.newPlot('conf-matrix',[trace],layout,{displayModeBar:false,responsive:true});
-          window._cmInited=true;
-        }
-      } catch(e){ console.warn('Confusion matrix:', e); }
+      
     }
 
     function renderClusterSection(){
@@ -948,6 +927,13 @@
 
 
     attachViewHandler(tbody);
+
+    // Initialize KPI help popovers
+    if (window.bootstrap) {
+      document.querySelectorAll('[data-bs-toggle="popover"]').forEach(function(el){
+        new bootstrap.Popover(el, { trigger: 'hover focus', container: 'body' });
+      });
+    }
 
     // View buttons for charts
     document.addEventListener('click', function(e){
