@@ -29,12 +29,8 @@
       </ul>
     </div>
 
-    <!-- Right-side utilities: help, theme toggle, auth/profile -->
-    <div class="d-flex align-items-center ms-3 gap-3">
-      <a href="https://example.com/help" target="_blank" rel="noopener" class="btn btn-link p-0" aria-label="Help">
-        <i class="bi bi-question-circle"></i>
-      </a>
-
+    <!-- Right-side utilities: theme toggle, auth/profile -->
+    <div class="d-flex align-items-center ms-3 gap-4">
       {% include 'components/theme_toggle.html' %}
 
       {% if current_user.is_authenticated %}
