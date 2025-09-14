@@ -1,7 +1,5 @@
 import pandas as pd
 from sklearn.ensemble import IsolationForest
-from sklearn.neighbors import LocalOutlierFactor
-from sklearn.cluster import DBSCAN
 from typing import Dict, Tuple, List
 
 
@@ -16,26 +14,63 @@ NUMERIC_COLS = [
 
 
 def detect_iqr_outliers(df: pd.DataFrame) -> Dict:
-    """Flag IQR-based column outliers and report counts."""
+    """Flag IQR-based column outliers and report counts.
+
+    Also compute a per-row 'score' equal to the maximum distance from the
+    nearest quartile in IQR units. Typical outliers have score > 1.5; extreme
+    outliers have score >= 3.0.
+    """
     counts: Dict[str, int] = {}
     col_masks: Dict[str, pd.Series] = {}
+    quartiles: Dict[str, tuple[float, float, float]] = {}
+    # Precompute quartiles for numeric cols
     for col in NUMERIC_COLS:
         if col not in df:
             continue
-        q1 = df[col].quantile(0.25)
-        q3 = df[col].quantile(0.75)
-        iqr = q3 - q1
+        q1 = float(df[col].quantile(0.25))
+        q3 = float(df[col].quantile(0.75))
+        iqr = float(q3 - q1) if pd.notna(q3) and pd.notna(q1) else 0.0
+        quartiles[col] = (q1, q3, iqr)
+        if iqr <= 0:
+            # Flat or insufficient spread; skip flagging for this column
+            counts[col] = 0
+            col_masks[col] = pd.Series(False, index=df.index)
+            continue
         low = q1 - 1.5 * iqr
         high = q3 + 1.5 * iqr
         mask = (df[col] < low) | (df[col] > high)
         counts[col] = int(mask.sum())
         col_masks[col] = mask
+
+    # Build reasons and compute IQR-based score per row
     reasons: Dict[int, list[str]] = {}
+    scores: Dict[int, float] = {}
     for col, mask in col_masks.items():
-        for idx in df[mask].index:
-            reasons.setdefault(idx, []).append(col)
+        if not mask.any():
+            continue
+        q1, q3, iqr = quartiles.get(col, (0.0, 0.0, 0.0))
+        if iqr <= 0:
+            continue
+        sub = df.loc[mask, col]
+        # Distance from nearest quartile in IQR units
+        below = sub[sub < q1]
+        above = sub[sub > q3]
+        if not below.empty:
+            s = (q1 - below) / iqr
+            for idx, val in s.items():
+                reasons.setdefault(idx, []).append(col)
+                scores[idx] = max(scores.get(idx, 0.0), float(val))
+        if not above.empty:
+            s = (above - q3) / iqr
+            for idx, val in s.items():
+                reasons.setdefault(idx, []).append(col)
+                scores[idx] = max(scores.get(idx, 0.0), float(val))
+
+    if not reasons:
+        return {"counts": counts, "rows": pd.DataFrame(columns=df.columns)}
     rows = df.loc[reasons.keys()].copy()
     rows["outlier_cols"] = [", ".join(reasons[idx]) for idx in rows.index]
+    rows["score"] = [scores.get(int(idx), float("nan")) for idx in rows.index]
     return {"counts": counts, "rows": rows}
 
 
@@ -86,42 +121,10 @@ def detect_zscore_outliers(df: pd.DataFrame, threshold: float = 3.0) -> pd.DataF
     return rows[["id", "outlier_cols", "score"]]
 
 
-def detect_lof_outliers(df: pd.DataFrame, n_neighbors: int = 20) -> pd.DataFrame:
-    """Detect outliers using Local Outlier Factor."""
-    feats = df.select_dtypes(include="number").drop(columns=["id"], errors="ignore")
-    if feats.shape[0] <= 1:
-        return pd.DataFrame(columns=["id", "outlier_cols", "score"])
-    n_neighbors = min(n_neighbors, max(2, feats.shape[0] - 1))
-    lof = LocalOutlierFactor(n_neighbors=n_neighbors, contamination="auto")
-    preds = lof.fit_predict(feats)
-    scores = -lof.negative_outlier_factor_
-    mask = preds == -1
-    rows = df[mask].copy()
-    rows["outlier_cols"] = ""
-    rows["score"] = scores[mask].round(3)
-    return rows[["id", "outlier_cols", "score"]]
-
-
-def detect_dbscan_outliers(df: pd.DataFrame, eps: float = 0.5, min_samples: int = 5) -> pd.DataFrame:
-    """Flag points labeled as noise by DBSCAN."""
-    feats = df.select_dtypes(include="number").drop(columns=["id"], errors="ignore")
-    if feats.empty:
-        return pd.DataFrame(columns=["id", "outlier_cols", "score"])
-    db = DBSCAN(eps=eps, min_samples=min_samples)
-    labels = db.fit_predict(feats)
-    mask = labels == -1
-    rows = df[mask].copy()
-    rows["outlier_cols"] = ""
-    rows["score"] = 1.0
-    return rows[["id", "outlier_cols", "score"]]
-
-
 OUTLIER_METHODS: Dict[str, Tuple[str, callable]] = {
     "iqr": ("IQR", _iqr_rows),
     "iforest": ("Isolation Forest", _iforest_rows),
     "zscore": ("Z-Score", detect_zscore_outliers),
-    "lof": ("LOF", detect_lof_outliers),
-    "dbscan": ("DBSCAN", detect_dbscan_outliers),
 }
 
 
@@ -136,7 +139,13 @@ def run_outlier_methods(df: pd.DataFrame, methods: List[str]) -> Dict[str, Dict]
         rows = func(df)
         thresh = None
         if not rows.empty and rows["score"].dtype.kind in "fc" and not rows["score"].isna().all():
-            thresh = rows["score"].quantile(0.95)
+            if key == "iqr":
+                # Extreme outliers for IQR: >= 3.0 IQR units from quartile
+                thresh = 3.0
+            else:
+                # For Isolation Forest / Z-Score, consider the top 5% scores as extreme
+                thresh = float(rows["score"].quantile(0.95))
+            rows = rows[rows["score"] >= thresh]
         results[key] = {"label": label, "rows": rows, "threshold": thresh}
     return results
 

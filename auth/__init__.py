@@ -1,4 +1,15 @@
-"""Authentication blueprint handling user login, sign-up and logout."""
+"""
+Authentication Package
+
+Auth blueprint and helpers for login, signup, MFA, and account flows.
+
+auth/forms.py - WTForms for authentication
+auth/decorators.py - RBAC decorators
+auth/rbac.py - RBAC roles and policies
+auth/mfa.py - MFA helpers
+auth/forgot_password.py - Password reset flow
+auth/totp.py - Time-based OTP helpers
+"""
 
 from __future__ import annotations
 

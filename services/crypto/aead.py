@@ -5,6 +5,10 @@ Core AEAD primitives using AES-256-GCM for confidentiality and authenticity.
 Provides fallback XOR implementation for testing only.
 """
 
+# Purpose: Provides low-level AEAD primitives using AES-256-GCM (encrypt/decrypt)
+# with nonce and tag handling. Accepts AAD for context binding. Includes a
+# testing-only XOR fallback when cryptography is unavailable (not for prod).
+
 import os
 from typing import Tuple
 

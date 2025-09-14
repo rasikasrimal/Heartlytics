@@ -12,6 +12,10 @@ services/crypto/keyring.py - Key management interface
 
 """
 
+# Purpose: Exposes a singleton keyring via get_keyring() and selects the KMS
+# provider (dev/aws/gcp/azure) from environment. Ensures a usable dev key is
+# auto-created locally for development and exports keyring types.
+
 import os
 import base64
 from .keyring import (

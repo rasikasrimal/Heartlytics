@@ -6,6 +6,10 @@ Supports: DevKeyring (local AES), AWS KMS, Google Cloud KMS, Azure Key Vault.
 Enables key rotation without re-encrypting data.
 """
 
+# Purpose: Defines the key management abstraction and keyring implementations.
+# Provides wrap/unwrap operations for DEKs and a dev keyring that uses AES key
+# wrap (or a testing fallback). Cloud KMS classes are placeholders for prod use.
+
 import base64
 import os
 from abc import ABC, abstractmethod

@@ -12,8 +12,10 @@
     const grid = styles.getPropertyValue('--grid-subtle').trim();
     const result = Object.assign({}, layout);
     result.font = Object.assign({family: 'Inter, system-ui, sans-serif', color: bodyColor}, result.font);
-    result.paper_bgcolor = theme === 'dark' ? 'rgba(0,0,0,0)' : bodyBg;
-    result.plot_bgcolor = theme === 'dark' ? 'rgba(0,0,0,0)' : bodyBg;
+    // Always render charts with transparent backgrounds so they blend
+    // with cards in both light and dark themes.
+    result.paper_bgcolor = 'rgba(0,0,0,0)';
+    result.plot_bgcolor = 'rgba(0,0,0,0)';
     result.hoverlabel = Object.assign({}, result.hoverlabel,
       theme === 'dark'
         ? {bgcolor: 'rgba(0,0,0,0.6)', font: {color: '#fff'}}
@@ -37,8 +39,10 @@
 
   function patchPlotly(){
     if (!window.Plotly) return;
-    const orig = Plotly.newPlot;
-    Plotly.newPlot = function(id, data, layout, config){
+    const origNew = Plotly.newPlot;
+    const origReact = Plotly.react ? Plotly.react.bind(Plotly) : null;
+
+    function patchDataForTheme(data){
       const theme = currentTheme();
       const patchedData = Array.isArray(data) ? data.map(tr => {
         const t = Object.assign({}, tr);
@@ -47,10 +51,22 @@
         }
         return t;
       }) : data;
+      return patchedData;
+    }
+
+    Plotly.newPlot = function(id, data, layout, config){
       const patchedLayout = buildLayout(layout || {});
       const cfg = Object.assign({responsive: true, displayModeBar: false}, config || {});
-      return orig(id, patchedData, patchedLayout, cfg);
+      return origNew(id, patchDataForTheme(data), patchedLayout, cfg);
     };
+
+    if (origReact) {
+      Plotly.react = function(id, data, layout, config){
+        const patchedLayout = buildLayout(layout || {});
+        const cfg = Object.assign({responsive: true, displayModeBar: false}, config || {});
+        return origReact(id, patchDataForTheme(data), patchedLayout, cfg);
+      }
+    }
 
     window.addEventListener('themechange', () => {
       document.querySelectorAll('.js-plotly-plot').forEach(el => {
