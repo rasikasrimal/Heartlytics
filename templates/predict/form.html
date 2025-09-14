@@ -42,20 +42,23 @@
             <div class="form-text"><span id="age-value">{{ defaults.age }}</span> years</div>
           </div>
           <div class="mb-3">
-            <label class="form-label">Sex</label>
-            <select class="form-select" name="sex">
-              <option value="1" {% if defaults.sex==1 %}selected{% endif %}>Male</option>
-              <option value="0" {% if defaults.sex==0 %}selected{% endif %}>Female</option>
-            </select>
+            <label class="form-label d-block">Sex</label>
+            <div class="d-flex flex-wrap gap-2" role="group" aria-label="Sex">
+              <input class="btn-check" type="radio" name="sex" id="sex-m" value="1" {% if defaults.sex==1 %}checked{% endif %}>
+              <label class="btn btn-outline-danger btn-sm" for="sex-m">Male</label>
+              <input class="btn-check" type="radio" name="sex" id="sex-f" value="0" {% if defaults.sex==0 %}checked{% endif %}>
+              <label class="btn btn-outline-danger btn-sm" for="sex-f">Female</label>
+            </div>
           </div>
           <div class="mb-3">
-            <label class="form-label">Chest Pain Type</label>
-            <select class="form-select" name="chest_pain_type">
+            <label class="form-label d-block">Chest Pain Type</label>
+            <div class="d-flex flex-wrap gap-2" role="group" aria-label="Chest Pain Type">
               {% set cpt = defaults.chest_pain_type %}
               {% for v in ['typical_angina','atypical_angina','non-anginal','asymptomatic'] %}
-              <option value="{{ v }}" {% if cpt==v %}selected{% endif %}>{{ v }}</option>
+              <input class="btn-check" type="radio" name="chest_pain_type" id="cpt-{{ v }}" value="{{ v }}" {% if cpt==v %}checked{% endif %}>
+              <label class="btn btn-outline-danger btn-sm text-capitalize" for="cpt-{{ v }}">{{ v.replace('_', ' ') }}</label>
               {% endfor %}
-            </select>
+            </div>
           </div>
         </div>
       </div>
@@ -79,13 +82,14 @@
             <div class="form-text"><span id="fbs-value">{{ defaults.fasting_blood_sugar }}</span> mg/dL</div>
           </div>
           <div class="mb-3">
-            <label class="form-label">Resting ECG</label>
-            <select class="form-select" name="Restecg">
+            <label class="form-label d-block">Resting ECG</label>
+            <div class="d-flex flex-wrap gap-2" role="group" aria-label="Resting ECG">
               {% set recg = defaults.Restecg %}
               {% for v in ['normal','left_ventricular_hypertrophy','st_t_wave_abnormality'] %}
-              <option value="{{ v }}" {% if recg==v %}selected{% endif %}>{{ v }}</option>
+              <input class="btn-check" type="radio" name="Restecg" id="recg-{{ v }}" value="{{ v }}" {% if recg==v %}checked{% endif %}>
+              <label class="btn btn-outline-danger btn-sm text-capitalize" for="recg-{{ v }}">{{ v.replace('_', ' ') }}</label>
               {% endfor %}
-            </select>
+            </div>
           </div>
           <div class="mb-3">
             <label class="form-label">Max Heart Rate</label>
@@ -93,11 +97,13 @@
             <div class="form-text"><span id="mhr-value">{{ defaults.max_heart_rate_achieved }}</span> bpm</div>
           </div>
           <div class="mb-3">
-            <label class="form-label">Exercise Angina</label>
-            <select class="form-select" name="exercise_induced_angina">
-              <option value="0" {% if defaults.exercise_induced_angina==0 %}selected{% endif %}>No</option>
-              <option value="1" {% if defaults.exercise_induced_angina==1 %}selected{% endif %}>Yes</option>
-            </select>
+            <label class="form-label d-block">Exercise Angina</label>
+            <div class="d-flex flex-wrap gap-2" role="group" aria-label="Exercise Angina">
+              <input class="btn-check" type="radio" name="exercise_induced_angina" id="angina-no" value="0" {% if defaults.exercise_induced_angina==0 %}checked{% endif %}>
+              <label class="btn btn-outline-danger btn-sm" for="angina-no">No</label>
+              <input class="btn-check" type="radio" name="exercise_induced_angina" id="angina-yes" value="1" {% if defaults.exercise_induced_angina==1 %}checked{% endif %}>
+              <label class="btn btn-outline-danger btn-sm" for="angina-yes">Yes</label>
+            </div>
           </div>
           <div class="mb-3">
             <label class="form-label">ST Depression</label>
@@ -105,13 +111,14 @@
             <div class="form-text"><span id="st_dep-value">{{ defaults.st_depression }}</span></div>
           </div>
           <div class="mb-3">
-            <label class="form-label">ST Slope Type</label>
-            <select class="form-select" name="st_slope_type">
+            <label class="form-label d-block">ST Slope Type</label>
+            <div class="d-flex flex-wrap gap-2" role="group" aria-label="ST Slope Type">
               {% set slope = defaults.st_slope_type %}
               {% for v in ['upsloping','flat','downsloping'] %}
-              <option value="{{ v }}" {% if slope==v %}selected{% endif %}>{{ v }}</option>
+              <input class="btn-check" type="radio" name="st_slope_type" id="slope-{{ v }}" value="{{ v }}" {% if slope==v %}checked{% endif %}>
+              <label class="btn btn-outline-danger btn-sm text-capitalize" for="slope-{{ v }}">{{ v.replace('_', ' ') }}</label>
               {% endfor %}
-            </select>
+            </div>
           </div>
           <div class="mb-3">
             <label class="form-label">Num Major Vessels</label>
@@ -119,13 +126,14 @@
             <div class="form-text"><span id="nmv-value">{{ defaults.num_major_vessels }}</span></div>
           </div>
           <div class="mb-3">
-            <label class="form-label">Thalassemia Type</label>
-            <select class="form-select" name="thalassemia_type">
+            <label class="form-label d-block">Thalassemia Type</label>
+            <div class="d-flex flex-wrap gap-2" role="group" aria-label="Thalassemia Type">
               {% set thal = defaults.thalassemia_type %}
               {% for v in ['normal','fixed_defect','reversible_defect'] %}
-              <option value="{{ v }}" {% if thal==v %}selected{% endif %}>{{ v }}</option>
+              <input class="btn-check" type="radio" name="thalassemia_type" id="thal-{{ v }}" value="{{ v }}" {% if thal==v %}checked{% endif %}>
+              <label class="btn btn-outline-danger btn-sm text-capitalize" for="thal-{{ v }}">{{ v.replace('_', ' ') }}</label>
               {% endfor %}
-            </select>
+            </div>
           </div>
         </div>
       </div>
