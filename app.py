@@ -1076,76 +1076,83 @@ def run_kmeans():  # Run K-means clustering on prediction data
 @app.get("/api/kmeans")
 @login_required
 def api_kmeans():  # API endpoint for K-means clustering
-    """Run K-Means clustering on selected features and return cluster info."""
-    rows = Prediction.query.all()
-    if not rows:
-        return jsonify({"labels": {}, "summaries": [], "silhouette": None})
+    """Run K-Means clustering on selected features and return cluster info.
 
-    allowed = {
-        "age",
-        "cholesterol",
-        "resting_blood_pressure",
-        "max_heart_rate_achieved",
-        "st_depression",
-        "num_major_vessels",
-        "risk_pct",
-    }
-    feats_param = request.args.get("features", "")
-    features = [f for f in feats_param.split(",") if f in allowed]
-    if len(features) < 2:
-        return jsonify({"error": "select at least two features"}), 400
+    Always returns JSON, even on errors, so the frontend can show a clear message.
+    """
+    try:
+        rows = Prediction.query.all()
+        if not rows:
+            return jsonify({"labels": {}, "summaries": [], "silhouette": None})
 
-    k_param = request.args.get("k", "3")
-    if not k_param.isdigit():
-        return jsonify({"error": "k must be a positive integer"}), 400
-    k = int(k_param)
-    if k < 2:
-        k = 2
+        allowed = {
+            "age",
+            "cholesterol",
+            "resting_blood_pressure",
+            "max_heart_rate_achieved",
+            "st_depression",
+            "num_major_vessels",
+            "risk_pct",
+        }
+        feats_param = request.args.get("features", "")
+        features = [f for f in feats_param.split(",") if f in allowed]
+        if len(features) < 2:
+            return jsonify({"error": "select at least two features"}), 400
 
-    data = [r.to_dict() for r in rows]
-    df = pd.DataFrame(data)
-    df["risk_pct"] = df.apply(
-        lambda r: (r["confidence"] if r["prediction"] == 1 else 1 - r["confidence"]) * 100,
-        axis=1,
-    )
-    df_feat = df[features].dropna()
-    if len(df_feat) <= k:
-        return jsonify({"error": "not enough data"}), 400
+        k_param = request.args.get("k", "3")
+        if not k_param.isdigit():
+            return jsonify({"error": "k must be a positive integer"}), 400
+        k = int(k_param)
+        if k < 2:
+            k = 2
 
-    scaler = StandardScaler()
-    X = scaler.fit_transform(df_feat)
-    km = KMeans(n_clusters=k, n_init=10, max_iter=300, random_state=0)
-    labels = km.fit_predict(X)
-    centers = scaler.inverse_transform(km.cluster_centers_)
-
-    df.loc[df_feat.index, "cluster_id"] = labels
-    summaries = []
-    for cid in range(k):
-        idxs = df_feat.index[labels == cid]
-        sub = df.loc[idxs]
-        centroid_vals = {feat: float(centers[cid, i]) for i, feat in enumerate(features)}
-        summaries.append(
-            {
-                "cluster_id": int(cid),
-                "avg_age": sub["age"].mean(),
-                "avg_cholesterol": sub["cholesterol"].mean(),
-                "avg_risk_pct": sub["risk_pct"].mean(),
-                "common_chest_pain_type": sub["chest_pain_type"].mode().iat[0]
-                if not sub["chest_pain_type"].mode().empty
-                else "",
-                "common_thalassemia_type": sub["thalassemia_type"].mode().iat[0]
-                if not sub["thalassemia_type"].mode().empty
-                else "",
-                "centroid": centroid_vals,
-            }
+        data = [r.to_dict() for r in rows]
+        df = pd.DataFrame(data)
+        df["risk_pct"] = df.apply(
+            lambda r: (r["confidence"] if r["prediction"] == 1 else 1 - r["confidence"]) * 100,
+            axis=1,
         )
+        df_feat = df[features].dropna()
+        if len(df_feat) <= k:
+            return jsonify({"error": "not enough data"}), 400
 
-    labels_map = {int(df.loc[i, "id"]): int(df.loc[i, "cluster_id"]) for i in df_feat.index}
-    sil = None
-    if k > 1 and len(df_feat) > k:
-        sil = float(silhouette_score(X, labels))
+        scaler = StandardScaler()
+        X = scaler.fit_transform(df_feat)
+        km = KMeans(n_clusters=k, n_init=10, max_iter=300, random_state=0)
+        labels = km.fit_predict(X)
+        centers = scaler.inverse_transform(km.cluster_centers_)
 
-    return jsonify({"labels": labels_map, "summaries": summaries, "silhouette": sil})
+        df.loc[df_feat.index, "cluster_id"] = labels
+        summaries = []
+        for cid in range(k):
+            idxs = df_feat.index[labels == cid]
+            sub = df.loc[idxs]
+            centroid_vals = {feat: float(centers[cid, i]) for i, feat in enumerate(features)}
+            summaries.append(
+                {
+                    "cluster_id": int(cid),
+                    "avg_age": sub["age"].mean(),
+                    "avg_cholesterol": sub["cholesterol"].mean(),
+                    "avg_risk_pct": sub["risk_pct"].mean(),
+                    "common_chest_pain_type": sub["chest_pain_type"].mode().iat[0]
+                    if not sub["chest_pain_type"].mode().empty
+                    else "",
+                    "common_thalassemia_type": sub["thalassemia_type"].mode().iat[0]
+                    if not sub["thalassemia_type"].mode().empty
+                    else "",
+                    "centroid": centroid_vals,
+                }
+            )
+
+        labels_map = {int(df.loc[i, "id"]): int(df.loc[i, "cluster_id"]) for i in df_feat.index}
+        sil = None
+        if k > 1 and len(df_feat) > k:
+            sil = float(silhouette_score(X, labels))
+
+        return jsonify({"labels": labels_map, "summaries": summaries, "silhouette": sil})
+    except Exception as e:  # ensure JSON errors for frontend
+        current_app.logger.exception("/api/kmeans failed")
+        return jsonify({"error": f"clustering failed: {str(e)}"}), 500
 
 # ---------------------------
 # Model File
@@ -2535,7 +2542,22 @@ def upload_preprocess(uid: str):  # Display data preprocessing interface
         ), 404
     df = pd.read_csv(p["mapped"])
     preview = df.head(5).drop(columns=["patient_name"], errors="ignore").to_dict(orient="records")
-    return render_template("uploads/preprocess.html", uid=uid, preview_json=preview)
+    # Count rows with any missing values (ignore optional name)
+    df_for_missing = df.drop(columns=["patient_name"], errors="ignore")
+    missing_rows = int(df_for_missing.isna().any(axis=1).sum())
+    total_rows = int(len(df))
+    missing_pct = round((missing_rows * 100.0 / total_rows), 1) if total_rows else 0.0
+    # Limit after which bulk delete is disabled (percentage of rows)
+    missing_drop_limit_pct = float(app.config.get("MISSING_DROP_LIMIT_PCT", 30))
+    return render_template(
+        "uploads/preprocess.html",
+        uid=uid,
+        preview_json=preview,
+        missing_rows=missing_rows,
+        total_rows=total_rows,
+        missing_pct=missing_pct,
+        missing_drop_limit_pct=missing_drop_limit_pct,
+    )
 
 
 
@@ -2565,6 +2587,9 @@ def upload_preprocess_task(uid: str, task: str):  # Execute data preprocessing t
         opts["impute_missing"] = True
     elif task == "outliers":
         opts["soften_outliers"] = True
+    elif task == "dropna":
+        # handled explicitly later
+        pass
     else:
         return jsonify({"ok": False, "error": "Unknown task"}), 400
 
@@ -2574,6 +2599,7 @@ def upload_preprocess_task(uid: str, task: str):  # Execute data preprocessing t
         "impute": "Filled missing values via median (numeric) or Random Forest (categorical).",
         "outliers": "Clipped extreme numeric values outside 1.5Ã—IQR range to soften outliers.",
     }
+    TASK_INFO["dropna"] = "Removed rows containing any missing values (ignoring optional patient_name)."
 
     dup_rows: list[dict] = []
     df_orig = df.copy()
@@ -2637,10 +2663,21 @@ def upload_preprocess_task(uid: str, task: str):  # Execute data preprocessing t
                     mask = (s < low) | (s > high)
                     if mask.any(): details_by_col[col] = _rows_for_mask(mask, df_orig)
 
-    try:
-        df_clean, clog = clean_dataframe(df, **opts)
-    except Exception as e:
-        return jsonify({"ok": False, "error": f"{type(e).__name__}: {e}"}), 400
+    if task == "dropna":
+        base = df.drop(columns=["patient_name"], errors="ignore")
+        mask_missing = base.isna().any(axis=1)
+        n_missing = int(mask_missing.sum())
+        if n_missing > 0:
+            df_clean = df.loc[~mask_missing].copy()
+            clog = [f"Removed {n_missing} rows with missing values; kept {len(df_clean)} of {len(df)}"]
+        else:
+            df_clean = df
+            clog = ["No rows with missing values found"]
+    else:
+        try:
+            df_clean, clog = clean_dataframe(df, **opts)
+        except Exception as e:
+            return jsonify({"ok": False, "error": f"{type(e).__name__}: {e}"}), 400
     clog = [m for m in clog if "skipped" not in m and "0 renamed" not in m and not m.startswith("Final rows")]
     df_clean.to_csv(p["mapped"], index=False)
 
@@ -2670,12 +2707,18 @@ def upload_preprocess_task(uid: str, task: str):  # Execute data preprocessing t
         json.dump(data, f)
 
     preview = df_clean.head(5).drop(columns=["patient_name"], errors="ignore").replace({np.nan: None}).to_dict(orient="records")
+    # Recompute missing counts after this step
+    df_for_missing = df_clean.drop(columns=["patient_name"], errors="ignore")
+    missing_rows = int(df_for_missing.isna().any(axis=1).sum())
+    total_rows = int(len(df_clean))
     return jsonify({
         "ok": True,
         "message": "; ".join(clog) or "No changes",
         "preview": preview,
         "info": TASK_INFO.get(task, ""),
         "details": dup_rows,
+        "missing_rows": missing_rows,
+        "total_rows": total_rows,
     })
 
 
