@@ -6,6 +6,9 @@
 <ul class="nav nav-tabs mb-4">
   <li class="nav-item"><a class="nav-link" href="{{ url_for('superadmin.dashboard') }}">Users</a></li>
   <li class="nav-item"><a class="nav-link active" href="{{ url_for('superadmin.audit_logs') }}">Audit Logs</a></li>
+  {% if current_user.role == 'SuperAdmin' %}
+  <li class="nav-item"><a class="nav-link" href="{{ url_for('superadmin.encryption_index') }}">Encryption</a></li>
+  {% endif %}
 </ul>
 
 <div class="card shadow-sm rounded-3 mb-5">

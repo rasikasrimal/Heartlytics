@@ -22,15 +22,16 @@ body, .navbar, .card, .card-section, .table, .form-control, .form-select, .btn, 
 .navbar-nav .nav-link {
   position: relative;
   padding: 0.5rem var(--space-4);
-  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+  transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
 }
 
 .navbar-nav .nav-link:hover,
 .navbar-nav .nav-link:focus {
   background-color: var(--bs-tertiary-bg);
   border-radius: 0.5rem;
-  color: var(--brand);
-  transform: translateY(-2px);
+  color: inherit; /* keep text color; only underline changes */
+  /* Removed hover lift animation */
+  transform: none;
   outline: 2px solid transparent;
   outline-offset: 2px;
 }
@@ -52,9 +53,24 @@ body, .navbar, .card, .card-section, .table, .form-control, .form-select, .btn, 
 }
 
 .navbar-nav .nav-link.active {
-  color: var(--brand);
+  color: inherit; /* keep text color; only underline indicates active */
   font-weight: 600;
 }
+
+/* ---- Main navbar theming for light/dark (topNav) ---- */
+/* Dark mode */
+.theme-dark #topNav .navbar-nav .nav-link:not(.active) { color: #f0f6fc; }
+.theme-dark #topNav .navbar-nav .nav-link.active { color: #f0f6fc; }
+.theme-dark #topNav .navbar-nav .nav-link i { color: #9198a1; }
+.theme-dark #topNav .navbar-nav .nav-link:hover,
+.theme-dark #topNav .navbar-nav .nav-link:focus { background-color: #15191f; }
+
+/* Light mode */
+[data-bs-theme="light"] #topNav .navbar-nav .nav-link:not(.active) { color: #1f2328; }
+[data-bs-theme="light"] #topNav .navbar-nav .nav-link.active { color: #1f2328; }
+[data-bs-theme="light"] #topNav .navbar-nav .nav-link i { color: #59636e; }
+[data-bs-theme="light"] #topNav .navbar-nav .nav-link:hover,
+[data-bs-theme="light"] #topNav .navbar-nav .nav-link:focus { background-color: #eaedf0; }
 
 .dropdown-menu {
   opacity: 0;
@@ -96,7 +112,7 @@ body, .navbar, .card, .card-section, .table, .form-control, .form-select, .btn, 
  .btn-brand {
    background-color: var(--brand);
    color: #fff;
-   transition: background-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+   transition: background-color var(--motion-fast) var(--ease-out);
    position: relative;
    overflow: hidden;
  }
@@ -113,24 +129,24 @@ body, .navbar, .card, .card-section, .table, .form-control, .form-select, .btn, 
  .btn-brand:hover {
    background-color: var(--brand-dark);
    color: #fff;
-   transform: translateY(-2px);
+   transform: none;
  }
  .btn-brand:hover::after {
    width: 100%;
  }
 
  .btn-success {
-   transition: background-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+   transition: background-color var(--motion-fast) var(--ease-out);
  }
  .btn-success:hover {
-   transform: translateY(-2px);
+   transform: none;
  }
 
  .btn-transition {
-   transition: background-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+   transition: background-color var(--motion-fast) var(--ease-out);
  }
  .btn-transition:hover {
-   transform: translateY(-2px);
+   transform: none;
  }
 
 .bg-gradient-primary {

@@ -26,3 +26,51 @@
 .card-footer.position-sticky {
   background: var(--bs-body-bg);
 }
+
+/* Settings page minimalist style */
+.settings-page .card {
+  box-shadow: none !important;
+  border: 0 !important;
+  background-color: var(--bs-body-bg) !important; /* merge with page background */
+}
+.settings-page .card-header {
+  /* Match page background exactly so header is not visually separate */
+  background-color: var(--bs-body-bg) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: .5rem .75rem;
+}
+.settings-page .card-header .h6,
+.settings-page .card-header h6 {
+  font-size: .95rem;
+  margin: 0;
+}
+.settings-page .card-body { padding: .75rem 1rem; }
+.settings-page .card-footer { padding: .75rem 1rem; }
+.settings-page .btn { box-shadow: none !important; }
+.settings-page .btn:focus { box-shadow: none !important; }
+.settings-page #settingsNav { box-shadow: none !important; }
+/* Remove dividing line under the secondary nav */
+.settings-page #settingsNav { border-bottom: 0 !important; }
+/* Trim vertical whitespace inside sections */
+.settings-page .card-body > *:last-child { margin-bottom: 0; }
+.settings-page .card-body > *:first-child { margin-top: 0; }
+
+/* Exact backgrounds per theme for Settings page */
+/* Dark mode exact: #0d1117 */
+.theme-dark .settings-page .card,
+.theme-dark .settings-page .card-header,
+.theme-dark #settingsNav {
+  background-color: #0d1117 !important;
+}
+/* Light mode exact: #f8fafc */
+[data-bs-theme="light"] .settings-page .card,
+[data-bs-theme="light"] .settings-page .card-header,
+[data-bs-theme="light"] #settingsNav {
+  background-color: #f8fafc !important;
+}
+.settings-page [id^="account"],
+.settings-page [id^="security"],
+.settings-page [id^="customization"] {
+  margin-bottom: 1rem !important;
+}
