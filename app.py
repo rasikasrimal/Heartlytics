@@ -1926,9 +1926,8 @@ def dashboard_clean_csv():  # Export cleaned dashboard data as CSV
 @app.get("/research")
 @login_required
 @require_module_access("Research")
-def research_paper():  # Display research paper viewer
-    paper = load_research_paper()
-    return render_template("research/index.html", paper=paper)
+def research_paper():  # Display research page (HTML-based, no LaTeX)
+    return render_template("research/plain.html")
 
 # ---------------------------
 # PDF single report

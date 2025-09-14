@@ -81,9 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
       html += `<div class="progress mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pred.risk_pct}"><div class="progress-bar bg-info" style="width:${pred.risk_pct}%">${pred.risk_pct}%</div></div>`;
     }
     if (pred.confidence_pct !== null) {
-      html += `<p class="mb-0">Model confidence: ${pred.confidence_pct}%</p>`;
+      html += `<p class="mb-0">Model confidence <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="Confidence for this single prediction, not overall model accuracy.">?</span>: ${pred.confidence_pct}%</p>`;
     }
     prediction.innerHTML = html;
+    // initialize tooltips inside the freshly rendered prediction block
+    prediction.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+      new bootstrap.Tooltip(el);
+    });
   }
 
   function renderChart(res) {

@@ -84,5 +84,13 @@
     </nav>
   </div>
 </div>
+<!-- Activity Log (accordion view) -->
+<div class="card shadow-sm rounded-3">
+  <div class="card-header"><h2 class="h6 mb-0">Activity Log</h2></div>
+  <div class="card-body">
+    {% from '_components/accordion.html' import log_accordion %}
+    {{ log_accordion(logs) }}
+  </div>
+</div>
 {% endblock %}
 

@@ -12,7 +12,7 @@
     </div>
   </div>
   {% endfor %}
-</div>
+  </div>
 {%- endmacro %}
 
 {% macro log_accordion(items) -%}
@@ -22,15 +22,25 @@
     <h2 class="accordion-header" id="log-h{{ loop.index }}">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#log-c{{ loop.index }}" aria-expanded="false" aria-controls="log-c{{ loop.index }}">
         <i class="bi bi-circle me-2"></i>
-        {{ log.action }}
-        <span class="ms-auto small text-muted">{{ log.timestamp }}</span>
+        {{ log.action if log.action is defined else 'Activity' }}
+        <span class="ms-auto small text-muted">{{ (log.timestamp.strftime('%Y-%m-%d %H:%M') if log.timestamp is string == false and log.timestamp.strftime is defined else log.timestamp) or '' }}</span>
       </button>
     </h2>
     <div id="log-c{{ loop.index }}" class="accordion-collapse collapse" data-bs-parent="#activityAccordion">
       <div class="accordion-body small">
-        IP: {{ log.ip or '—' }}<br>
-        Agent: {{ log.user_agent or '—' }}<br>
-        more details...
+        {% set ip = (log.requester_ip if log.requester_ip is defined else (log.ip if log.ip is defined else None)) %}
+        {% set ua = (log.user_agent if log.user_agent is defined else None) %}
+        {% if ip %}<div><span class="text-muted">IP:</span> {{ ip }}</div>{% endif %}
+        {% if ua %}<div><span class="text-muted">Agent:</span> {{ ua }}</div>{% endif %}
+        {% if log.acting_user is defined or log.target_user is defined %}
+        <div class="mt-2">
+          <div><span class="text-muted">By:</span> {{ log.acting_user.username if log.acting_user is defined and log.acting_user else '—' }}</div>
+          <div><span class="text-muted">Target:</span> {{ log.target_user.username if log.target_user is defined and log.target_user else '—' }}</div>
+          {% if log.old_value is defined or log.new_value is defined %}
+          <div><span class="text-muted">Change:</span> {{ (log.old_value or '—') }} → {{ (log.new_value or '—') }}</div>
+          {% endif %}
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -40,5 +50,6 @@
     <p class="mt-3">No activity yet</p>
   </div>
   {% endfor %}
-</div>
+  </div>
 {%- endmacro %}
+
