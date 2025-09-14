@@ -220,7 +220,9 @@ MFA_EMAIL_TTL_MIN=10
 MFA_EMAIL_MAX_ATTEMPTS=5
 MFA_EMAIL_RESEND_COOLDOWN_SEC=30
 ```
-
+```
+Remove-Item -Force -ErrorAction SilentlyContinue .\instance\app.db, .\instance\app.db-wal, .\instance\app.db-shm
+```
 Use the `/debug/mail` page (SuperAdmin only) to send a test message and inspect
 recent delivery events.
 
