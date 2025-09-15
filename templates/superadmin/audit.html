@@ -34,6 +34,7 @@
           <option value="change_role" {% if request.args.get('action')=='change_role' %}selected{% endif %}>Change Role</option>
           <option value="toggle_status" {% if request.args.get('action')=='toggle_status' %}selected{% endif %}>Toggle Status</option>
           <option value="reset_password" {% if request.args.get('action')=='reset_password' %}selected{% endif %}>Reset Password</option>
+          <option value="username_change" {% if request.args.get('action')=='username_change' %}selected{% endif %}>Username Change</option>
         </select>
       </div>
       <div class="col-md-2">

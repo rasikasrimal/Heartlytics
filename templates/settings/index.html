@@ -15,7 +15,6 @@
     <li class="nav-item"><a class="nav-link" href="#account">Account</a></li>
     <li class="nav-item"><a class="nav-link" href="#security">Security</a></li>
     <li class="nav-item"><a class="nav-link" href="#customization">Customization</a></li>
-    <li class="nav-item"><a class="nav-link" href="#activity-log">Activity Log</a></li>
   </ul>
 </nav>
 <div class="row g-3">
@@ -36,6 +35,14 @@
         <form method="post" action="{{ url_for('settings.update_profile') }}" class="card-body position-relative">
           <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
           {{ form_field('text', 'username', 'Username', current_user.username, help='Visible to others.') }}
+          {% if username_cooldown_active %}
+          <div class="text-muted small mt-n2 mb-2">
+            Next change available on: <strong>{{ username_next_change_at.strftime('%Y-%m-%d') }}</strong>
+          </div>
+          {% endif %}
+          <div class="text-muted small mb-2">
+            For your security, old usernames are held for {{ username_hold_days }} days to prevent impersonation.
+          </div>
           {{ form_field('email', 'email', 'Email', current_user.email) }}
           {{ form_field('text', 'nickname', 'Nickname', current_user.nickname) }}
           <div class="card-footer bg-transparent border-0 position-sticky bottom-0 d-flex justify-content-end gap-2">
@@ -99,9 +106,45 @@
 <footer class="text-center text-muted small mt-5">© 2025 HeartLytics. For educational use only.</footer>
 
 {{ modal_upload('avatarModal', 'Upload Avatar', url_for('settings.update_profile'), 'avatar') }}
+<!-- Username cooldown modal -->
+<div class="modal fade" id="usernameCooldownModal" tabindex="-1" aria-labelledby="usernameCooldownModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="usernameCooldownModalLabel">Username Change Cooldown</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        You can change your username again on <strong id="cooldown-date">—</strong>.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
 <script src="{{ url_for('static', filename='js/settings-ui.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const until = {{ ('"' ~ username_cooldown_until ~ '"') if username_cooldown_until else 'null' }};
+    if (until) {
+      try {
+        const dt = new Date(until);
+        const el = document.getElementById('cooldown-date');
+        if (el) {
+          const y = dt.getFullYear();
+          const m = String(dt.getMonth()+1).padStart(2,'0');
+          const d = String(dt.getDate()).padStart(2,'0');
+          el.textContent = `${y}-${m}-${d}`;
+        }
+        const modal = new bootstrap.Modal(document.getElementById('usernameCooldownModal'));
+        modal.show();
+      } catch (e) { /* noop */ }
+    }
+  });
+</script>
 {% endblock %}

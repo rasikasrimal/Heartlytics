@@ -108,9 +108,18 @@ def login():
 def check_username():
     """Return availability of a username."""
     User = current_app.User
+    UsernameReservation = current_app.UsernameReservation
     username = request.args.get("username", "").strip()
+    # Check live users
     exists = User.query.filter_by(username=username).first() is not None
-    return jsonify({"available": not exists})
+    # Check active reservations
+    reserved = (
+        UsernameReservation.query.filter_by(username=username)
+        .filter(UsernameReservation.reserved_until >= datetime.utcnow())
+        .first()
+        is not None
+    )
+    return jsonify({"available": not (exists or reserved)})
 
 
 @auth_bp.get("/check-email")
@@ -136,7 +145,16 @@ def signup():
         User = current_app.User
 
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            UsernameReservation = current_app.UsernameReservation
             if User.query.filter_by(username=form.username.data).first():
+                return jsonify({"error": "username"}), 400
+            # Prevent using reserved usernames during active hold window
+            res = (
+                UsernameReservation.query.filter_by(username=form.username.data)
+                .filter(UsernameReservation.reserved_until >= datetime.utcnow())
+                .first()
+            )
+            if res:
                 return jsonify({"error": "username"}), 400
             if User.query.filter_by(email=form.email.data).first():
                 return jsonify({"error": "email"}), 400
@@ -174,8 +192,17 @@ def signup():
             return jsonify({"success": True})
 
         # Prevent duplicate usernames/emails.
+        UsernameReservation = current_app.UsernameReservation
         if User.query.filter_by(username=form.username.data).first():
             flash("Username taken", "error")
+            return render_template("auth/signup.html", form=form)
+        res = (
+            UsernameReservation.query.filter_by(username=form.username.data)
+            .filter(UsernameReservation.reserved_until >= datetime.utcnow())
+            .first()
+        )
+        if res:
+            flash("Username reserved, please choose another", "error")
             return render_template("auth/signup.html", form=form)
         if User.query.filter_by(email=form.email.data).first():
             flash("Email already registered, sign in?", "error")

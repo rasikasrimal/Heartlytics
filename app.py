@@ -450,6 +450,8 @@ class User(db.Model, UserMixin):
     mfa_secret_kver = db.Column(db.Integer)
     mfa_recovery_hashes = db.Column(db.JSON)
     mfa_last_enforced_at = db.Column(db.DateTime)
+    # Username change policy tracking
+    last_username_change_at = db.Column(db.DateTime)
 
     def set_password(self, password: str) -> None:
         """Hash and store the given password using Argon2id."""
@@ -546,6 +548,22 @@ class AuditLog(db.Model):
     acting_user = db.relationship("User", foreign_keys=[acting_user_id])
     target_user = db.relationship("User", foreign_keys=[target_user_id])
 
+
+class UsernameReservation(db.Model):
+    """Temporarily reserve a username after it is changed.
+
+    Prevents other accounts from claiming a recently released username
+    to reduce impersonation risk.
+    """
+
+    __tablename__ = "username_reservation"
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    reserved_until = db.Column(db.DateTime, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+    user = db.relationship("User")
 
 class PasswordResetRequest(db.Model):
     """Short-lived record for password reset verification codes."""
@@ -829,6 +847,7 @@ app.MFAEmailChallenge = MFAEmailChallenge
 app.Role = Role
 app.UserRole = UserRole
 app.Patient = Patient
+app.UsernameReservation = UsernameReservation
 
 
 @login_manager.user_loader
@@ -849,8 +868,8 @@ def enforce_session_timeout():  # Enforce session timeout for security
         flash("Session expired, please log in again.", "warning")
         return redirect(url_for("auth.login"))
     session["last_active"] = now.isoformat()
-
-
+  
+  
 @app.errorhandler(403)
 def forbidden(_):  # Handle 403 errors with JSON response
     """Render a user-friendly forbidden page."""
@@ -862,7 +881,7 @@ def forbidden(_):  # Handle 403 errors with JSON response
         ),
         403,
     )
-
+ 
 with app.app_context():
     db.create_all()
     insp = inspect(db.engine)
@@ -904,6 +923,28 @@ with app.app_context():
             )
             db.session.commit()
 
+    # ensure username_reservation table columns exist if table was created previously
+    try:
+        tables = insp.get_table_names()
+        if "username_reservation" in tables:
+            res_cols = [c["name"] for c in insp.get_columns("username_reservation")]
+            if "user_id" not in res_cols:
+                db.session.execute(text("ALTER TABLE username_reservation ADD COLUMN user_id INTEGER"))
+                db.session.commit()
+            if "created_at" not in res_cols:
+                db.session.execute(text("ALTER TABLE username_reservation ADD COLUMN created_at DATETIME"))
+                db.session.commit()
+            # Ensure unique index on username
+            db.session.execute(
+                text(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS ix_username_reservation_username ON username_reservation (username)"
+                )
+            )
+            db.session.commit()
+    except Exception:
+        # Best-effort; skip if unavailable
+        pass
+
     # ensure uid, requested_role and updated_at columns exist for existing user tables
     user_cols = [c["name"] for c in insp.get_columns("user")]
     if "requested_role" not in user_cols:
@@ -941,6 +982,9 @@ with app.app_context():
                 "CREATE UNIQUE INDEX IF NOT EXISTS ix_user_nickname ON user (nickname) WHERE nickname IS NOT NULL"
             )
         )
+        db.session.commit()
+    if "last_username_change_at" not in user_cols:
+        db.session.execute(text("ALTER TABLE user ADD COLUMN last_username_change_at DATETIME"))
         db.session.commit()
 
     # ensure MFA columns exist for older databases
@@ -982,7 +1026,7 @@ with app.app_context():
             sa.roles.append(sa_role)
         db.session.add(sa)
         db.session.commit()
-
+ 
 
 def run_kmeans():  # Run K-means clustering on prediction data
     rows = Prediction.query.all()
