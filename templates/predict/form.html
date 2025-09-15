@@ -33,7 +33,7 @@
         <div class="card-body">
           <h5 class="card-title">Demographics</h5>
           <div class="mb-3">
-            <label class="form-label">Patient Name</label>
+            <label class="form-label">Patient Name <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="Optional. For display only; not used by the model.">?</span></label>
             <input type="text" class="form-control" name="patient_name" value="{{ defaults.patient_name }}">
           </div>
           <div class="mb-3">
@@ -42,7 +42,7 @@
             <div class="form-text"><span id="age-value">{{ defaults.age }}</span> years</div>
           </div>
           <div class="mb-3">
-            <label class="form-label d-block">Sex</label>
+            <label class="form-label d-block">Sex <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="Biological sex used by the dataset.">?</span></label>
             <div class="d-flex flex-wrap gap-2" role="group" aria-label="Sex">
               <input class="btn-check" type="radio" name="sex" id="sex-m" value="1" {% if defaults.sex==1 %}checked{% endif %}>
               <label class="btn btn-outline-danger btn-sm" for="sex-m">Male</label>
@@ -51,7 +51,7 @@
             </div>
           </div>
           <div class="mb-3">
-            <label class="form-label d-block">Chest Pain Type</label>
+            <label class="form-label d-block">Chest Pain Type <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="UCI categories: typical/atypical angina, non-anginal, asymptomatic.">?</span></label>
             <div class="d-flex flex-wrap gap-2" role="group" aria-label="Chest Pain Type">
               {% set cpt = defaults.chest_pain_type %}
               {% for v in ['typical_angina','atypical_angina','non-anginal','asymptomatic'] %}
@@ -67,22 +67,22 @@
         <div class="card-body">
           <h5 class="card-title">Clinical Measurements</h5>
           <div class="mb-3">
-            <label class="form-label">Resting BP</label>
+            <label class="form-label">Resting BP <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="Resting blood pressure at admission (mmHg).">?</span></label>
             <input type="range" class="form-range" name="resting_blood_pressure" id="bp" min="80" max="250" value="{{ defaults.resting_blood_pressure }}">
             <div class="form-text"><span id="bp-value">{{ defaults.resting_blood_pressure }}</span> mmHg</div>
           </div>
           <div class="mb-3">
-            <label class="form-label">Cholesterol</label>
+            <label class="form-label">Cholesterol <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="Serum cholesterol (mg/dL).">?</span></label>
             <input type="range" class="form-range" name="cholesterol" id="chol" min="100" max="600" value="{{ defaults.cholesterol }}">
             <div class="form-text"><span id="chol-value">{{ defaults.cholesterol }}</span> mg/dL</div>
           </div>
           <div class="mb-3">
-            <label class="form-label">Fasting Blood Sugar / Glucose (mg/dL)</label>
+            <label class="form-label">Fasting Blood Sugar / Glucose (mg/dL) <span class="ms-1 text-muted" data-bs-toggle="tooltip" title=">= 120 mg/dL is treated as FBS=1; else 0.">?</span></label>
             <input type="range" class="form-range" name="fasting_blood_sugar" id="fbs" min="60" max="200" value="{{ defaults.fasting_blood_sugar }}">
             <div class="form-text"><span id="fbs-value">{{ defaults.fasting_blood_sugar }}</span> mg/dL</div>
           </div>
           <div class="mb-3">
-            <label class="form-label d-block">Resting ECG</label>
+            <label class="form-label d-block">Resting ECG <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="Resting electrocardiographic results.">?</span></label>
             <div class="d-flex flex-wrap gap-2" role="group" aria-label="Resting ECG">
               {% set recg = defaults.Restecg %}
               {% for v in ['normal','left_ventricular_hypertrophy','st_t_wave_abnormality'] %}
@@ -92,12 +92,12 @@
             </div>
           </div>
           <div class="mb-3">
-            <label class="form-label">Max Heart Rate</label>
+            <label class="form-label">Max Heart Rate <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="Maximum heart rate achieved during exercise (bpm).">?</span></label>
             <input type="range" class="form-range" name="max_heart_rate_achieved" id="mhr" min="60" max="220" value="{{ defaults.max_heart_rate_achieved }}">
             <div class="form-text"><span id="mhr-value">{{ defaults.max_heart_rate_achieved }}</span> bpm</div>
           </div>
           <div class="mb-3">
-            <label class="form-label d-block">Exercise Angina</label>
+            <label class="form-label d-block">Exercise Angina <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="Angina induced by exercise (0/1).">?</span></label>
             <div class="d-flex flex-wrap gap-2" role="group" aria-label="Exercise Angina">
               <input class="btn-check" type="radio" name="exercise_induced_angina" id="angina-no" value="0" {% if defaults.exercise_induced_angina==0 %}checked{% endif %}>
               <label class="btn btn-outline-danger btn-sm" for="angina-no">No</label>
@@ -106,12 +106,12 @@
             </div>
           </div>
           <div class="mb-3">
-            <label class="form-label">ST Depression</label>
+            <label class="form-label">ST Depression <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="Oldpeak: ST depression induced by exercise relative to rest.">?</span></label>
             <input type="range" step="0.1" class="form-range" name="st_depression" id="st_dep" min="0" max="6.2" value="{{ defaults.st_depression }}">
             <div class="form-text"><span id="st_dep-value">{{ defaults.st_depression }}</span></div>
           </div>
           <div class="mb-3">
-            <label class="form-label d-block">ST Slope Type</label>
+            <label class="form-label d-block">ST Slope Type <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="Slope of the peak exercise ST segment.">?</span></label>
             <div class="d-flex flex-wrap gap-2" role="group" aria-label="ST Slope Type">
               {% set slope = defaults.st_slope_type %}
               {% for v in ['upsloping','flat','downsloping'] %}
@@ -121,12 +121,12 @@
             </div>
           </div>
           <div class="mb-3">
-            <label class="form-label">Num Major Vessels</label>
+            <label class="form-label">Num Major Vessels <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="Number of major vessels colored by fluoroscopy (0-3).">?</span></label>
             <input type="range" class="form-range" name="num_major_vessels" id="nmv" min="0" max="3" step="1" value="{{ defaults.num_major_vessels }}">
             <div class="form-text"><span id="nmv-value">{{ defaults.num_major_vessels }}</span></div>
           </div>
           <div class="mb-3">
-            <label class="form-label d-block">Thalassemia Type</label>
+            <label class="form-label d-block">Thalassemia Type <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="Thalassemia category (normal/fixed defect/reversible defect).">?</span></label>
             <div class="d-flex flex-wrap gap-2" role="group" aria-label="Thalassemia Type">
               {% set thal = defaults.thalassemia_type %}
               {% for v in ['normal','fixed_defect','reversible_defect'] %}

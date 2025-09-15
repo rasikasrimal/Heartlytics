@@ -31,6 +31,20 @@
   <div class="card shadow-sm">
     <div class="card-body">
       <div class="d-flex justify-content-between align-items-center">
+        <h2 class="h6 mb-0">Rows with missing values</h2>
+        {% set miss_pct = (missing_rows * 100 / total_rows) if total_rows else 0 %}
+        <button class="btn btn-sm btn-outline-danger" data-action="dropna" {% if missing_rows == 0 or miss_pct > missing_drop_limit_pct %}disabled{% endif %}>Delete all</button>
+      </div>
+      <div class="mt-2 small text-muted">
+        Found <strong id="missing-count">{{ missing_rows }}</strong> of <span id="total-count">{{ total_rows }}</span> rows with at least one missing cell (<span id="missing-pct">{{ '%.1f' % missing_pct }}</span>%).
+        Deletion disabled if more than {{ '%.0f' % missing_drop_limit_pct }}% of rows have missing values.
+      </div>
+      <div class="mt-2" id="msg-dropna"></div>
+    </div>
+  </div>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center">
         <h2 class="h6 mb-0">Missing value imputation</h2>
         <button class="btn btn-sm btn-brand" data-action="impute">Fix</button>
       </div>
@@ -74,6 +88,7 @@ const uid = "{{ uid }}";
 const csrfToken = "{{ csrf_token() }}";
 const preview = {{ preview_json|tojson|safe }};
 const detailCache = {};
+const DROP_LIMIT_PCT = {{ (missing_drop_limit_pct or 30) | int }};
 
 function showModal(modalEl){
   if(window.bootstrap && bootstrap.Modal){
@@ -126,6 +141,23 @@ document.querySelectorAll('[data-action]').forEach(btn=>{
       }
       msg.innerHTML = `<div class=\"alert alert-success small mb-0\"><strong>${data.message}</strong><br><span class=\"text-muted\">${data.info}</span>${extraBtn}</div>`;
       renderPreview(data.preview);
+      // Update missing counts if provided
+      if (typeof data.missing_rows === 'number') {
+        const mc = document.getElementById('missing-count');
+        if (mc) mc.textContent = data.missing_rows;
+      }
+      if (typeof data.total_rows === 'number') {
+        const tc = document.getElementById('total-count');
+        if (tc) tc.textContent = data.total_rows;
+      }
+      // Apply threshold-based disable logic and update percent label
+      const dropBtn = document.querySelector('[data-action="dropna"]');
+      const mcVal = Number(document.getElementById('missing-count')?.textContent || 0);
+      const tcVal = Number(document.getElementById('total-count')?.textContent || 0);
+      const pct = tcVal ? Math.round((mcVal / tcVal) * 1000) / 10 : 0;
+      const pctEl = document.getElementById('missing-pct');
+      if (pctEl) pctEl.textContent = pct.toFixed(1);
+      if (dropBtn) dropBtn.disabled = (mcVal === 0) || (tcVal > 0 && pct > DROP_LIMIT_PCT);
     } catch(e) {
       msg.innerHTML = `<div class="alert alert-danger small mb-0">Error: ${e.message}</div>`;
 

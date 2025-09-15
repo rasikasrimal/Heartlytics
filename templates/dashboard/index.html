@@ -412,7 +412,10 @@
       const k = kSelect.value;
       let resp, json;
       try {
-        resp = await fetch(`/api/kmeans?features=${feats.join(',')}&k=${k}`);
+        resp = await fetch(`/api/kmeans?features=${feats.join(',')}&k=${k}` , {
+          headers: { 'Accept': 'application/json' },
+          credentials: 'same-origin'
+        });
         json = await parseJson(resp);
       } catch(e){
         clusterMsg.textContent = 'Clustering failed';

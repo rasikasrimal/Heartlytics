@@ -76,14 +76,57 @@ document.addEventListener('DOMContentLoaded', () => {
       prediction.innerHTML = '';
       return;
     }
-    let html = `<p class="mb-1"><strong>${pred.label}</strong></p>`;
-    if (pred.risk_pct !== null) {
-      html += `<div class="progress mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pred.risk_pct}"><div class="progress-bar bg-info" style="width:${pred.risk_pct}%">${pred.risk_pct}%</div></div>`;
+
+    // Derive risk band and classes similar to /predict
+    const riskPct = pred.risk_pct;
+    const confidencePct = pred.confidence_pct;
+    let riskBand = null;
+    if (riskPct !== null && riskPct !== undefined) {
+      if (riskPct < 30) riskBand = 'Low';
+      else if (riskPct < 60) riskBand = 'Moderate';
+      else riskBand = 'High';
     }
-    if (pred.confidence_pct !== null) {
-      html += `<p class="mb-0">Model confidence <span class="ms-1 text-muted" data-bs-toggle="tooltip" title="Confidence for this single prediction, not overall model accuracy.">?</span>: ${pred.confidence_pct}%</p>`;
+    const isPositive = (pred.label || '').toLowerCase().includes('heart disease') && (pred.label || '').toLowerCase() !== 'no heart disease';
+    const badgeClass = isPositive ? 'danger' : 'success';
+    const barClass = riskBand === 'Low' ? 'success' : riskBand === 'Moderate' ? 'warning' : 'danger';
+
+    let html = '';
+    html += '<div class="mb-4">';
+    html += `<span class="badge rounded-pill fs-5 bg-${badgeClass}">${isPositive ? 'Risk Detected' : 'No Heart Disease'}</span>`;
+    if (riskBand) {
+      html += `<span class="badge bg-secondary fs-6 ms-2">${riskBand} risk band</span>`;
     }
+    html += '</div>';
+
+    if (riskPct !== null && riskPct !== undefined) {
+      html += '<h5 class="mb-2">Risk Percentage</h5>';
+      html += `<div class="progress progress-hover mb-4" role="progressbar" aria-valuenow="${riskPct}" aria-valuemin="0" aria-valuemax="100" data-bs-toggle="tooltip" title="${riskBand || ''} Risk (${riskPct}%)">`;
+      html += `<div class="progress-bar progress-bar-striped progress-bar-animated bg-${barClass} fw-semibold" data-target="${riskPct}" style="width:0;">${riskPct}%</div>`;
+      html += '</div>';
+    } else {
+      html += '<div class="alert alert-warning mb-3">Probability unavailable (model doesn\'t expose <code>predict_proba</code>).</div>';
+    }
+
+    if (confidencePct !== null && confidencePct !== undefined) {
+      html += '<h5 class="mb-2">Model Confidence</h5>';
+      html += `<div class="progress progress-hover mb-4" role="progressbar" aria-valuenow="${confidencePct}" aria-valuemin="0" aria-valuemax="100" data-bs-toggle="tooltip" title="Model is ${confidencePct}% confident in this prediction">`;
+      html += `<div class="progress-bar progress-bar-striped progress-bar-animated bg-info fw-semibold" data-target="${confidencePct}" style="width:0;">${confidencePct}%</div>`;
+      html += '</div>';
+    }
+
+    html += '<p class="small text-muted mb-0">Educational demo — not a medical diagnosis.</p>';
+
     prediction.innerHTML = html;
+
+    // Animate progress bars to target width
+    prediction.querySelectorAll('.progress-bar[data-target]').forEach(bar => {
+      const target = bar.getAttribute('data-target');
+      // Allow reflow then animate
+      requestAnimationFrame(() => {
+        setTimeout(() => { bar.style.width = `${target}%`; }, 150);
+      });
+    });
+
     // initialize tooltips inside the freshly rendered prediction block
     prediction.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
       new bootstrap.Tooltip(el);
