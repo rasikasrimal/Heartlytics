@@ -85,6 +85,9 @@ def mfa_verify():
         secret = user.mfa_secret
         if secret and verify_totp(secret, code):
             login_user(user)
+            session.permanent = True
+            session['_fresh'] = True
+            session['_user_id'] = str(user.get_id())
             user.last_login = datetime.utcnow()
             user.mfa_last_enforced_at = datetime.utcnow()
             current_app.db.session.commit()
@@ -96,6 +99,9 @@ def mfa_verify():
             hashes.remove(hashed)
             user.mfa_recovery_hashes = hashes
             login_user(user)
+            session.permanent = True
+            session['_fresh'] = True
+            session['_user_id'] = str(user.get_id())
             user.last_login = datetime.utcnow()
             user.mfa_last_enforced_at = datetime.utcnow()
             current_app.db.session.commit()

@@ -15,3 +15,8 @@ instance/
 .idea/
 
 .env
+# Node
+node_modules/
+.next/
+frontend/.next/
+frontend/node_modules/

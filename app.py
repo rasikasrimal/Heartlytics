@@ -99,6 +99,7 @@ import hashlib
 from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo
 import click
+from jinja2 import DictLoader
 
 import numpy as np
 import pandas as pd
@@ -167,6 +168,7 @@ except Exception:  # pragma: no cover - minimal stubs when crypto deps missing
         return None
 from config import DevelopmentConfig, ProductionConfig
 from navigation import get_nav_items
+from legacy_templates import TEMPLATES
 
 # ML imputation helpers
 from sklearn.metrics import (
@@ -218,6 +220,7 @@ from sqlalchemy import inspect, text
 # App & Config
 # ---------------------------
 app = Flask(__name__, instance_relative_config=True)
+app.jinja_loader = DictLoader(TEMPLATES)
 env = os.getenv("FLASK_ENV", "production")
 app.config.from_object(DevelopmentConfig if env == "development" else ProductionConfig)
 
@@ -291,7 +294,9 @@ def set_security_headers(resp):  # Add security headers to all responses
 
 @app.errorhandler(403)
 def handle_forbidden(e):  # Handle 403 Forbidden errors
-    if request.accept_mimetypes.accept_json and not request.accept_mimetypes.accept_html:
+    accept_header = request.headers.get("Accept", "").lower()
+    wants_json = "application/json" in accept_header or request.is_json
+    if wants_json:
         return jsonify({"error": "forbidden"}), 403
     return render_template("errors/403.html"), 403
 
@@ -870,18 +875,6 @@ def enforce_session_timeout():  # Enforce session timeout for security
     session["last_active"] = now.isoformat()
   
   
-@app.errorhandler(403)
-def forbidden(_):  # Handle 403 errors with JSON response
-    """Render a user-friendly forbidden page."""
-    return (
-        render_template(
-            "error.html",
-            title="Forbidden",
-            message="Access denied. You do not have permission to view this page.",
-        ),
-        403,
-    )
- 
 with app.app_context():
     db.create_all()
     insp = inspect(db.engine)

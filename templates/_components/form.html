@@ -1,7 +1,0 @@
-{% macro text_input(name, label, type='text', value='', error=None, attrs={}) -%}
-  <div class="mb-3">
-    <label for="{{ name }}" class="form-label">{{ label }}</label>
-    <input type="{{ type }}" name="{{ name }}" id="{{ name }}" value="{{ value }}" class="form-control{% if error %} is-invalid{% endif %}" {% for k,v in attrs.items() %} {{k}}="{{v}}"{% endfor %}>
-    {% if error %}<div class="invalid-feedback">{{ error }}</div>{% endif %}
-  </div>
-{%- endmacro %}

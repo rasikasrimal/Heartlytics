@@ -36,6 +36,17 @@ def app():
     import secrets as _secrets
     app_module.secrets = _secrets
     flask_app.config.update({"TESTING": True, "WTF_CSRF_ENABLED": False})
+
+    # Each test needs a pristine database to avoid cross-test UNIQUE
+    # constraint collisions. Dropping and re-creating the schema here ensures
+    # fixtures like ``auth_client`` can freely create users with fixed emails
+    # without leaking state into later tests.
+    from app import db  # imported lazily to avoid circular imports
+
+    with flask_app.app_context():
+        db.drop_all()
+        db.create_all()
+
     yield flask_app
 
 @pytest.fixture
