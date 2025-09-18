@@ -202,6 +202,7 @@ export const useChatStore = create<ChatState>()(
     }),
     { name: "chat-preview" }
   )
+
 );
 
 function resolveScenario(input: string, scenarioId?: string): ChatScenario {
