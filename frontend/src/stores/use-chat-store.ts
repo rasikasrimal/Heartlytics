@@ -125,81 +125,83 @@ const initialState = () => ({
 });
 
 export const useChatStore = create<ChatState>()(
-  devtools((set, get) => ({
-    ...initialState(),
-    async sendMessage(input, options) {
-      const value = input.trim();
-      if (!value) return;
+  devtools(
+    (set, get) => ({
+      ...initialState(),
+      async sendMessage(input, options) {
+        const value = input.trim();
+        if (!value) return;
 
-      const scenario = resolveScenario(value, options?.scenarioId);
-      const streamId = nanoid();
-      const timestamp = Date.now();
+        const scenario = resolveScenario(value, options?.scenarioId);
+        const streamId = nanoid();
+        const timestamp = Date.now();
 
-      const userMessage: ChatMessage = {
-        id: nanoid(),
-        author: "user",
-        content: value,
-        createdAt: timestamp
-      };
+        const userMessage: ChatMessage = {
+          id: nanoid(),
+          author: "user",
+          content: value,
+          createdAt: timestamp
+        };
 
-      set((state) => ({
-        messages: [
-          ...state.messages,
-          userMessage,
-          {
-            id: streamId,
-            author: "assistant",
-            content: "",
-            createdAt: Date.now(),
-            streaming: true
-          }
-        ],
-        isStreaming: true
-      }));
+        set((state) => ({
+          messages: [
+            ...state.messages,
+            userMessage,
+            {
+              id: streamId,
+              author: "assistant",
+              content: "",
+              createdAt: Date.now(),
+              streaming: true
+            }
+          ],
+          isStreaming: true
+        }));
 
-      for (const chunk of scenario.responseChunks) {
-        await delay(STREAMING_INTERVAL);
+        for (const chunk of scenario.responseChunks) {
+          await delay(STREAMING_INTERVAL);
+          set((state) => ({
+            messages: state.messages.map((message) =>
+              message.id === streamId
+                ? { ...message, content: `${message.content}${chunk}` }
+                : message
+            )
+          }));
+        }
+
+        const completedAt = Date.now();
+
         set((state) => ({
           messages: state.messages.map((message) =>
-            message.id === streamId
-              ? { ...message, content: `${message.content}${chunk}` }
-              : message
-          )
+            message.id === streamId ? { ...message, streaming: false } : message
+          ),
+          isStreaming: false,
+          toolRuns: scenario.toolRun
+            ? [
+                {
+                  id: nanoid(),
+                  status: "succeeded",
+                  startedAt: timestamp,
+                  finishedAt: completedAt,
+                  ...scenario.toolRun
+                },
+                ...state.toolRuns
+              ].slice(0, 3)
+            : state.toolRuns
         }));
+      },
+      async runSuggestion(id) {
+        const suggestion = get().suggestions.find((item) => item.id === id);
+        if (!suggestion) return;
+
+        await get().sendMessage(suggestion.prompt, { scenarioId: id });
+      },
+      resetConversation() {
+        set(initialState());
       }
-
-      const completedAt = Date.now();
-
-      set((state) => ({
-        messages: state.messages.map((message) =>
-          message.id === streamId ? { ...message, streaming: false } : message
-        ),
-        isStreaming: false,
-        toolRuns: scenario.toolRun
-          ? [
-              {
-                id: nanoid(),
-                status: "succeeded",
-                startedAt: timestamp,
-                finishedAt: completedAt,
-                ...scenario.toolRun
-              },
-              ...state.toolRuns
-            ].slice(0, 3)
-          : state.toolRuns
-      }));
-    },
-    async runSuggestion(id) {
-      const suggestion = get().suggestions.find((item) => item.id === id);
-      if (!suggestion) return;
-
-      await get().sendMessage(suggestion.prompt, { scenarioId: id });
-    },
-    resetConversation() {
-      set(initialState());
-    }
-  }),
-  { name: "chat-preview" }
+    }),
+    { name: "chat-preview" }
+  )
 );
 
 function resolveScenario(input: string, scenarioId?: string): ChatScenario {
