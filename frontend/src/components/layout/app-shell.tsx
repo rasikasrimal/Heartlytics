@@ -1,20 +1,18 @@
-import { ReactNode } from "react";
+import { PropsWithChildren } from "react";
 
-import { MainNav } from "@/components/layout/main-nav";
-import { MotionBackground } from "@/components/layout/motion-background";
+import { SiteFooter } from "./site-footer";
+import { SiteHeader } from "./site-header";
 
-interface AppShellProps {
-  children: ReactNode;
-}
-
-export function AppShell({ children }: AppShellProps) {
+export function AppShell({ children }: PropsWithChildren) {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-background via-background to-muted">
-      <MotionBackground />
-      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 pb-20 pt-10 sm:px-8 lg:px-12">
-        <MainNav />
-        <main className="mt-12 flex-1 pb-16">{children}</main>
+    <div className="relative flex min-h-screen flex-col bg-background">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-32 left-1/2 h-[38rem] w-[38rem] -translate-x-1/2 rounded-full bg-spotlight" />
+        <div className="absolute inset-x-0 top-0 h-[1200px] bg-grid-slate bg-[length:40px_40px] opacity-[0.18]" />
       </div>
+      <SiteHeader />
+      <main className="relative flex-1 pb-24">{children}</main>
+      <SiteFooter />
     </div>
   );
 }

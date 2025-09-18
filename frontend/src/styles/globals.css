@@ -4,27 +4,42 @@
 
 :root {
   --background: 0 0% 100%;
-  --foreground: 240 10% 3.9%;
+  --foreground: 224 71% 4%;
+
   --card: 0 0% 100%;
-  --card-foreground: 240 10% 3.9%;
-  --muted: 240 5% 96%;
-  --muted-foreground: 240 3.8% 46.1%;
-  --border: 240 5.9% 90%;
-  --input: 240 5.9% 90%;
-  --primary: 222 47% 11%;
+  --card-foreground: 224 71% 4%;
+
+  --muted: 214 32% 92%;
+  --muted-foreground: 220 14% 45%;
+
+  --border: 214 32% 87%;
+  --input: 214 32% 87%;
+
+  --primary: 222 89% 53%;
   --primary-foreground: 210 40% 98%;
-  --secondary: 216 34% 17%;
+
+  --secondary: 224 16% 20%;
   --secondary-foreground: 210 40% 96%;
-  --accent: 250 84% 60%;
+
+  --accent: 173 58% 45%;
   --accent-foreground: 210 40% 98%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 210 40% 98%;
-  --ring: 215 20% 65%;
-  --radius: 0.75rem;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --ring: 223 86% 62%;
+  --radius: 0.875rem;
 }
 
-body {
-  @apply bg-background text-foreground antialiased;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss02";
+  }
 }
 
 ::-webkit-scrollbar {
@@ -32,11 +47,11 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-muted;
+  @apply bg-muted/40;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-muted-foreground/30 rounded-full;
+  @apply rounded-full bg-secondary/30;
 }
 
 html,
