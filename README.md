@@ -1,7 +1,7 @@
 # Heart Disease Risk Prediction Web App
 
-A full-stack **Flask** application for predicting the risk of heart disease using a trained **Random Forest** model (scikit-learn).
-Users can enter patient data, upload CSV files for batch analysis, explore results in an interactive dashboard, and export rich PDF reports.
+A full-stack platform that pairs a **Flask** backend with a **Next.js (TypeScript)** frontend for predicting the risk of heart disease using a trained **Random Forest** model (scikit-learn).
+Users can enter patient data, upload CSV files for batch analysis, explore results in an interactive dashboard, and export rich PDF reports through the refreshed web experience.
 
 ---
 
@@ -24,7 +24,7 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 - 🕵️ **Outlier Detection**: Batch EDA includes IQR, Isolation Forest, Z-Score, LOF, and DBSCAN methods to highlight anomalous records.
 - 📈 **EDA**: Cleaning log, summary statistics, and numeric correlation heatmap.
 - 🛡️ **Resilient Batch Prediction**: Handles missing `num_major_vessels` values without failing.
-- 🎨 **Modern UI**: Responsive Bootstrap 5 theme with custom colors, icons, and charts.
+- 🎨 **Modern UI**: React-driven experience powered by Next.js, Tailwind CSS, and shadcn/ui primitives.
 - 🌗 **Light/Dark Theme**: Toggle via navbar or auth pages, preference stored in localStorage/cookie with server-side rendering awareness. Charts adapt automatically with transparent backgrounds in dark mode.
 - 🧾 **Themed Tables & Logs**: Cleaning logs and patient record tables match the active theme for consistent readability.
 - 🧹 **Normalized Cleaning Logs**: Blank lines are stripped server-side for compact output; batch predictions surface a concise inline notice.
@@ -65,7 +65,7 @@ Roles are one of `SuperAdmin`, `Admin`, `Doctor`, or `User`.
 ## 🛠 Tech Stack
 - **Backend**: Python, Flask, Flask-SQLAlchemy
 - **ML**: scikit-learn, pandas, numpy
-- **Frontend**: Jinja2 templates, Bootstrap 5, Plotly.js
+- **Frontend**: Next.js (App Router), React, TypeScript, Tailwind CSS, shadcn/ui, Radix primitives, Lucide icons
 - **Reports**: ReportLab for PDF export
 - **Database**: SQLite (default)
 
@@ -91,43 +91,33 @@ honors `prefers-reduced-motion` for accessibility.
 
 ## 📂 Project Structure
 ```text
-heart-app/
-├── app.py               # Application entry point
-├── config.py            # Configuration classes
-├── helpers.py           # Shared utility functions
-├── outlier_detection.py # Outlier detection helpers
-├── auth/                # Authentication blueprint and forms
-├── doctor/              # Doctor dashboard
-├── routes/              # Core Flask blueprints
-│   ├── __init__.py
-│   ├── predict.py
-│   └── settings.py
-├── services/            # Business logic and ML helpers
-│   ├── auth.py
-│   ├── data.py
-│   ├── pdf.py
-│   ├── security.py
-│   └── simulation.py
-├── simulations/         # What-if risk modules
-├── superadmin/          # Superadmin dashboard and management
-├── user/                # Basic user dashboard
-├── templates/           # Jinja2 templates
-│   ├── base.html
-│   ├── error.html
-│   └── predict/
-│       ├── form.html
-│       └── result.html
-├── static/              # CSS, images and sample files
-│   ├── styles.css
-│   ├── logo.svg
-│   └── sample.csv
-├── ml/                  # Trained model artifacts
-│   └── model.pkl
-├── tests/               # Pytest suites
-│   ├── test_predict.py
-│   └── ...
-├── research_paper.tex   # Research paper content
-└── requirements.txt     # Python dependencies
+Heartlytics/
+├── app.py                   # Flask application entry point
+├── config.py                # Configuration classes
+├── helpers.py               # Shared utility functions
+├── legacy_templates.py      # Minimal Flask-rendered HTML pages
+├── outlier_detection.py     # Outlier detection helpers
+├── auth/                    # Authentication blueprint and forms
+├── blueprints/              # Modular Flask blueprints
+├── routes/                  # Core Flask routes
+├── services/                # Business logic and ML helpers
+├── simulations/             # What-if risk modules
+├── superadmin/              # Superadmin dashboard and management
+├── tests/                   # Pytest suites
+├── frontend/                # Next.js application
+│   ├── next.config.mjs
+│   ├── package.json
+│   ├── src/
+│   │   ├── app/             # App Router routes and layout
+│   │   ├── components/      # Reusable UI components
+│   │   ├── stores/          # Zustand state stores
+│   │   ├── styles/          # Tailwind globals and font registration
+│   │   └── types/           # Shared TypeScript types
+│   └── tailwind.config.ts
+├── ml/                      # Trained model artifacts
+├── migrations/              # Database migrations
+├── requirements.txt         # Python dependencies
+└── README.md
 ```
 
 ## 🗺️ Blueprints
@@ -149,31 +139,27 @@ git clone https://github.com/rasikasrimal/heart-disease-risk-app.git
 cd heart-disease-risk-app
 ```
 
-### 2. Create a virtual environment
+### 2. Backend setup (Flask)
 ```bash
 python -m venv .venv
 source .venv/bin/activate   # Linux/Mac
 .venv\Scripts\activate      # Windows
-```
-
-### 3. Install dependencies
-```bash
 pip install -r requirements.txt
-```
-
-### 4. Configure environment variables
-Copy `.env.example` to `.env` and adjust the values for your environment:
-```bash
 cp .env.example .env
+flask db upgrade            # Optional: apply migrations
+flask run                   # Runs on http://127.0.0.1:5000
 ```
 
-### 5. Run the app
+### 3. Frontend setup (Next.js)
 ```bash
-flask run
+cd frontend
+npm install
+npm run dev                  # Runs on http://localhost:3000
 ```
-App will run at: http://127.0.0.1:5000
+Use a separate terminal for the frontend dev server. The Next.js app proxies API calls to the Flask backend.
+When you are done, return to the repository root (`cd ..`) to manage the backend or run tests.
 
-### 6. Run tests
+### 4. Run tests
 ```bash
 pytest
 ```
