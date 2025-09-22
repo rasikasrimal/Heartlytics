@@ -1,17 +1,49 @@
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.class
 
-# Virtual environment
+# Packaging
+build/
+dist/
+.eggs/
+*.egg-info/
+
+# Virtual environments
 .venv/
+venv/
+ENV/
+env/
+venv.bak/
+env.bak/
 
 # Flask instance (db, secrets, uploads)
 instance/
 
+# Logs and coverage
+*.log
+.coverage*
+htmlcov/
+.pytest_cache/
+
 # OS / IDE junk
 .DS_Store
+Thumbs.db
 *.swp
 .vscode/
 .idea/
 
+# Environment files
 .env
+.env.*
+!.env.example
+
+# Node / frontend
+node_modules/
+.next/
+frontend/.next/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
