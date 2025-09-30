@@ -45,12 +45,12 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 
 ## Role Policy Matrix
 
-| Role       | Predict | Batch | Dashboard | Research |
+| Role       | Predict | Batch | Dashboard | Research | Admin Dashboard |
 |------------|:------:|:-----:|:--------:|:--------:|
-| SuperAdmin |   ✔    |   ✔   |     ✔    |    ✔     |
-| Admin      |   ✖    |   ✖   |     ✖    |    ✖     |
-| Doctor     |   ✔    |   ✔   |     ✔    |    ✔     |
-| User       |   ✔    |   ✖   |     ✖    |    ✖     |
+| SuperAdmin |   ✔    |   ✔   |     ✔    |    ✔     |    ✔     |
+| Admin      |   ✖    |   ✖   |     ✖    |    ✖     |    ✔     |
+| Doctor     |   ✔    |   ✔   |     ✔    |    ✔     |    ✖     |
+| User       |   ✔    |   ✖   |     ✖    |    ✖     |    ✖     |
 
 Use the Flask CLI to manage roles:
 
