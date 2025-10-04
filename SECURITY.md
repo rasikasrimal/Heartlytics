@@ -12,7 +12,8 @@ We actively maintain the latest production release and the `main` branch. Older 
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in Heartlytics, **please do not open a public issue**. Instead, email the core team at [security@heartlytics.app](mailto:security@heartlytics.app) with the following details:
+If you discover a security vulnerability in Heartlytics, **please do not open a public issue**. Instead, email the core team at [rasikasrimal.contact@gmail.com](mailto:rasikasrimal.contact@gmail.com) with the following details:
+
 
 1. A clear description of the vulnerability and the potential impact.
 2. The steps required to reproduce the issue, including proof-of-concept code if possible.
