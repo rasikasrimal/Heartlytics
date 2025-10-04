@@ -1,0 +1,44 @@
+name: "Feature request"
+description: "Suggest an idea for Heartlytics."
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! Share as much detail as you can so we can evaluate it quickly.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Issue checklist
+      options:
+        - label: I have searched existing issues to make sure this idea hasn't already been proposed.
+          required: true
+        - label: This feature will not expose sensitive data or weaken patient privacy safeguards.
+          required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What problem are you trying to solve?
+      placeholder: I would like to...
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the change you would like to see and why it helps users.
+      placeholder: |
+        - Update the...
+        - Add a new...
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Have you looked at other solutions or workarounds?
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Links, mockups, metrics, or anything else we should consider.
