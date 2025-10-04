@@ -1,0 +1,65 @@
+name: "Bug report"
+description: "Report something that isn't working as expected."
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report an issue. Please fill out the checklist so we can reproduce it quickly.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Issue checklist
+      options:
+        - label: I have searched existing issues to ensure this has not already been reported.
+          required: true
+        - label: I am using the latest version of Heartlytics (or have noted the exact version below).
+          required: true
+  - type: input
+    id: version
+    attributes:
+      label: Heartlytics version
+      description: Include the git commit SHA, release number, or branch name.
+      placeholder: e.g. v1.4.0 or 9b3d2f1
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: Provide a clear and concise description of what the bug is.
+      placeholder: When I ...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Provide the minimal steps needed to reproduce the issue.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen instead?
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or logs
+      description: Attach screenshots, stack traces, or console output that help explain the problem.
+      placeholder: Drag and drop images or paste log output here.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment details
+      description: Operating system, browser (if applicable), Python version, and other relevant context.
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Any other context about the problem.
