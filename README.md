@@ -80,64 +80,337 @@ The `Diagrams/` folder contains publication-ready charts that surface key insigh
 
 ## High-Level Architecture & Security Diagrams
 
-Use the system diagrams below to communicate architecture decisions, security posture, and operational flows.
+Use the system diagrams below to communicate architecture decisions, security posture, and operational flows. The source PNGs remain in `Diagrams/` if you need high-resolution exports, but the README now renders live Mermaid diagrams that stay version-controlled with the docs.
 
 ### C4 Views
 
-<table>
-  <tr>
-    <td>
-      <img src="Diagrams/C4%20Level%201%20-%20Context.png" alt="C4 Level 1 - Context diagram" width="360" height="240">
-    </td>
-    <td>
-      <img src="Diagrams/C4%20Level%202%20-%20Containers.png" alt="C4 Level 2 - Container diagram" width="360" height="240">
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <img src="Diagrams/C4%20Level%203%20-%20Components.png" alt="C4 Level 3 - Component diagram" width="360" height="240">
-    </td>
-    <td>
-      <img src="Diagrams/High-level%20system%20architecture.png" alt="High-level system architecture" width="360" height="240">
-    </td>
-  </tr>
-</table>
+```mermaid
+flowchart LR
+    Patient["Patient/User (External Actor)"]
+    Doctor["Doctor (External Actor)"]
+    Admin["Admin / SuperAdmin"]
+    Heartlytics["Heartlytics Platform\n(Flask + Dashboard UI)"]
+    Email["Email Service"]
+    KMS["Key Management Service"]
+
+    Patient -->|HTTPS| Heartlytics
+    Doctor -->|HTTPS| Heartlytics
+    Admin -->|HTTPS| Heartlytics
+    Heartlytics -->|Notifications| Email
+    Heartlytics -->|Envelope Keys| KMS
+```
+
+```mermaid
+flowchart LR
+    subgraph Browser["Client Browser"]
+        WebUI["Bootstrap UI / Charts"]
+    end
+    subgraph Backend["Flask Application"]
+        API["REST & Jinja API"]
+        Authz["RBAC Middleware"]
+    end
+    subgraph Services["Internal Services"]
+        Model["Prediction Service\n(Random Forest)"]
+        Workers["Celery Workers"]
+    end
+    subgraph DataLayer["Data Layer"]
+        DB["SQL Database"]
+        Storage["Object Storage\n(Reports, CSVs)"]
+        Cache["Redis Cache"]
+    end
+    WebUI -->|Form submit / fetch| API
+    API -->|Render HTML| WebUI
+    API -->|Score| Model
+    API -->|Dispatch jobs| Workers
+    API -->|CRUD| DB
+    API -->|Upload| Storage
+    API -->|Cache| Cache
+    Workers -->|Persist| DB
+    Workers -->|Write| Storage
+```
+
+```mermaid
+flowchart TB
+    subgraph FlaskAPI["Flask API Components"]
+        Auth["Auth Blueprint\nLogin, MFA, RBAC"]
+        Predict["Predict Blueprint\nRealtime scoring"]
+        Batch["Batch Blueprint\nCSV ingestion"]
+        Reports["Reports Blueprint\nPDF + downloads"]
+        AdminComp["Admin Blueprint\nUser governance"]
+        Research["Research Blueprint\nPaper viewer"]
+    end
+    Model["Model Service"]
+    DB["Database"]
+    Queue["Task Queue"]
+    Storage["Static / Reports"]
+
+    Auth --> DB
+    Predict --> Model
+    Predict --> DB
+    Batch --> Queue
+    Reports --> Queue
+    AdminComp --> DB
+    Research --> Storage
+    Queue --> Model
+    Queue --> DB
+    Queue --> Storage
+```
 
 ### Operational Flows
 
-<p>
-  <img src="Diagrams/Detailed%20data%20flow.png" alt="Detailed data flow" width="360" height="240">
-  <img src="Diagrams/Deployment%20topology.png" alt="Deployment topology" width="360" height="240">
-</p>
+```mermaid
+flowchart LR
+    Patient["Patient / CSV uploader"]
+    UI["Web UI\nValidation"]
+    API["Flask API"]
+    Clean["Data Cleaning & Feature Engineering"]
+    Model["Random Forest Model"]
+    Persist["Persist Prediction"]
+    Notify["Email / PDF Export"]
+    DB["SQL DB"]
 
-<p>
-  <img src="Diagrams/Sequence%20of%20interactions.png" alt="Sequence of interactions" width="360" height="240">
-  <img src="Diagrams/Database%20ERD.png" alt="Database entity-relationship diagram" width="360" height="240">
-</p>
+    Patient --> UI --> API --> Clean --> Model --> API
+    API --> Persist --> DB
+    API --> Notify --> Patient
+```
+
+```mermaid
+flowchart TB
+    CDN["CDN / Static Assets"]
+    LB["HTTPS Load Balancer"]
+    App["Gunicorn / Flask App Tier"]
+    Worker["Celery Worker Pool"]
+    DB["Managed PostgreSQL"]
+    Cache["Redis / Key-Value"]
+    Storage["Object Storage (S3)"]
+    Email["Email Provider"]
+
+    CDN --> LB --> App
+    App --> Worker
+    App --> DB
+    App --> Cache
+    App --> Storage
+    App --> Email
+    Worker --> DB
+    Worker --> Storage
+```
+
+```mermaid
+sequenceDiagram
+    participant U as User Browser
+    participant F as Frontend UI
+    participant A as Flask API
+    participant M as ML Service
+    participant D as Database
+
+    U->>F: Submit patient data
+    F->>A: POST /predict
+    A->>A: Validate payload & RBAC
+    A->>M: Score features
+    M-->>A: Probability & class
+    A->>D: Store prediction + audit
+    A-->>F: Risk probability JSON
+    F-->>U: Render dashboard update
+```
+
+```mermaid
+erDiagram
+    USER ||--o{ PREDICTION : "generates"
+    USER ||--o{ AUDIT_LOG : "triggers"
+    PATIENT ||--o{ PREDICTION : "has"
+    PREDICTION ||--o{ PATIENT_NOTE : "annotated by"
+
+    USER {
+        uuid id PK
+        string email
+        string role
+        boolean is_active
+    }
+    PATIENT {
+        uuid id PK
+        int age
+        string sex
+        string chest_pain_type
+    }
+    PREDICTION {
+        uuid id PK
+        uuid user_id FK
+        uuid patient_id FK
+        float risk_score
+        float probability
+        timestamp created_at
+    }
+    PATIENT_NOTE {
+        uuid id PK
+        uuid prediction_id FK
+        text note
+        timestamp created_at
+    }
+    AUDIT_LOG {
+        uuid id PK
+        uuid user_id FK
+        string action
+        string resource
+        timestamp created_at
+    }
+```
 
 ### Identity, Security & Compliance
 
-<p>
-  <img src="Diagrams/Role-based%20access%20control%20%28RBAC%29.png" alt="Role-based access control overview" width="360" height="240">
-  <img src="Diagrams/Security-aware%20data%20flow.png" alt="Security-aware data flow" width="360" height="240">
-</p>
+```mermaid
+flowchart LR
+    subgraph Roles
+        Super[SuperAdmin]
+        Admin[Admin]
+        Doctor[Doctor]
+        User[User]
+    end
+    subgraph Capabilities
+        Manage["Manage Users & Roles"]
+        Review["Review Predictions"]
+        Predict["Run Predictions"]
+        Research["Research Viewer"]
+        Batch["Batch Pipeline"]
+    end
+    Super --> Manage
+    Super --> Review
+    Super --> Predict
+    Super --> Research
+    Super --> Batch
+    Admin --> Manage
+    Admin --> Review
+    Admin --> Predict
+    Admin --> Research
+    Admin --> Batch
+    Doctor --> Review
+    Doctor --> Predict
+    Doctor --> Research
+    Doctor --> Batch
+    User --> Predict
+    User --> Research
+```
 
-<p>
-  <img src="Diagrams/Threat%20model%20quickview.png" alt="Threat model quickview" width="360" height="240">
-  <img src="Diagrams/Envelope%20encryption%20workflow.png" alt="Envelope encryption workflow" width="360" height="240">
-</p>
+```mermaid
+flowchart LR
+    Client["Client Browser"]
+    TLS["HTTPS/TLS"]
+    API["Flask API"]
+    Encrypt["Envelope Encryption"]
+    KMS["Key Management Service"]
+    Vault["Encrypted Columns"]
+    Audit["Audit Logger"]
+    Logs["Immutable Log Store"]
+
+    Client --> TLS --> API
+    API --> Encrypt --> Vault
+    Encrypt --> KMS
+    API --> Audit --> Logs
+```
+
+```mermaid
+flowchart TD
+    Threats["Threat Model"]
+    MITM["Man-in-the-middle"]
+    Brute["Credential stuffing"]
+    Insider["Privileged misuse"]
+    DataLeak["Data exfiltration"]
+    Controls["Controls"]
+    TLSControl["TLS 1.3 + HSTS"]
+    RBACCtrl["Role-based access control"]
+    MFAControl["MFA + OTP"]
+    EncryptionCtrl["Envelope encryption"]
+    AuditCtrl["Audit trails + alerts"]
+
+    Threats --> MITM --> TLSControl
+    Threats --> Brute --> MFAControl
+    Threats --> Insider --> RBACCtrl
+    Threats --> DataLeak --> EncryptionCtrl
+    Controls --> AuditCtrl
+    AuditCtrl --> Insider
+```
+
+```mermaid
+sequenceDiagram
+    participant App as Application
+    participant KMS as KMS
+    participant DB as Database
+
+    App->>App: Generate data key
+    App->>KMS: Encrypt data key
+    KMS-->>App: Encrypted data key
+    App->>App: Encrypt payload with data key
+    App->>DB: Store ciphertext + encrypted key
+    App->>KMS: Decrypt data key on read
+    KMS-->>App: Plain data key
+    App->>App: Decrypt payload
+```
 
 ### Multi-Factor & Recovery Journeys
 
-<p>
-  <img src="Diagrams/OTP%20lifecycle%20state%20machine.png" alt="OTP lifecycle state machine" width="360" height="240">
-  <img src="Diagrams/BPMN%20for%20two-step%20verification.png" alt="Two-step verification BPMN" width="360" height="240">
-</p>
+```mermaid
+stateDiagram-v2
+    [*] --> Requested
+    Requested --> Generated : Generate OTP + Secrets
+    Generated --> Delivered : Send email/SMS
+    Delivered --> Verified : Correct code
+    Delivered --> Expired : TTL elapsed
+    Delivered --> Locked : Max retries hit
+    Verified --> [*]
+    Expired --> Requested : Resend allowed
+    Locked --> [*]
+```
 
-<p>
-  <img src="Diagrams/Password-reset%20BPMN%20process.png" alt="Password reset BPMN process" width="360" height="240">
-  <img src="Diagrams/Encryptiondecryption%20sequence.png" alt="Encryption/decryption sequence diagram" width="360" height="240">
-</p>
+```mermaid
+flowchart LR
+    Login["User submits login"]
+    Password["Password verified"]
+    SecondFactor{"Second factor enabled?"}
+    OTP["Send OTP challenge"]
+    Verify["Validate OTP"]
+    Success["Establish session"]
+    Recovery["Recovery code fallback"]
+
+    Login --> Password --> SecondFactor
+    SecondFactor -- No --> Success
+    SecondFactor -- Yes --> OTP --> Verify
+    Verify -- Success --> Success
+    Verify -- Failure --> OTP
+    OTP -- Timeout --> Recovery
+    Recovery --> Verify
+```
+
+```mermaid
+flowchart TD
+    Request["User requests password reset"]
+    VerifyIdentity["Verify email + cooldown"]
+    IssueCode["Generate reset code"]
+    DeliverCode["Send code via email"]
+    ValidateCode{"Code valid?"}
+    NewPassword["Prompt for new password"]
+    RotateSecrets["Rotate session + recovery tokens"]
+    Complete["Notify user & log event"]
+
+    Request --> VerifyIdentity --> IssueCode --> DeliverCode --> ValidateCode
+    ValidateCode -- No --> IssueCode
+    ValidateCode -- Yes --> NewPassword --> RotateSecrets --> Complete
+```
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant API
+    participant Crypto as Crypto Module
+    participant KMS
+    participant DB
+
+    Client->>API: Submit encrypted payload
+    API->>Crypto: Request data key
+    Crypto->>KMS: Decrypt master key
+    KMS-->>Crypto: Data key
+    Crypto-->>API: Plaintext
+    API->>DB: Persist ciphertext + metadata
+    API-->>Client: Acknowledgement
+```
 
 > Complement these with `Diagrams/Sequence%20of%20interactions.png`, `Diagrams/SA.png`, and `Diagrams/fig%203.13%20should%20be%20this%20-%20.png` when you need deeper technical or compliance walkthroughs.
 
