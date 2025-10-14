@@ -84,15 +84,24 @@ Use the system diagrams below to communicate architecture decisions, security po
 
 ### C4 Views
 
-<p>
-  <img src="Diagrams/C4%20Level%201%20-%20Context.png" alt="C4 Level 1 - Context diagram" width="360" height="240">
-  <img src="Diagrams/C4%20Level%202%20-%20Containers.png" alt="C4 Level 2 - Container diagram" width="360" height="240">
-</p>
-
-<p>
-  <img src="Diagrams/C4%20Level%203%20-%20Components.png" alt="C4 Level 3 - Component diagram" width="360" height="240">
-  <img src="Diagrams/High-level%20system%20architecture.png" alt="High-level system architecture" width="360" height="240">
-</p>
+<table>
+  <tr>
+    <td>
+      <img src="Diagrams/C4%20Level%201%20-%20Context.png" alt="C4 Level 1 - Context diagram" width="360" height="240">
+    </td>
+    <td>
+      <img src="Diagrams/C4%20Level%202%20-%20Containers.png" alt="C4 Level 2 - Container diagram" width="360" height="240">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="Diagrams/C4%20Level%203%20-%20Components.png" alt="C4 Level 3 - Component diagram" width="360" height="240">
+    </td>
+    <td>
+      <img src="Diagrams/High-level%20system%20architecture.png" alt="High-level system architecture" width="360" height="240">
+    </td>
+  </tr>
+</table>
 
 ### Operational Flows
 
