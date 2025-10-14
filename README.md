@@ -1,51 +1,72 @@
-# Heart Disease Risk Prediction Web App.
+﻿# Heart Disease Risk Prediction Web App.
 
 A full-stack **Flask** application for predicting the risk of heart disease using a trained **Random Forest** model (scikit-learn).
 Users can enter patient data, upload CSV files for batch analysis, explore results in an interactive dashboard, and export rich PDF reports.
 
 ---
 
-## ✨ Features
-- 🧠 **ML Model**: Random Forest (GridSearchCV tuned), trained on the UCI Heart Disease dataset (Cleveland + others).
-- 📋 **Form Input**: Collects key clinical features (age, sex, chest pain type, blood pressure, cholesterol, fasting blood sugar, ECG results, max heart rate, exercise angina, ST depression, slope, number of major vessels, thalassemia type).
-- 📂 **Batch Analysis**: Step-by-step workflow with drag‑and‑drop CSV upload, column mapping, auto-cleaning, and progress feedback.
-- 📊 **Dashboard & PDF Export**:
+<a id="table-of-contents"></a>
+
+## Table of Contents
+
+1. [Features](#section-features)
+2. [Role Policy Matrix](#section-role-policy)
+3. [Exploratory Data Analysis (EDA) Visuals](#section-eda)
+4. [High-Level Architecture & Security Diagrams](#section-architecture)
+   - [C4 Views](#section-c4)
+   - [Operational Flows](#section-operational)
+   - [Identity, Security & Compliance](#section-security)
+   - [Multi-Factor & Recovery Journeys](#section-mfa)
+5. [Quickstart](#section-quickstart)
+6. [Environment Variables](#section-environment)
+7. [Gmail SMTP Configuration](#section-smtp)
+8. [Example Workflow](#section-workflow)
+9. [Disclaimer](#section-disclaimer)
+
+---
+<a id="section-features"></a>
+## Γ£¿ Features
+- ≡ƒºá **ML Model**: Random Forest (GridSearchCV tuned), trained on the UCI Heart Disease dataset (Cleveland + others).
+- ≡ƒôï **Form Input**: Collects key clinical features (age, sex, chest pain type, blood pressure, cholesterol, fasting blood sugar, ECG results, max heart rate, exercise angina, ST depression, slope, number of major vessels, thalassemia type).
+- ≡ƒôé **Batch Analysis**: Step-by-step workflow with dragΓÇæandΓÇædrop CSV upload, column mapping, auto-cleaning, and progress feedback.
+- ≡ƒôè **Dashboard & PDF Export**:
   - KPIs: total predictions, positive rate, average risk
   - Risk probability distribution (histogram + KDE)
   - Box plots and numeric-feature correlation heatmap
   - Cluster analysis: distribution bar chart, profiles table, and scatter plot
   - Exports all visuals and records to a styled PDF with table of contents and responsive column widths
-- 📑 **Patient PDF Reports**: Generate downloadable patient-level summaries with all inputs, prediction, probability, risk band, and confidence.
-- 📚 **Research Paper Viewer**: Renders a bundled LaTeX manuscript with MathJax, tables, figures, and reference links.
-- 👥 **Role-Based Access Control**: Users, Doctors, Admins, and SuperAdmins with dedicated dashboards, account approval workflow, and audit logs.
-- 🩺 **Doctor Portal**: Doctors can review their own patient predictions and histories.
-- ⚙️ **Profile Settings**: Update username, email, nickname, avatar, and password while viewing recent activity logs.
-  - 🧪 **Simulations**: What-if analysis and risk projections for variables such as age or exercise-induced angina with inline auto-update loader and fresh-result acknowledgment.
-- 🕵️ **Outlier Detection**: Batch EDA includes IQR, Isolation Forest, Z-Score, LOF, and DBSCAN methods to highlight anomalous records.
-- 📈 **EDA**: Cleaning log, summary statistics, and numeric correlation heatmap.
-- 🛡️ **Resilient Batch Prediction**: Handles missing `num_major_vessels` values without failing.
-- 🎨 **Modern UI**: Responsive Bootstrap 5 theme with custom colors, icons, and charts.
-- 🌗 **Light/Dark Theme**: Toggle via navbar or auth pages, preference stored in localStorage/cookie with server-side rendering awareness. Charts adapt automatically with transparent backgrounds in dark mode.
-- 🧾 **Themed Tables & Logs**: Cleaning logs and patient record tables match the active theme for consistent readability.
-- 🧹 **Normalized Cleaning Logs**: Blank lines are stripped server-side for compact output; batch predictions surface a concise inline notice.
-- 🔐 **Redesigned Login**: Clean layout without top navigation, centered branding and form, fields start empty with autofill disabled, password visibility toggle, hover animation on login button, and quick links.
-- 🔑 **Forgot Password Flow**: Six-digit codes are emailed, hashed with a pepper, and expire after a short TTL. The resend link includes a cooldown timer and backend enforcement.
-- 🔐 **TOTP 2-Step Verification**: Optional authenticator app codes with one-time recovery codes.
-- ✉️ **Email MFA Codes**: Enabled by default and sent as single-use backups when authenticator codes aren't available.
-- 🙈 **Masked OTP Delivery**: Verification emails are masked server-side and resend links enforce cooldowns.
-- 📌 **Sticky Footer**: Consistent footer on every page that stays at the bottom.
-- 🧭 **Responsive Navigation**: Evenly spaced top bar with RBAC-driven items, sticky elevation, and utility icons.
-- 🎞️ **Motion System**: Tokenized durations/easings applied across components with `prefers-reduced-motion` support.
-- 🔒 **Safe by design**:
+- ≡ƒôæ **Patient PDF Reports**: Generate downloadable patient-level summaries with all inputs, prediction, probability, risk band, and confidence.
+- ≡ƒôÜ **Research Paper Viewer**: Renders a bundled LaTeX manuscript with MathJax, tables, figures, and reference links.
+- ≡ƒæÑ **Role-Based Access Control**: Users, Doctors, Admins, and SuperAdmins with dedicated dashboards, account approval workflow, and audit logs.
+- ≡ƒ⌐║ **Doctor Portal**: Doctors can review their own patient predictions and histories.
+- ΓÜÖ∩╕Å **Profile Settings**: Update username, email, nickname, avatar, and password while viewing recent activity logs.
+  - ≡ƒº¬ **Simulations**: What-if analysis and risk projections for variables such as age or exercise-induced angina with inline auto-update loader and fresh-result acknowledgment.
+- ≡ƒò╡∩╕Å **Outlier Detection**: Batch EDA includes IQR, Isolation Forest, Z-Score, LOF, and DBSCAN methods to highlight anomalous records.
+- ≡ƒôê **EDA**: Cleaning log, summary statistics, and numeric correlation heatmap.
+- ≡ƒ¢í∩╕Å **Resilient Batch Prediction**: Handles missing `num_major_vessels` values without failing.
+- ≡ƒÄ¿ **Modern UI**: Responsive Bootstrap 5 theme with custom colors, icons, and charts.
+- ≡ƒîù **Light/Dark Theme**: Toggle via navbar or auth pages, preference stored in localStorage/cookie with server-side rendering awareness. Charts adapt automatically with transparent backgrounds in dark mode.
+- ≡ƒº╛ **Themed Tables & Logs**: Cleaning logs and patient record tables match the active theme for consistent readability.
+- ≡ƒº╣ **Normalized Cleaning Logs**: Blank lines are stripped server-side for compact output; batch predictions surface a concise inline notice.
+- ≡ƒöÉ **Redesigned Login**: Clean layout without top navigation, centered branding and form, fields start empty with autofill disabled, password visibility toggle, hover animation on login button, and quick links.
+- ≡ƒöæ **Forgot Password Flow**: Six-digit codes are emailed, hashed with a pepper, and expire after a short TTL. The resend link includes a cooldown timer and backend enforcement.
+- ≡ƒöÉ **TOTP 2-Step Verification**: Optional authenticator app codes with one-time recovery codes.
+- Γ£ë∩╕Å **Email MFA Codes**: Enabled by default and sent as single-use backups when authenticator codes aren't available.
+- ≡ƒÖê **Masked OTP Delivery**: Verification emails are masked server-side and resend links enforce cooldowns.
+- ≡ƒôî **Sticky Footer**: Consistent footer on every page that stays at the bottom.
+- ≡ƒº¡ **Responsive Navigation**: Evenly spaced top bar with RBAC-driven items, sticky elevation, and utility icons.
+- ≡ƒÄ₧∩╕Å **Motion System**: Tokenized durations/easings applied across components with `prefers-reduced-motion` support.
+- ≡ƒöÆ **Safe by design**:
   - CSRF tokens for forms and API
   - Security headers (no-sniff, frame denial, no referrer, no FLoC)
   - Login rate limiting and session timeouts
-  - 🗄 **Persistence**: SQLite database via SQLAlchemy, storing predictions with metadata.
-- 🔐 **Application-level encryption** for patient data and patient names with envelope encryption and Argon2id password hashing.
+  - ≡ƒùä **Persistence**: SQLite database via SQLAlchemy, storing predictions with metadata.
+- ≡ƒöÉ **Application-level encryption** for patient data and patient names with envelope encryption and Argon2id password hashing.
 
+<a id="section-eda"></a>
 ## Exploratory Data Analysis (EDA) Visuals
 
-The `Diagrams/` folder contains publication-ready charts that surface key insights from the Heart Disease dataset. Reference or embed them in dashboards, reports, or stakeholder communications as needed.
+The `Diagrams/` folder contains publication-ready charts that surface key insights from the Heart Disease dataset.[^diagram-sources] Reference or embed them in dashboards, reports, or stakeholder communications as needed.
 
 ### Patient Demographics
 
@@ -78,10 +99,14 @@ The `Diagrams/` folder contains publication-ready charts that surface key insigh
 
 > Open the PNGs directly to access the full-resolution artwork when preparing research posters, presentations, or internal training materials.
 
+[Back to contents](#table-of-contents)
+
+<a id="section-architecture"></a>
 ## High-Level Architecture & Security Diagrams
 
-Use the system diagrams below to communicate architecture decisions, security posture, and operational flows. The source PNGs remain in `Diagrams/` if you need high-resolution exports, but the README now renders live Mermaid diagrams that stay version-controlled with the docs.
+Use the system diagrams below to communicate architecture decisions, security posture, and operational flows. The source PNGs remain in `Diagrams/` if you need high-resolution exports, but the README now renders live Mermaid diagrams that stay version-controlled with the docs.[^mermaid-source]
 
+<a id="section-c4"></a>
 ### C4 Views
 
 ```mermaid
@@ -156,6 +181,7 @@ flowchart TB
     Queue --> Storage
 ```
 
+<a id="section-operational"></a>
 ### Operational Flows
 
 ```mermaid
@@ -255,6 +281,7 @@ erDiagram
     }
 ```
 
+<a id="section-security"></a>
 ### Identity, Security & Compliance
 
 ```mermaid
@@ -345,6 +372,7 @@ sequenceDiagram
     App->>App: Decrypt payload
 ```
 
+<a id="section-mfa"></a>
 ### Multi-Factor & Recovery Journeys
 
 ```mermaid
@@ -411,17 +439,19 @@ sequenceDiagram
     API->>DB: Persist ciphertext + metadata
     API-->>Client: Acknowledgement
 ```
-
 > Complement these with `Diagrams/Sequence%20of%20interactions.png`, `Diagrams/SA.png`, and `Diagrams/fig%203.13%20should%20be%20this%20-%20.png` when you need deeper technical or compliance walkthroughs.
 
+[Back to contents](#table-of-contents)
+
+<a id="section-role-policy"></a>
 ## Role Policy Matrix
 
 | Role       | Predict | Batch | Dashboard | Research | Admin Dashboard |
 |------------|:------:|:-----:|:--------:|:--------:|:--------:|
-| SuperAdmin |   ✔    |   ✔   |     ✔    |    ✔     |    ✔     |
-| Admin      |   ✖    |   ✖   |     ✖    |    ✖     |    ✔     |
-| Doctor     |   ✔    |   ✔   |     ✔    |    ✔     |    ✖     |
-| User       |   ✔    |   ✖   |     ✖    |    ✖     |    ✖     |
+| SuperAdmin |   Γ£ö    |   Γ£ö   |     Γ£ö    |    Γ£ö     |    Γ£ö     |
+| Admin      |   Γ£û    |   Γ£û   |     Γ£û    |    Γ£û     |    Γ£ö     |
+| Doctor     |   Γ£ö    |   Γ£ö   |     Γ£ö    |    Γ£ö     |    Γ£û     |
+| User       |   Γ£ö    |   Γ£û   |     Γ£û    |    Γ£û     |    Γ£û     |
 
 Use the Flask CLI to manage roles:
 
@@ -433,7 +463,26 @@ Roles are one of `SuperAdmin`, `Admin`, `Doctor`, or `User`.
 
 ---
 
-## 🛠 Tech Stack
+<a id="table-of-contents"></a>
+
+## Table of Contents
+
+1. [Features](#section-features)
+2. [Role Policy Matrix](#section-role-policy)
+3. [Exploratory Data Analysis (EDA) Visuals](#section-eda)
+4. [High-Level Architecture & Security Diagrams](#section-architecture)
+   - [C4 Views](#section-c4)
+   - [Operational Flows](#section-operational)
+   - [Identity, Security & Compliance](#section-security)
+   - [Multi-Factor & Recovery Journeys](#section-mfa)
+5. [Quickstart](#section-quickstart)
+6. [Environment Variables](#section-environment)
+7. [Gmail SMTP Configuration](#section-smtp)
+8. [Example Workflow](#section-workflow)
+9. [Disclaimer](#section-disclaimer)
+
+---
+## ≡ƒ¢á Tech Stack
 - **Backend**: Python, Flask, Flask-SQLAlchemy
 - **ML**: scikit-learn, pandas, numpy
 - **Frontend**: Jinja2 templates, Bootstrap 5, Plotly.js
@@ -442,17 +491,36 @@ Roles are one of `SuperAdmin`, `Admin`, `Doctor`, or `User`.
 
 ---
 
-## 🎨 UI Theming
+<a id="table-of-contents"></a>
+
+## Table of Contents
+
+1. [Features](#section-features)
+2. [Role Policy Matrix](#section-role-policy)
+3. [Exploratory Data Analysis (EDA) Visuals](#section-eda)
+4. [High-Level Architecture & Security Diagrams](#section-architecture)
+   - [C4 Views](#section-c4)
+   - [Operational Flows](#section-operational)
+   - [Identity, Security & Compliance](#section-security)
+   - [Multi-Factor & Recovery Journeys](#section-mfa)
+5. [Quickstart](#section-quickstart)
+6. [Environment Variables](#section-environment)
+7. [Gmail SMTP Configuration](#section-smtp)
+8. [Example Workflow](#section-workflow)
+9. [Disclaimer](#section-disclaimer)
+
+---
+## ≡ƒÄ¿ UI Theming
 
 The application ships with a light theme by default. Users may toggle to a dark
 theme using the navbar button or from the **Settings** page. The preference is
 stored in `localStorage` and a cookie so server-rendered pages load in the
 correct mode with no flash. Plotly and Chart.js visualizations automatically
-adapt — in dark mode charts render on transparent backgrounds with updated text
+adapt ΓÇö in dark mode charts render on transparent backgrounds with updated text
 and grid colors. See [`docs/ui-theming.md`](docs/ui-theming.md) for guidance on
 extending theming.
 
-## 🎬 Motion Guidelines
+## ≡ƒÄ¼ Motion Guidelines
 
 Utilities like `.animate-fade` and `.animate-slide` add subtle entrance effects.
 Limit movements to 12px and avoid bouncy easings. The token set automatically
@@ -460,59 +528,97 @@ honors `prefers-reduced-motion` for accessibility.
 
 ---
 
-## 📂 Project Structure
+<a id="table-of-contents"></a>
+
+## Table of Contents
+
+1. [Features](#section-features)
+2. [Role Policy Matrix](#section-role-policy)
+3. [Exploratory Data Analysis (EDA) Visuals](#section-eda)
+4. [High-Level Architecture & Security Diagrams](#section-architecture)
+   - [C4 Views](#section-c4)
+   - [Operational Flows](#section-operational)
+   - [Identity, Security & Compliance](#section-security)
+   - [Multi-Factor & Recovery Journeys](#section-mfa)
+5. [Quickstart](#section-quickstart)
+6. [Environment Variables](#section-environment)
+7. [Gmail SMTP Configuration](#section-smtp)
+8. [Example Workflow](#section-workflow)
+9. [Disclaimer](#section-disclaimer)
+
+---
+## ≡ƒôé Project Structure
 ```text
 heart-app/
-├── app.py               # Application entry point
-├── config.py            # Configuration classes
-├── helpers.py           # Shared utility functions
-├── outlier_detection.py # Outlier detection helpers
-├── auth/                # Authentication blueprint and forms
-├── doctor/              # Doctor dashboard
-├── routes/              # Core Flask blueprints
-│   ├── __init__.py
-│   ├── predict.py
-│   └── settings.py
-├── services/            # Business logic and ML helpers
-│   ├── auth.py
-│   ├── data.py
-│   ├── pdf.py
-│   ├── security.py
-│   └── simulation.py
-├── simulations/         # What-if risk modules
-├── superadmin/          # Superadmin dashboard and management
-├── user/                # Basic user dashboard
-├── templates/           # Jinja2 templates
-│   ├── base.html
-│   ├── error.html
-│   └── predict/
-│       ├── form.html
-│       └── result.html
-├── static/              # CSS, images and sample files
-│   ├── styles.css
-│   ├── logo.svg
-│   └── sample.csv
-├── ml/                  # Trained model artifacts
-│   └── model.pkl
-├── tests/               # Pytest suites
-│   ├── test_predict.py
-│   └── ...
-├── research_paper.tex   # Research paper content
-└── requirements.txt     # Python dependencies
+Γö£ΓöÇΓöÇ app.py               # Application entry point
+Γö£ΓöÇΓöÇ config.py            # Configuration classes
+Γö£ΓöÇΓöÇ helpers.py           # Shared utility functions
+Γö£ΓöÇΓöÇ outlier_detection.py # Outlier detection helpers
+Γö£ΓöÇΓöÇ auth/                # Authentication blueprint and forms
+Γö£ΓöÇΓöÇ doctor/              # Doctor dashboard
+Γö£ΓöÇΓöÇ routes/              # Core Flask blueprints
+Γöé   Γö£ΓöÇΓöÇ __init__.py
+Γöé   Γö£ΓöÇΓöÇ predict.py
+Γöé   ΓööΓöÇΓöÇ settings.py
+Γö£ΓöÇΓöÇ services/            # Business logic and ML helpers
+Γöé   Γö£ΓöÇΓöÇ auth.py
+Γöé   Γö£ΓöÇΓöÇ data.py
+Γöé   Γö£ΓöÇΓöÇ pdf.py
+Γöé   Γö£ΓöÇΓöÇ security.py
+Γöé   ΓööΓöÇΓöÇ simulation.py
+Γö£ΓöÇΓöÇ simulations/         # What-if risk modules
+Γö£ΓöÇΓöÇ superadmin/          # Superadmin dashboard and management
+Γö£ΓöÇΓöÇ user/                # Basic user dashboard
+Γö£ΓöÇΓöÇ templates/           # Jinja2 templates
+Γöé   Γö£ΓöÇΓöÇ base.html
+Γöé   Γö£ΓöÇΓöÇ error.html
+Γöé   ΓööΓöÇΓöÇ predict/
+Γöé       Γö£ΓöÇΓöÇ form.html
+Γöé       ΓööΓöÇΓöÇ result.html
+Γö£ΓöÇΓöÇ static/              # CSS, images and sample files
+Γöé   Γö£ΓöÇΓöÇ styles.css
+Γöé   Γö£ΓöÇΓöÇ logo.svg
+Γöé   ΓööΓöÇΓöÇ sample.csv
+Γö£ΓöÇΓöÇ ml/                  # Trained model artifacts
+Γöé   ΓööΓöÇΓöÇ model.pkl
+Γö£ΓöÇΓöÇ tests/               # Pytest suites
+Γöé   Γö£ΓöÇΓöÇ test_predict.py
+Γöé   ΓööΓöÇΓöÇ ...
+Γö£ΓöÇΓöÇ research_paper.tex   # Research paper content
+ΓööΓöÇΓöÇ requirements.txt     # Python dependencies
 ```
 
-## 🗺️ Blueprints
+## ≡ƒù║∩╕Å Blueprints
 
-- `predict` – renders the prediction form and returns the model's risk assessment.
-- `settings` – profile management and activity logs.
-- `simulations` – interactive what‑if analysis tools.
-- `doctor` – dashboard for doctors to view their patients.
-- `user` – simple dashboard for regular users.
-- `superadmin` – user management, approvals, and audit logs.
+- `predict` ΓÇô renders the prediction form and returns the model's risk assessment.
+- `settings` ΓÇô profile management and activity logs.
+- `simulations` ΓÇô interactive whatΓÇæif analysis tools.
+- `doctor` ΓÇô dashboard for doctors to view their patients.
+- `user` ΓÇô simple dashboard for regular users.
+- `superadmin` ΓÇô user management, approvals, and audit logs.
 
 ---
 
-## 🚀 Quickstart
+<a id="table-of-contents"></a>
+
+## Table of Contents
+
+1. [Features](#section-features)
+2. [Role Policy Matrix](#section-role-policy)
+3. [Exploratory Data Analysis (EDA) Visuals](#section-eda)
+4. [High-Level Architecture & Security Diagrams](#section-architecture)
+   - [C4 Views](#section-c4)
+   - [Operational Flows](#section-operational)
+   - [Identity, Security & Compliance](#section-security)
+   - [Multi-Factor & Recovery Journeys](#section-mfa)
+5. [Quickstart](#section-quickstart)
+6. [Environment Variables](#section-environment)
+7. [Gmail SMTP Configuration](#section-smtp)
+8. [Example Workflow](#section-workflow)
+9. [Disclaimer](#section-disclaimer)
+
+---
+## ≡ƒÜÇ Quickstart
 
 ### 1. Clone the repo
 ```bash
@@ -597,17 +703,42 @@ Remove-Item -Force -ErrorAction SilentlyContinue .\instance\app.db, .\instance\a
 Use the `/debug/mail` page (SuperAdmin only) to send a test message and inspect
 recent delivery events.
 
-## 📈 Example Workflow
+## ≡ƒôê Example Workflow
 
-1. **Enter Data** → Open the homepage and fill in patient details through the form.
-2. **Batch Predict** → Upload a CSV, map columns, and review cleaned data.
-3. **Analyze Trends** → Use the dashboard to explore KPIs and charts.
-4. **Export Reports** → Download patient-level PDFs or the full dashboard report.
+1. **Enter Data** ΓåÆ Open the homepage and fill in patient details through the form.
+2. **Batch Predict** ΓåÆ Upload a CSV, map columns, and review cleaned data.
+3. **Analyze Trends** ΓåÆ Use the dashboard to explore KPIs and charts.
+4. **Export Reports** ΓåÆ Download patient-level PDFs or the full dashboard report.
 
 ---
 
-## ⚠️ Disclaimer
+<a id="table-of-contents"></a>
+
+## Table of Contents
+
+1. [Features](#section-features)
+2. [Role Policy Matrix](#section-role-policy)
+3. [Exploratory Data Analysis (EDA) Visuals](#section-eda)
+4. [High-Level Architecture & Security Diagrams](#section-architecture)
+   - [C4 Views](#section-c4)
+   - [Operational Flows](#section-operational)
+   - [Identity, Security & Compliance](#section-security)
+   - [Multi-Factor & Recovery Journeys](#section-mfa)
+5. [Quickstart](#section-quickstart)
+6. [Environment Variables](#section-environment)
+7. [Gmail SMTP Configuration](#section-smtp)
+8. [Example Workflow](#section-workflow)
+9. [Disclaimer](#section-disclaimer)
+
+---
+## ΓÜá∩╕Å Disclaimer
 
 This project is provided strictly for **educational and demonstration purposes**.
 It is **not a medical device**, and its outputs must **not** be used as a substitute for professional medical advice, diagnosis, or treatment.
+
+
+
+
+
+
 
