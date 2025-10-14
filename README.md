@@ -450,10 +450,10 @@ sequenceDiagram
 
 | Role       | Predict | Batch | Dashboard | Research | Admin Dashboard |
 |------------|:------:|:-----:|:--------:|:--------:|:--------:|
-| SuperAdmin |   Γ£ö    |   Γ£ö   |     Γ£ö    |    Γ£ö     |    Γ£ö     |
-| Admin      |   Γ£û    |   Γ£û   |     Γ£û    |    Γ£û     |    Γ£ö     |
-| Doctor     |   Γ£ö    |   Γ£ö   |     Γ£ö    |    Γ£ö     |    Γ£û     |
-| User       |   Γ£ö    |   Γ£û   |     Γ£û    |    Γ£û     |    Γ£û     |
+| SuperAdmin |   ✔    |   ✔   |     ✔    |    ✔     |    ✔     |
+| Admin      |   ✗    |   ✗   |     ✗    |    ✗     |    ✔     |
+| Doctor     |   ✔    |   ✔   |     ✔    |    ✔     |    ✗     |
+| User       |   ✔    |   ✗   |     ✗    |    ✗     |    ✗     |
 
 Use the Flask CLI to manage roles:
 
