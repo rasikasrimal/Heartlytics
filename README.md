@@ -66,7 +66,7 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
 <a id="section-eda"></a>
 ## Exploratory Data Analysis (EDA) Visuals
 
-The `Diagrams/` folder contains publication-ready charts that surface key insights from the Heart Disease dataset.[^diagram-sources] Reference or embed them in dashboards, reports, or stakeholder communications as needed.
+The `Diagrams/` folder contains publication-ready charts that surface key insights from the Heart Disease dataset.[^diagram-sources] Reference or embed them in dashboards, reports, or stakeholder communications as needed. For a narrative walkthrough of the full exploratory analysis, see the companion Kaggle notebook: [Heart Disease Prediction](https://www.kaggle.com/code/rasikasrimal/heart-disease-prediction-22867).
 
 ### Patient Demographics
 
@@ -463,25 +463,6 @@ Roles are one of `SuperAdmin`, `Admin`, `Doctor`, or `User`.
 
 ---
 
-<a id="table-of-contents"></a>
-
-## Table of Contents
-
-1. [Features](#section-features)
-2. [Role Policy Matrix](#section-role-policy)
-3. [Exploratory Data Analysis (EDA) Visuals](#section-eda)
-4. [High-Level Architecture & Security Diagrams](#section-architecture)
-   - [C4 Views](#section-c4)
-   - [Operational Flows](#section-operational)
-   - [Identity, Security & Compliance](#section-security)
-   - [Multi-Factor & Recovery Journeys](#section-mfa)
-5. [Quickstart](#section-quickstart)
-6. [Environment Variables](#section-environment)
-7. [Gmail SMTP Configuration](#section-smtp)
-8. [Example Workflow](#section-workflow)
-9. [Disclaimer](#section-disclaimer)
-
----
 ## ≡ƒ¢á Tech Stack
 - **Backend**: Python, Flask, Flask-SQLAlchemy
 - **ML**: scikit-learn, pandas, numpy
@@ -491,25 +472,6 @@ Roles are one of `SuperAdmin`, `Admin`, `Doctor`, or `User`.
 
 ---
 
-<a id="table-of-contents"></a>
-
-## Table of Contents
-
-1. [Features](#section-features)
-2. [Role Policy Matrix](#section-role-policy)
-3. [Exploratory Data Analysis (EDA) Visuals](#section-eda)
-4. [High-Level Architecture & Security Diagrams](#section-architecture)
-   - [C4 Views](#section-c4)
-   - [Operational Flows](#section-operational)
-   - [Identity, Security & Compliance](#section-security)
-   - [Multi-Factor & Recovery Journeys](#section-mfa)
-5. [Quickstart](#section-quickstart)
-6. [Environment Variables](#section-environment)
-7. [Gmail SMTP Configuration](#section-smtp)
-8. [Example Workflow](#section-workflow)
-9. [Disclaimer](#section-disclaimer)
-
----
 ## ≡ƒÄ¿ UI Theming
 
 The application ships with a light theme by default. Users may toggle to a dark
@@ -528,25 +490,6 @@ honors `prefers-reduced-motion` for accessibility.
 
 ---
 
-<a id="table-of-contents"></a>
-
-## Table of Contents
-
-1. [Features](#section-features)
-2. [Role Policy Matrix](#section-role-policy)
-3. [Exploratory Data Analysis (EDA) Visuals](#section-eda)
-4. [High-Level Architecture & Security Diagrams](#section-architecture)
-   - [C4 Views](#section-c4)
-   - [Operational Flows](#section-operational)
-   - [Identity, Security & Compliance](#section-security)
-   - [Multi-Factor & Recovery Journeys](#section-mfa)
-5. [Quickstart](#section-quickstart)
-6. [Environment Variables](#section-environment)
-7. [Gmail SMTP Configuration](#section-smtp)
-8. [Example Workflow](#section-workflow)
-9. [Disclaimer](#section-disclaimer)
-
----
 ## ≡ƒôé Project Structure
 ```text
 heart-app/
@@ -599,25 +542,6 @@ heart-app/
 
 ---
 
-<a id="table-of-contents"></a>
-
-## Table of Contents
-
-1. [Features](#section-features)
-2. [Role Policy Matrix](#section-role-policy)
-3. [Exploratory Data Analysis (EDA) Visuals](#section-eda)
-4. [High-Level Architecture & Security Diagrams](#section-architecture)
-   - [C4 Views](#section-c4)
-   - [Operational Flows](#section-operational)
-   - [Identity, Security & Compliance](#section-security)
-   - [Multi-Factor & Recovery Journeys](#section-mfa)
-5. [Quickstart](#section-quickstart)
-6. [Environment Variables](#section-environment)
-7. [Gmail SMTP Configuration](#section-smtp)
-8. [Example Workflow](#section-workflow)
-9. [Disclaimer](#section-disclaimer)
-
----
 [Back to contents](#table-of-contents)
 
 <a id="section-quickstart"></a>
@@ -724,38 +648,16 @@ recent delivery events.
 
 ---
 
-<a id="table-of-contents"></a>
-
-## Table of Contents
-
-1. [Features](#section-features)
-2. [Role Policy Matrix](#section-role-policy)
-3. [Exploratory Data Analysis (EDA) Visuals](#section-eda)
-4. [High-Level Architecture & Security Diagrams](#section-architecture)
-   - [C4 Views](#section-c4)
-   - [Operational Flows](#section-operational)
-   - [Identity, Security & Compliance](#section-security)
-   - [Multi-Factor & Recovery Journeys](#section-mfa)
-5. [Quickstart](#section-quickstart)
-6. [Environment Variables](#section-environment)
-7. [Gmail SMTP Configuration](#section-smtp)
-8. [Example Workflow](#section-workflow)
-9. [Disclaimer](#section-disclaimer)
-
----
+<a id="section-disclaimer"></a>
 ## ΓÜá∩╕Å Disclaimer
 
 This project is provided strictly for **educational and demonstration purposes**.
 It is **not a medical device**, and its outputs must **not** be used as a substitute for professional medical advice, diagnosis, or treatment.
 
+[Back to contents](#table-of-contents)
 
-
-
-
-
-
-
-
+[^diagram-sources]: Visual analytics generated from the PNG charts stored under `Diagrams/`.
+[^mermaid-source]: Architecture diagrams derived from the PNG drafts in `Diagrams/` and maintained here as Mermaid for auditable updates.
 
 
 
