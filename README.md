@@ -43,6 +43,95 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
   - 🗄 **Persistence**: SQLite database via SQLAlchemy, storing predictions with metadata.
 - 🔐 **Application-level encryption** for patient data and patient names with envelope encryption and Argon2id password hashing.
 
+## Exploratory Data Analysis (EDA) Visuals
+
+The `Diagrams/` folder contains publication-ready charts that surface key insights from the Heart Disease dataset. Reference or embed them in dashboards, reports, or stakeholder communications as needed.
+
+### Patient Demographics
+
+<p>
+  <img src="Diagrams/Age%20distribution%20of%20patients.png" alt="Age distribution of patients" width="340">
+  <img src="Diagrams/Age%20distribution%20by%20gender.png" alt="Age distribution by gender" width="340">
+</p>
+
+<p>
+  <img src="Diagrams/Age%20distribution%20by%20chest%20pain%20type.png" alt="Age distribution by chest pain type" width="340">
+  <img src="Diagrams/Age%20distribution%20by%20dataset%20site.png" alt="Age distribution by dataset site" width="340">
+</p>
+
+### Clinical Feature Relationships
+
+<p>
+  <img src="Diagrams/Heart%20disease%20frequency%20by%20chest%20pain%20type.png" alt="Heart disease frequency by chest pain type" width="340">
+  <img src="Diagrams/Chest%20pain%20categories%20by%20thallium%20status.png" alt="Chest pain categories by thallium status" width="340">
+</p>
+
+<p>
+  <img src="Diagrams/Resting%20blood%20pressure%20by%20disease%20status.png" alt="Resting blood pressure by disease status" width="340">
+  <img src="Diagrams/Serum%20cholesterol%20across%20disease%20stages.png" alt="Serum cholesterol across disease stages" width="340">
+</p>
+
+<p>
+  <img src="Diagrams/Thallium%20test%20results%20vs.%20disease%20status.png" alt="Thallium test results vs. disease status" width="340">
+  <img src="Diagrams/Age%20distribution%20by%20severity%20levels.png" alt="Age distribution by severity levels" width="340">
+</p>
+
+> Open the PNGs directly to access the full-resolution artwork when preparing research posters, presentations, or internal training materials.
+
+## High-Level Architecture & Security Diagrams
+
+Use the system diagrams below to communicate architecture decisions, security posture, and operational flows.
+
+### C4 Views
+
+<p>
+  <img src="Diagrams/C4%20Level%201%20-%20Context.png" alt="C4 Level 1 - Context diagram" width="340">
+  <img src="Diagrams/C4%20Level%202%20-%20Containers.png" alt="C4 Level 2 - Container diagram" width="340">
+</p>
+
+<p>
+  <img src="Diagrams/C4%20Level%203%20-%20Components.png" alt="C4 Level 3 - Component diagram" width="340">
+  <img src="Diagrams/High-level%20system%20architecture.png" alt="High-level system architecture" width="340">
+</p>
+
+### Operational Flows
+
+<p>
+  <img src="Diagrams/Detailed%20data%20flow.png" alt="Detailed data flow" width="340">
+  <img src="Diagrams/Deployment%20topology.png" alt="Deployment topology" width="340">
+</p>
+
+<p>
+  <img src="Diagrams/Sequence%20of%20interactions.png" alt="Sequence of interactions" width="340">
+  <img src="Diagrams/Database%20ERD.png" alt="Database entity-relationship diagram" width="340">
+</p>
+
+### Identity, Security & Compliance
+
+<p>
+  <img src="Diagrams/Role-based%20access%20control%20%28RBAC%29.png" alt="Role-based access control overview" width="340">
+  <img src="Diagrams/Security-aware%20data%20flow.png" alt="Security-aware data flow" width="340">
+</p>
+
+<p>
+  <img src="Diagrams/Threat%20model%20quickview.png" alt="Threat model quickview" width="340">
+  <img src="Diagrams/Envelope%20encryption%20workflow.png" alt="Envelope encryption workflow" width="340">
+</p>
+
+### Multi-Factor & Recovery Journeys
+
+<p>
+  <img src="Diagrams/OTP%20lifecycle%20state%20machine.png" alt="OTP lifecycle state machine" width="340">
+  <img src="Diagrams/BPMN%20for%20two-step%20verification.png" alt="Two-step verification BPMN" width="340">
+</p>
+
+<p>
+  <img src="Diagrams/Password-reset%20BPMN%20process.png" alt="Password reset BPMN process" width="340">
+  <img src="Diagrams/Encryptiondecryption%20sequence.png" alt="Encryption/decryption sequence diagram" width="340">
+</p>
+
+> Complement these with `Diagrams/Sequence%20of%20interactions.png`, `Diagrams/SA.png`, and `Diagrams/fig%203.13%20should%20be%20this%20-%20.png` when you need deeper technical or compliance walkthroughs.
+
 ## Role Policy Matrix
 
 | Role       | Predict | Batch | Dashboard | Research | Admin Dashboard |
