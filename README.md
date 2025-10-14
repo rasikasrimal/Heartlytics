@@ -618,6 +618,9 @@ heart-app/
 9. [Disclaimer](#section-disclaimer)
 
 ---
+[Back to contents](#table-of-contents)
+
+<a id="section-quickstart"></a>
 ## ≡ƒÜÇ Quickstart
 
 ### 1. Clone the repo
@@ -655,6 +658,9 @@ App will run at: http://127.0.0.1:5000
 pytest
 ```
 
+[Back to contents](#table-of-contents)
+
+<a id="section-environment"></a>
 ### Environment variables
 
 The application reads configuration from environment variables (see `.env.example`):
@@ -673,6 +679,9 @@ The application reads configuration from environment variables (see `.env.exampl
 | `RESET_CODE_TTL` | Minutes before a reset code expires | `10` |
 | `RESET_RESEND_COOLDOWN` | Seconds before another code can be sent | `30` |
 
+[Back to contents](#table-of-contents)
+
+<a id="section-smtp"></a>
 ### Gmail SMTP configuration
 
 Enable 2-Step Verification on the Gmail account and create an **App Password**.
@@ -703,6 +712,9 @@ Remove-Item -Force -ErrorAction SilentlyContinue .\instance\app.db, .\instance\a
 Use the `/debug/mail` page (SuperAdmin only) to send a test message and inspect
 recent delivery events.
 
+[Back to contents](#table-of-contents)
+
+<a id="section-workflow"></a>
 ## ≡ƒôê Example Workflow
 
 1. **Enter Data** ΓåÆ Open the homepage and fill in patient details through the form.
@@ -735,6 +747,11 @@ recent delivery events.
 
 This project is provided strictly for **educational and demonstration purposes**.
 It is **not a medical device**, and its outputs must **not** be used as a substitute for professional medical advice, diagnosis, or treatment.
+
+
+
+
+
 
 
 
