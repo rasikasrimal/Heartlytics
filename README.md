@@ -1,9 +1,31 @@
-# Heart Disease Risk Prediction Web App.
+﻿# Heart Disease Risk Prediction Web App.
 
 A full-stack **Flask** application for predicting the risk of heart disease using a trained **Random Forest** model (scikit-learn).
 Users can enter patient data, upload CSV files for batch analysis, explore results in an interactive dashboard, and export rich PDF reports.
 
 ---
+
+<a id="table-of-contents"></a>
+
+## Table of Contents
+
+1. [Features](#section-features)
+2. [Role Policy Matrix](#section-role-policy)
+3. [Exploratory Data Analysis (EDA) Visuals](#section-eda)
+4. [High-Level Architecture & Security Diagrams](#section-architecture)
+   - [C4 Views](#section-c4)
+   - [Operational Flows](#section-operational)
+   - [Identity, Security & Compliance](#section-security)
+   - [Multi-Factor & Recovery Journeys](#section-mfa)
+5. [Quickstart](#section-quickstart)
+6. [Environment Variables](#section-environment)
+7. [Gmail SMTP Configuration](#section-smtp)
+8. [Example Workflow](#section-workflow)
+9. [Disclaimer](#section-disclaimer)
+
+---
+<a id="section-features"></a>
+
 
 ## ✨ Features
 - 🧠 **ML Model**: Random Forest (GridSearchCV tuned), trained on the UCI Heart Disease dataset (Cleveland + others).
@@ -43,14 +65,395 @@ Users can enter patient data, upload CSV files for batch analysis, explore resul
   - 🗄 **Persistence**: SQLite database via SQLAlchemy, storing predictions with metadata.
 - 🔐 **Application-level encryption** for patient data and patient names with envelope encryption and Argon2id password hashing.
 
+<a id="section-eda"></a>
+## Exploratory Data Analysis (EDA) Visuals
+
+The `Diagrams/` folder contains publication-ready charts that surface key insights from the Heart Disease dataset.[^diagram-sources] Reference or embed them in dashboards, reports, or stakeholder communications as needed. For a narrative walkthrough of the full exploratory analysis, see the companion Kaggle notebook: [Heart Disease Prediction](https://www.kaggle.com/code/rasikasrimal/heart-disease-prediction-22867).
+
+### Patient Demographics
+
+<p>
+  <img src="Diagrams/Age%20distribution%20of%20patients.png" alt="Age distribution of patients" width="340" height="220">
+  <img src="Diagrams/Age%20distribution%20by%20gender.png" alt="Age distribution by gender" width="340" height="220">
+</p>
+
+<p>
+  <img src="Diagrams/Age%20distribution%20by%20chest%20pain%20type.png" alt="Age distribution by chest pain type" width="340" height="220">
+  <img src="Diagrams/Age%20distribution%20by%20dataset%20site.png" alt="Age distribution by dataset site" width="340" height="220">
+</p>
+
+### Clinical Feature Relationships
+
+<p>
+  <img src="Diagrams/Heart%20disease%20frequency%20by%20chest%20pain%20type.png" alt="Heart disease frequency by chest pain type" width="340" height="220">
+  <img src="Diagrams/Chest%20pain%20categories%20by%20thallium%20status.png" alt="Chest pain categories by thallium status" width="340" height="220">
+</p>
+
+<p>
+  <img src="Diagrams/Resting%20blood%20pressure%20by%20disease%20status.png" alt="Resting blood pressure by disease status" width="340" height="220">
+  <img src="Diagrams/Serum%20cholesterol%20across%20disease%20stages.png" alt="Serum cholesterol across disease stages" width="340" height="220">
+</p>
+
+<p>
+  <img src="Diagrams/Thallium%20test%20results%20vs.%20disease%20status.png" alt="Thallium test results vs. disease status" width="340" height="220">
+  <img src="Diagrams/Age%20distribution%20by%20severity%20levels.png" alt="Age distribution by severity levels" width="340" height="220">
+</p>
+
+> Open the PNGs directly to access the full-resolution artwork when preparing research posters, presentations, or internal training materials.
+
+[Back to contents](#table-of-contents)
+
+<a id="section-architecture"></a>
+## High-Level Architecture & Security Diagrams
+
+Use the system diagrams below to communicate architecture decisions, security posture, and operational flows. The source PNGs remain in `Diagrams/` if you need high-resolution exports, but the README now renders live Mermaid diagrams that stay version-controlled with the docs.[^mermaid-source]
+
+<a id="section-c4"></a>
+### C4 Views
+
+```mermaid
+flowchart LR
+    Patient["Patient/User (External Actor)"]
+    Doctor["Doctor (External Actor)"]
+    Admin["Admin / SuperAdmin"]
+    Heartlytics["Heartlytics Platform\n(Flask + Dashboard UI)"]
+    Email["Email Service"]
+    KMS["Key Management Service"]
+
+    Patient -->|HTTPS| Heartlytics
+    Doctor -->|HTTPS| Heartlytics
+    Admin -->|HTTPS| Heartlytics
+    Heartlytics -->|Notifications| Email
+    Heartlytics -->|Envelope Keys| KMS
+```
+
+```mermaid
+flowchart LR
+    subgraph Browser["Client Browser"]
+        WebUI["Bootstrap UI / Charts"]
+    end
+    subgraph Backend["Flask Application"]
+        API["REST & Jinja API"]
+        Authz["RBAC Middleware"]
+    end
+    subgraph Services["Internal Services"]
+        Model["Prediction Service\n(Random Forest)"]
+        Workers["Celery Workers"]
+    end
+    subgraph DataLayer["Data Layer"]
+        DB["SQL Database"]
+        Storage["Object Storage\n(Reports, CSVs)"]
+        Cache["Redis Cache"]
+    end
+    WebUI -->|Form submit / fetch| API
+    API -->|Render HTML| WebUI
+    API -->|Score| Model
+    API -->|Dispatch jobs| Workers
+    API -->|CRUD| DB
+    API -->|Upload| Storage
+    API -->|Cache| Cache
+    Workers -->|Persist| DB
+    Workers -->|Write| Storage
+```
+
+```mermaid
+flowchart TB
+    subgraph FlaskAPI["Flask API Components"]
+        Auth["Auth Blueprint\nLogin, MFA, RBAC"]
+        Predict["Predict Blueprint\nRealtime scoring"]
+        Batch["Batch Blueprint\nCSV ingestion"]
+        Reports["Reports Blueprint\nPDF + downloads"]
+        AdminComp["Admin Blueprint\nUser governance"]
+        Research["Research Blueprint\nPaper viewer"]
+    end
+    Model["Model Service"]
+    DB["Database"]
+    Queue["Task Queue"]
+    Storage["Static / Reports"]
+
+    Auth --> DB
+    Predict --> Model
+    Predict --> DB
+    Batch --> Queue
+    Reports --> Queue
+    AdminComp --> DB
+    Research --> Storage
+    Queue --> Model
+    Queue --> DB
+    Queue --> Storage
+```
+
+<a id="section-operational"></a>
+### Operational Flows
+
+```mermaid
+flowchart LR
+    Patient["Patient / CSV uploader"]
+    UI["Web UI\nValidation"]
+    API["Flask API"]
+    Clean["Data Cleaning & Feature Engineering"]
+    Model["Random Forest Model"]
+    Persist["Persist Prediction"]
+    Notify["Email / PDF Export"]
+    DB["SQL DB"]
+
+    Patient --> UI --> API --> Clean --> Model --> API
+    API --> Persist --> DB
+    API --> Notify --> Patient
+```
+
+```mermaid
+flowchart TB
+    CDN["CDN / Static Assets"]
+    LB["HTTPS Load Balancer"]
+    App["Gunicorn / Flask App Tier"]
+    Worker["Celery Worker Pool"]
+    DB["Managed PostgreSQL"]
+    Cache["Redis / Key-Value"]
+    Storage["Object Storage (S3)"]
+    Email["Email Provider"]
+
+    CDN --> LB --> App
+    App --> Worker
+    App --> DB
+    App --> Cache
+    App --> Storage
+    App --> Email
+    Worker --> DB
+    Worker --> Storage
+```
+
+```mermaid
+sequenceDiagram
+    participant U as User Browser
+    participant F as Frontend UI
+    participant A as Flask API
+    participant M as ML Service
+    participant D as Database
+
+    U->>F: Submit patient data
+    F->>A: POST /predict
+    A->>A: Validate payload & RBAC
+    A->>M: Score features
+    M-->>A: Probability & class
+    A->>D: Store prediction + audit
+    A-->>F: Risk probability JSON
+    F-->>U: Render dashboard update
+```
+
+```mermaid
+erDiagram
+    USER ||--o{ PREDICTION : "generates"
+    USER ||--o{ AUDIT_LOG : "triggers"
+    PATIENT ||--o{ PREDICTION : "has"
+    PREDICTION ||--o{ PATIENT_NOTE : "annotated by"
+
+    USER {
+        uuid id PK
+        string email
+        string role
+        boolean is_active
+    }
+    PATIENT {
+        uuid id PK
+        int age
+        string sex
+        string chest_pain_type
+    }
+    PREDICTION {
+        uuid id PK
+        uuid user_id FK
+        uuid patient_id FK
+        float risk_score
+        float probability
+        timestamp created_at
+    }
+    PATIENT_NOTE {
+        uuid id PK
+        uuid prediction_id FK
+        text note
+        timestamp created_at
+    }
+    AUDIT_LOG {
+        uuid id PK
+        uuid user_id FK
+        string action
+        string resource
+        timestamp created_at
+    }
+```
+
+<a id="section-security"></a>
+### Identity, Security & Compliance
+
+```mermaid
+flowchart LR
+    subgraph Roles
+        Super[SuperAdmin]
+        Admin[Admin]
+        Doctor[Doctor]
+        User[User]
+    end
+    subgraph Capabilities
+        Manage["Manage Users & Roles"]
+        Review["Review Predictions"]
+        Predict["Run Predictions"]
+        Research["Research Viewer"]
+        Batch["Batch Pipeline"]
+    end
+    Super --> Manage
+    Super --> Review
+    Super --> Predict
+    Super --> Research
+    Super --> Batch
+    Admin --> Manage
+    Admin --> Review
+    Admin --> Predict
+    Admin --> Research
+    Admin --> Batch
+    Doctor --> Review
+    Doctor --> Predict
+    Doctor --> Research
+    Doctor --> Batch
+    User --> Predict
+    User --> Research
+```
+
+```mermaid
+flowchart LR
+    Client["Client Browser"]
+    TLS["HTTPS/TLS"]
+    API["Flask API"]
+    Encrypt["Envelope Encryption"]
+    KMS["Key Management Service"]
+    Vault["Encrypted Columns"]
+    Audit["Audit Logger"]
+    Logs["Immutable Log Store"]
+
+    Client --> TLS --> API
+    API --> Encrypt --> Vault
+    Encrypt --> KMS
+    API --> Audit --> Logs
+```
+
+```mermaid
+flowchart TD
+    Threats["Threat Model"]
+    MITM["Man-in-the-middle"]
+    Brute["Credential stuffing"]
+    Insider["Privileged misuse"]
+    DataLeak["Data exfiltration"]
+    Controls["Controls"]
+    TLSControl["TLS 1.3 + HSTS"]
+    RBACCtrl["Role-based access control"]
+    MFAControl["MFA + OTP"]
+    EncryptionCtrl["Envelope encryption"]
+    AuditCtrl["Audit trails + alerts"]
+
+    Threats --> MITM --> TLSControl
+    Threats --> Brute --> MFAControl
+    Threats --> Insider --> RBACCtrl
+    Threats --> DataLeak --> EncryptionCtrl
+    Controls --> AuditCtrl
+    AuditCtrl --> Insider
+```
+
+```mermaid
+sequenceDiagram
+    participant App as Application
+    participant KMS as KMS
+    participant DB as Database
+
+    App->>App: Generate data key
+    App->>KMS: Encrypt data key
+    KMS-->>App: Encrypted data key
+    App->>App: Encrypt payload with data key
+    App->>DB: Store ciphertext + encrypted key
+    App->>KMS: Decrypt data key on read
+    KMS-->>App: Plain data key
+    App->>App: Decrypt payload
+```
+
+<a id="section-mfa"></a>
+### Multi-Factor & Recovery Journeys
+
+```mermaid
+stateDiagram-v2
+    [*] --> Requested
+    Requested --> Generated : Generate OTP + Secrets
+    Generated --> Delivered : Send email/SMS
+    Delivered --> Verified : Correct code
+    Delivered --> Expired : TTL elapsed
+    Delivered --> Locked : Max retries hit
+    Verified --> [*]
+    Expired --> Requested : Resend allowed
+    Locked --> [*]
+```
+
+```mermaid
+flowchart LR
+    Login["User submits login"]
+    Password["Password verified"]
+    SecondFactor{"Second factor enabled?"}
+    OTP["Send OTP challenge"]
+    Verify["Validate OTP"]
+    Success["Establish session"]
+    Recovery["Recovery code fallback"]
+
+    Login --> Password --> SecondFactor
+    SecondFactor -- No --> Success
+    SecondFactor -- Yes --> OTP --> Verify
+    Verify -- Success --> Success
+    Verify -- Failure --> OTP
+    OTP -- Timeout --> Recovery
+    Recovery --> Verify
+```
+
+```mermaid
+flowchart TD
+    Request["User requests password reset"]
+    VerifyIdentity["Verify email + cooldown"]
+    IssueCode["Generate reset code"]
+    DeliverCode["Send code via email"]
+    ValidateCode{"Code valid?"}
+    NewPassword["Prompt for new password"]
+    RotateSecrets["Rotate session + recovery tokens"]
+    Complete["Notify user & log event"]
+
+    Request --> VerifyIdentity --> IssueCode --> DeliverCode --> ValidateCode
+    ValidateCode -- No --> IssueCode
+    ValidateCode -- Yes --> NewPassword --> RotateSecrets --> Complete
+```
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant API
+    participant Crypto as Crypto Module
+    participant KMS
+    participant DB
+
+    Client->>API: Submit encrypted payload
+    API->>Crypto: Request data key
+    Crypto->>KMS: Decrypt master key
+    KMS-->>Crypto: Data key
+    Crypto-->>API: Plaintext
+    API->>DB: Persist ciphertext + metadata
+    API-->>Client: Acknowledgement
+```
+> Complement these with `Diagrams/Sequence%20of%20interactions.png`, `Diagrams/SA.png`, and `Diagrams/fig%203.13%20should%20be%20this%20-%20.png` when you need deeper technical or compliance walkthroughs.
+
+[Back to contents](#table-of-contents)
+
+<a id="section-role-policy"></a>
 ## Role Policy Matrix
 
 | Role       | Predict | Batch | Dashboard | Research | Admin Dashboard |
 |------------|:------:|:-----:|:--------:|:--------:|:--------:|
 | SuperAdmin |   ✔    |   ✔   |     ✔    |    ✔     |    ✔     |
-| Admin      |   ✖    |   ✖   |     ✖    |    ✖     |    ✔     |
-| Doctor     |   ✔    |   ✔   |     ✔    |    ✔     |    ✖     |
-| User       |   ✔    |   ✖   |     ✖    |    ✖     |    ✖     |
+| Admin      |   ✗    |   ✗   |     ✗    |    ✗     |    ✔     |
+| Doctor     |   ✔    |   ✔   |     ✔    |    ✔     |    ✗     |
+| User       |   ✔    |   ✗   |     ✗    |    ✗     |    ✗     |
 
 Use the Flask CLI to manage roles:
 
@@ -71,6 +474,7 @@ Roles are one of `SuperAdmin`, `Admin`, `Doctor`, or `User`.
 
 ---
 
+
 ## 🎨 UI Theming
 
 The application ships with a light theme by default. Users may toggle to a dark
@@ -87,7 +491,10 @@ Utilities like `.animate-fade` and `.animate-slide` add subtle entrance effects.
 Limit movements to 12px and avoid bouncy easings. The token set automatically
 honors `prefers-reduced-motion` for accessibility.
 
+
 ---
+
+
 
 ## 📂 Project Structure
 ```text
@@ -128,6 +535,7 @@ heart-app/
 │   └── ...
 ├── research_paper.tex   # Research paper content
 └── requirements.txt     # Python dependencies
+
 ```
 
 ## 🗺️ Blueprints
@@ -138,8 +546,12 @@ heart-app/
 - `doctor` – dashboard for doctors to view their patients.
 - `user` – simple dashboard for regular users.
 - `superadmin` – user management, approvals, and audit logs.
-
 ---
+
+[Back to contents](#table-of-contents)
+
+<a id="section-quickstart"></a>
+
 
 ## 🚀 Quickstart
 
@@ -178,6 +590,9 @@ App will run at: http://127.0.0.1:5000
 pytest
 ```
 
+[Back to contents](#table-of-contents)
+
+<a id="section-environment"></a>
 ### Environment variables
 
 The application reads configuration from environment variables (see `.env.example`):
@@ -196,6 +611,9 @@ The application reads configuration from environment variables (see `.env.exampl
 | `RESET_CODE_TTL` | Minutes before a reset code expires | `10` |
 | `RESET_RESEND_COOLDOWN` | Seconds before another code can be sent | `30` |
 
+[Back to contents](#table-of-contents)
+
+<a id="section-smtp"></a>
 ### Gmail SMTP configuration
 
 Enable 2-Step Verification on the Gmail account and create an **App Password**.
@@ -226,6 +644,10 @@ Remove-Item -Force -ErrorAction SilentlyContinue .\instance\app.db, .\instance\a
 Use the `/debug/mail` page (SuperAdmin only) to send a test message and inspect
 recent delivery events.
 
+[Back to contents](#table-of-contents)
+
+<a id="section-workflow"></a>
+
 ## 📈 Example Workflow
 
 1. **Enter Data** → Open the homepage and fill in patient details through the form.
@@ -233,10 +655,22 @@ recent delivery events.
 3. **Analyze Trends** → Use the dashboard to explore KPIs and charts.
 4. **Export Reports** → Download patient-level PDFs or the full dashboard report.
 
+
 ---
+
+<a id="section-disclaimer"></a>
 
 ## ⚠️ Disclaimer
 
 This project is provided strictly for **educational and demonstration purposes**.
 It is **not a medical device**, and its outputs must **not** be used as a substitute for professional medical advice, diagnosis, or treatment.
+
+
+
+[Back to contents](#table-of-contents)
+
+[^diagram-sources]: Visual analytics generated from the PNG charts stored under `Diagrams/`.
+[^mermaid-source]: Architecture diagrams derived from the PNG drafts in `Diagrams/` and maintained here as Mermaid for auditable updates.
+
+
 
