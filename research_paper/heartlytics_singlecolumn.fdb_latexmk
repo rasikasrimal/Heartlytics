@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1760894391.6398 "heartlytics_singlecolumn.tex" "heartlytics_singlecolumn.pdf" "heartlytics_singlecolumn" 1760894402.659 0
+["pdflatex"] 1760894646.12513 "g:/Heartlytics/research_paper/heartlytics_singlecolumn.tex" "heartlytics_singlecolumn.pdf" "heartlytics_singlecolumn" 1760894656.97383 0
   "C:/Users/Snow" 1759393309 19039 987c26062e0982340c5164621e755ee1 ""
   "C:/Users/Snow ghost/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1760893715 96176 40a8022d15c5925d7081b1ad66e03248 ""
   "C:/Users/Snow ghost/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1759169554 24227442 7b3f8c3b1a73217f8405b13bdeeb9d44 ""
@@ -111,9 +111,10 @@
   "figures/serum_cholesterol_across_disease_stages.png" 1760890477 29528 aebbcaf3af07f4df9b892a1d76b9f98b ""
   "figures/thallium_test_results_vs_disease_status.png" 1760890477 41956 fc4de30f1859fa1635bd93562673d806 ""
   "figures/threat_model_quickview.png" 1760890477 38084 7314cb31bfabeb6c055c5d545e845181 ""
-  "heartlytics_singlecolumn.aux" 1760894402 14441 b7f9283b1fbc4e4b0659d09ca6bfed46 "pdflatex"
-  "heartlytics_singlecolumn.out" 1760894402 3572 749d6244f7f1548a169f4b9c851fbb19 "pdflatex"
-  "heartlytics_singlecolumn.tex" 1760894279 32086 cf3e786146457443a2271dbb8715c118 ""
+  "g:/Heartlytics/research_paper/heartlytics_singlecolumn.tex" 1760894645 32090 cf3e786146457443a2271dbb8715c118 ""
+  "heartlytics_singlecolumn.aux" 1760894656 14441 b7f9283b1fbc4e4b0659d09ca6bfed46 "pdflatex"
+  "heartlytics_singlecolumn.out" 1760894656 3572 749d6244f7f1548a169f4b9c851fbb19 "pdflatex"
+  "heartlytics_singlecolumn.tex" 1760894645 32090 cf3e786146457443a2271dbb8715c118 ""
   (generated)
   "heartlytics_singlecolumn.aux"
   "heartlytics_singlecolumn.log"
