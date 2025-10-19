@@ -6,45 +6,152 @@
 \citation{chen2016xgboost}
 \citation{zhang2021heart}
 \citation{janosi1988uci}
+\citation{pedregosa2011scikit}
+\citation{chawla2002smote}
+\citation{breiman2001random}
+\citation{chen2016xgboost}
+\citation{platt1999probabilistic}
+\citation{kohavi1995study}
+\citation{lundberg2017unified}
 \@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{section.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{1}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {II}Background and Related Work}{1}{section.2}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Key Features in the Heart Disease Dataset}}{1}{table.1}\protected@file@percent }
 \newlabel{tab:features}{{I}{1}{Key Features in the Heart Disease Dataset}{table.1}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {III}Dataset Characterization and Exploratory Analysis}{1}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {III}Materials and Methods}{1}{section.3}\protected@file@percent }
+\newlabel{sec:methods}{{III}{1}{Materials and Methods}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Dataset}{1}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Data Preprocessing}{1}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Modeling Pipeline}{1}{subsection.3.3}\protected@file@percent }
+\citation{dworkin2007recommendation}
+\citation{googlekms}
+\citation{awskms}
+\citation{biryukov2015argon2}
+\citation{provos1999bcrypt}
+\citation{grassi2017digital}
+\citation{mraihi2011totp}
+\citation{owasp2021}
+\citation{ferraiolo2001proposed}
+\citation{howard2006security}
+\citation{shostack2014threat}
+\citation{grinberg2018flask}
+\citation{celery}
+\citation{bootstrap5}
+\citation{reportlab}
+\citation{w3c_wcag21}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Security Architecture}{2}{subsection.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}System Implementation and Testing}{2}{subsection.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-F}}Exploratory Data Analysis}{2}{subsection.3.6}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Dataset composition by gender.}}{2}{figure.1}\protected@file@percent }
 \newlabel{fig:gender}{{1}{2}{Dataset composition by gender}{figure.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Age distribution by data-collection site.}}{2}{figure.2}\protected@file@percent }
-\newlabel{fig:site}{{2}{2}{Age distribution by data-collection site}{figure.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Age distribution segmented by gender, emphasizing the concentration of male patients between 50 and 65 years.}}{2}{figure.2}\protected@file@percent }
+\newlabel{fig:age_gender}{{2}{2}{Age distribution segmented by gender, emphasizing the concentration of male patients between 50 and 65 years}{figure.2}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {IV}Modeling Methodology}{2}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {V}System Architecture and Security Controls}{2}{section.5}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Aggregate age distribution of patients in the unified cohort.}}{2}{figure.3}\protected@file@percent }
-\newlabel{fig:age_overall}{{3}{2}{Aggregate age distribution of patients in the unified cohort}{figure.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Age distribution by disease severity level.}}{2}{figure.4}\protected@file@percent }
-\newlabel{fig:age_severity}{{4}{2}{Age distribution by disease severity level}{figure.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {VI}Experimental Evaluation}{2}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VII}Discussion}{2}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VIII}Conclusion and Future Work}{2}{section.8}\protected@file@percent }
-\bibcite{breiman2001random}{1}
-\bibcite{chen2016xgboost}{2}
-\bibcite{zhang2021heart}{3}
-\bibcite{janosi1988uci}{4}
-\bibcite{flaskdocs}{5}
-\bibcite{provos1999bcrypt}{6}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Age distribution by chest pain category.}}{3}{figure.5}\protected@file@percent }
-\newlabel{fig:age_cp}{{5}{3}{Age distribution by chest pain category}{figure.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Resting blood pressure by disease status.}}{3}{figure.6}\protected@file@percent }
-\newlabel{fig:bp}{{6}{3}{Resting blood pressure by disease status}{figure.6}{}}
-\@writefile{toc}{\contentsline {section}{References}{3}{section*.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Serum cholesterol distribution across disease stages.}}{3}{figure.7}\protected@file@percent }
-\newlabel{fig:chol}{{7}{3}{Serum cholesterol distribution across disease stages}{figure.7}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces High-level deployment topology of the Heartlytics platform.}}{3}{figure.8}\protected@file@percent }
-\newlabel{fig:topology}{{8}{3}{High-level deployment topology of the Heartlytics platform}{figure.8}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Envelope encryption workflow protecting model artifacts and secrets.}}{3}{figure.9}\protected@file@percent }
-\newlabel{fig:encryption}{{9}{3}{Envelope encryption workflow protecting model artifacts and secrets}{figure.9}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Held-Out Performance Metrics}}{3}{table.2}\protected@file@percent }
-\newlabel{tab:metrics}{{II}{3}{Held-Out Performance Metrics}{table.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces BPMN diagram for two-step verification with resend cooldown.}}{4}{figure.10}\protected@file@percent }
-\newlabel{fig:bpmn}{{10}{4}{BPMN diagram for two-step verification with resend cooldown}{figure.10}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces OTP verification data-flow highlighting storage boundaries and audit trails.}}{4}{figure.11}\protected@file@percent }
-\newlabel{fig:dfd}{{11}{4}{OTP verification data-flow highlighting storage boundaries and audit trails}{figure.11}{}}
-\gdef \@abspage@last{4}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Age distribution by data-collection site.}}{3}{figure.3}\protected@file@percent }
+\newlabel{fig:site}{{3}{3}{Age distribution by data-collection site}{figure.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Aggregate age distribution of patients in the unified cohort.}}{3}{figure.4}\protected@file@percent }
+\newlabel{fig:age_overall}{{4}{3}{Aggregate age distribution of patients in the unified cohort}{figure.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}System Architecture and Security Controls}{3}{section.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Age distribution by disease severity level.}}{3}{figure.5}\protected@file@percent }
+\newlabel{fig:age_severity}{{5}{3}{Age distribution by disease severity level}{figure.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Age distribution by chest pain category.}}{3}{figure.6}\protected@file@percent }
+\newlabel{fig:age_cp}{{6}{3}{Age distribution by chest pain category}{figure.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Experimental Evaluation}{3}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}Machine Learning Performance}{3}{subsection.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Testing Strategy}{3}{subsection.6.2}\protected@file@percent }
+\citation{chen2016xgboost}
+\citation{breiman2001random}
+\citation{lundberg2017unified}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Distribution of heart-disease severity annotations across the unified dataset.}}{4}{figure.7}\protected@file@percent }
+\newlabel{fig:severity_distribution}{{7}{4}{Distribution of heart-disease severity annotations across the unified dataset}{figure.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Left: heart-disease frequency by chest pain category. Right: interplay between chest pain categories and thallium stress-test outcomes.}}{4}{figure.8}\protected@file@percent }
+\newlabel{fig:cp_thallium}{{8}{4}{Left: heart-disease frequency by chest pain category. Right: interplay between chest pain categories and thallium stress-test outcomes}{figure.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}System Performance and Security Evaluation}{4}{subsection.6.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Thallium stress-test outcomes contrasted with disease status, surfacing reversible defects among positive diagnoses.}}{4}{figure.9}\protected@file@percent }
+\newlabel{fig:thal_results}{{9}{4}{Thallium stress-test outcomes contrasted with disease status, surfacing reversible defects among positive diagnoses}{figure.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Resting blood pressure by disease status.}}{4}{figure.10}\protected@file@percent }
+\newlabel{fig:bp}{{10}{4}{Resting blood pressure by disease status}{figure.10}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Discussion}{4}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-A}}Interpretation of Predictive Findings}{4}{subsection.7.1}\protected@file@percent }
+\citation{dworkin2007recommendation}
+\citation{biryukov2015argon2}
+\citation{ferraiolo2001proposed}
+\citation{w3c_wcag21}
+\citation{oshero2012improving}
+\citation{howard2006security}
+\citation{celery}
+\citation{mitchell2019model}
+\citation{barocas2019fairness}
+\citation{platt1999probabilistic}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Serum cholesterol distribution across disease stages.}}{5}{figure.11}\protected@file@percent }
+\newlabel{fig:chol}{{11}{5}{Serum cholesterol distribution across disease stages}{figure.11}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces High-level deployment topology of the Heartlytics platform.}}{5}{figure.12}\protected@file@percent }
+\newlabel{fig:topology}{{12}{5}{High-level deployment topology of the Heartlytics platform}{figure.12}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-B}}Security, Usability, and Deployment Considerations}{5}{subsection.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-C}}Limitations}{5}{subsection.7.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Envelope encryption workflow protecting model artifacts and secrets.}}{5}{figure.13}\protected@file@percent }
+\newlabel{fig:encryption}{{13}{5}{Envelope encryption workflow protecting model artifacts and secrets}{figure.13}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces C4 Level~1 context view situating Heartlytics among external actors and SaaS dependencies.}}{5}{figure.14}\protected@file@percent }
+\newlabel{fig:c4_context}{{14}{5}{C4 Level~1 context view situating Heartlytics among external actors and SaaS dependencies}{figure.14}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VIII}Conclusion and Future Work}{5}{section.8}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces C4 Level~2 container diagram outlining web, API, model-serving, and analytics services.}}{6}{figure.15}\protected@file@percent }
+\newlabel{fig:c4_containers}{{15}{6}{C4 Level~2 container diagram outlining web, API, model-serving, and analytics services}{figure.15}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces C4 Level~3 component view detailing intra-application modules and shared libraries.}}{6}{figure.16}\protected@file@percent }
+\newlabel{fig:c4_components}{{16}{6}{C4 Level~3 component view detailing intra-application modules and shared libraries}{figure.16}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces High-level system architecture mapping client channels to platform services and data stores.}}{6}{figure.17}\protected@file@percent }
+\newlabel{fig:system_arch}{{17}{6}{High-level system architecture mapping client channels to platform services and data stores}{figure.17}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {18}{\ignorespaces Security automation roadmap coordinating monitoring, incident response, and compliance activities.}}{6}{figure.18}\protected@file@percent }
+\newlabel{fig:security_automation}{{18}{6}{Security automation roadmap coordinating monitoring, incident response, and compliance activities}{figure.18}{}}
+\bibcite{janosi1988uci}{1}
+\bibcite{breiman2001random}{2}
+\bibcite{chen2016xgboost}{3}
+\bibcite{zhang2021heart}{4}
+\bibcite{pedregosa2011scikit}{5}
+\bibcite{chawla2002smote}{6}
+\bibcite{platt1999probabilistic}{7}
+\bibcite{kohavi1995study}{8}
+\bibcite{lundberg2017unified}{9}
+\bibcite{dworkin2007recommendation}{10}
+\bibcite{googlekms}{11}
+\bibcite{awskms}{12}
+\bibcite{biryukov2015argon2}{13}
+\bibcite{provos1999bcrypt}{14}
+\bibcite{grassi2017digital}{15}
+\bibcite{mraihi2011totp}{16}
+\bibcite{owasp2021}{17}
+\bibcite{ferraiolo2001proposed}{18}
+\bibcite{howard2006security}{19}
+\bibcite{shostack2014threat}{20}
+\bibcite{grinberg2018flask}{21}
+\bibcite{celery}{22}
+\bibcite{bootstrap5}{23}
+\bibcite{reportlab}{24}
+\bibcite{w3c_wcag21}{25}
+\bibcite{oshero2012improving}{26}
+\@writefile{lof}{\contentsline {figure}{\numberline {19}{\ignorespaces Entity-relationship diagram (ERD) capturing patient, prediction, audit, and policy metadata stores.}}{7}{figure.19}\protected@file@percent }
+\newlabel{fig:database_erd}{{19}{7}{Entity-relationship diagram (ERD) capturing patient, prediction, audit, and policy metadata stores}{figure.19}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {20}{\ignorespaces Role-based access control matrix assigning permissions to Users, Doctors, Admins, and SuperAdmins.}}{7}{figure.20}\protected@file@percent }
+\newlabel{fig:rbac}{{20}{7}{Role-based access control matrix assigning permissions to Users, Doctors, Admins, and SuperAdmins}{figure.20}{}}
+\@writefile{toc}{\contentsline {section}{References}{7}{section*.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {21}{\ignorespaces Security-aware data flow diagram annotating encryption, logging, and boundary controls.}}{7}{figure.21}\protected@file@percent }
+\newlabel{fig:security_flow}{{21}{7}{Security-aware data flow diagram annotating encryption, logging, and boundary controls}{figure.21}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {22}{\ignorespaces Threat-model quick view aligning STRIDE categories with mitigations across components.}}{7}{figure.22}\protected@file@percent }
+\newlabel{fig:threat_model}{{22}{7}{Threat-model quick view aligning STRIDE categories with mitigations across components}{figure.22}{}}
+\bibcite{mitchell2019model}{27}
+\bibcite{barocas2019fairness}{28}
+\@writefile{lof}{\contentsline {figure}{\numberline {23}{\ignorespaces Sequence diagram for encryption and decryption pathways safeguarding sensitive artifacts.}}{8}{figure.23}\protected@file@percent }
+\newlabel{fig:enc_sequence}{{23}{8}{Sequence diagram for encryption and decryption pathways safeguarding sensitive artifacts}{figure.23}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {24}{\ignorespaces Service interaction sequence capturing prediction requests, auditing, and notification hooks.}}{8}{figure.24}\protected@file@percent }
+\newlabel{fig:sequence_interactions}{{24}{8}{Service interaction sequence capturing prediction requests, auditing, and notification hooks}{figure.24}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {25}{\ignorespaces Defense-in-depth alignment of perimeter, platform, and application safeguards and monitoring loops.}}{8}{figure.25}\protected@file@percent }
+\newlabel{fig:defense_layers}{{25}{8}{Defense-in-depth alignment of perimeter, platform, and application safeguards and monitoring loops}{figure.25}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {26}{\ignorespaces BPMN diagram for two-step verification with resend cooldown.}}{8}{figure.26}\protected@file@percent }
+\newlabel{fig:bpmn}{{26}{8}{BPMN diagram for two-step verification with resend cooldown}{figure.26}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {27}{\ignorespaces OTP verification data-flow highlighting storage boundaries and audit trails.}}{8}{figure.27}\protected@file@percent }
+\newlabel{fig:dfd}{{27}{8}{OTP verification data-flow highlighting storage boundaries and audit trails}{figure.27}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {28}{\ignorespaces OTP lifecycle state machine covering issuance, verification, expiration, and revocation.}}{9}{figure.28}\protected@file@percent }
+\newlabel{fig:otp_state}{{28}{9}{OTP lifecycle state machine covering issuance, verification, expiration, and revocation}{figure.28}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {29}{\ignorespaces Password reset BPMN process integrating MFA, cooldowns, and audit checkpoints.}}{9}{figure.29}\protected@file@percent }
+\newlabel{fig:pwd_reset_bpmn}{{29}{9}{Password reset BPMN process integrating MFA, cooldowns, and audit checkpoints}{figure.29}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Held-Out Performance Metrics}}{9}{table.2}\protected@file@percent }
+\newlabel{tab:metrics}{{II}{9}{Held-Out Performance Metrics}{table.2}{}}
+\gdef \@abspage@last{9}

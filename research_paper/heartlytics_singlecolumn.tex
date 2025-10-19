@@ -1,16 +1,18 @@
-\documentclass[conference]{IEEEtran}
+\documentclass[12pt]{article}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{array}
 \usepackage{booktabs}
-\usepackage{hyperref}
+\\usepackage{hyperref}
+\\usepackage{float}
+\usepackage{geometry}
 \graphicspath{{figures/}}
+\geometry{margin=1in}
 
 \begin{document}
 \title{Heartlytics: Secure Machine Learning Pipelines for Heart-Disease Risk Stratification}
 
-\author{\IEEEauthorblockN{HMRS Samaranayaka}\\
-\IEEEauthorblockA{Dept. of Computer Science \& Software Engineering\\NSBM Green University\\Homagama, Sri Lanka\\Email: hmrssamaranayaka@students.nsbm.ac.lk}}
+\author{HMRS Samaranayaka\\Dept. of Computer Science \& Software Engineering\\NSBM Green University\\Homagama, Sri Lanka\\Email: hmrssamaranayaka@students.nsbm.ac.lk}\date{}
 
 \maketitle
 
@@ -18,9 +20,8 @@
 Cardiovascular diseases (CVDs) remain the leading cause of mortality worldwide. Heartlytics unifies exploratory data analysis, ensemble learning, and layered security controls to deliver accurate and trustworthy heart-disease predictions. Using the harmonized UCI dataset with 920 patient encounters, we contextualize demographic disparities, engineer interpretable features, and deploy tuned Random Forest and XGBoost models. The best configuration achieves 92\% test accuracy and a 0.93 F1-score while remaining auditable through explainability dashboards and standardized artifacts. The system integrates OTP-hardened account recovery, encrypted data flows, and continuous audit to satisfy safety-critical expectations.
 \end{abstract}
 
-\begin{IEEEkeywords}
-Heart disease prediction, Machine learning, Exploratory data analysis, Random Forest, XGBoost, Security architecture.
-\end{IEEEkeywords}
+\noindent\textbf{Keywords:} Heart disease prediction; Machine learning; Exploratory data analysis; Random Forest; XGBoost; Security architecture.
+
 
 \section{Introduction}
 Cardiovascular disease imposes substantial morbidity and strain on global health systems. Timely screening is essential, yet clinical workflows often lack automated support. Tree-based ensembles and gradient boosting capture the nonlinear relations between physiological markers and adverse events. Heartlytics extends this body of work with an end-to-end platform emphasizing reproducible data handling, high-fidelity visualization, and robust deployment security. Key contributions include: (i) an enriched exploratory data analysis (EDA) catalogue that highlights demographic and clinical nuances; (ii) a reproducible modeling pipeline for Random Forest and XGBoost with calibration and fairness diagnostics; and (iii) a defense-in-depth deployment architecture encompassing encryption, one-time-password (OTP) lifecycle governance, and auditability.
