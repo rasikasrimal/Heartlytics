@@ -1,6 +1,6 @@
-PWD g:\Heartlytics\research_paper
+PWD G:\Heartlytics\research_paper
 INPUT C:\Users\Snow ghost\AppData\Local\MiKTeX\miktex\data\le\pdftex\pdflatex.fmt
-INPUT g:\Heartlytics\research_paper\heartlytics_singlecolumn.tex
+INPUT heartlytics_singlecolumn.tex
 OUTPUT heartlytics_singlecolumn.log
 INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\base\article.cls
 INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\base\article.cls
