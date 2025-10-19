@@ -1,0 +1,353 @@
+PWD g:\Heartlytics\research_paper
+INPUT C:\Users\Snow ghost\AppData\Local\MiKTeX\miktex\data\le\pdftex\pdflatex.fmt
+INPUT g:\Heartlytics\research_paper\heartlytics_singlecolumn.tex
+OUTPUT heartlytics_singlecolumn.log
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\base\article.cls
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\base\article.cls
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\base\size12.clo
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\base\size12.clo
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\base\size12.clo
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr12.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\graphics\graphicx.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\graphics\graphicx.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\graphics\keyval.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\graphics\keyval.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\graphics\graphics.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\graphics\graphics.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\graphics\trig.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\graphics\trig.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\graphics-cfg\graphics.cfg
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\graphics-cfg\graphics.cfg
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\graphics-cfg\graphics.cfg
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\graphics-def\pdftex.def
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\graphics-def\pdftex.def
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\graphics-def\pdftex.def
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\amsmath\amsmath.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\amsmath\amsmath.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\amsmath\amsopn.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\amsmath\amstext.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\amsmath\amstext.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\amsmath\amsgen.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\amsmath\amsgen.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\amsmath\amsbsy.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\amsmath\amsbsy.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\amsmath\amsopn.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\tools\array.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\tools\array.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\booktabs\booktabs.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\booktabs\booktabs.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\hyperref.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\hyperref.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\iftex\iftex.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\iftex\iftex.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\infwarerr\infwarerr.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\infwarerr\infwarerr.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\kvsetkeys\kvsetkeys.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\kvsetkeys\kvsetkeys.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\kvdefinekeys\kvdefinekeys.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\kvdefinekeys\kvdefinekeys.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\pdfescape\pdfescape.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\pdfescape\pdfescape.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\ltxcmds\ltxcmds.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\ltxcmds\ltxcmds.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\pdftexcmds\pdftexcmds.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\pdftexcmds\pdftexcmds.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\hycolor\hycolor.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\hycolor\hycolor.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\letltxmacro\letltxmacro.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\letltxmacro\letltxmacro.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\auxhook\auxhook.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\auxhook\auxhook.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\nameref.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\nameref.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\refcount\refcount.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\refcount\refcount.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\gettitlestring\gettitlestring.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\gettitlestring\gettitlestring.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\kvoptions\kvoptions.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\kvoptions\kvoptions.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\etoolbox\etoolbox.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\etoolbox\etoolbox.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\pd1enc.def
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\pd1enc.def
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\pd1enc.def
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\intcalc\intcalc.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\intcalc\intcalc.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\puenc.def
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\puenc.def
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\puenc.def
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\url\url.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\url\url.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\bitset\bitset.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\bitset\bitset.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\bigintcalc\bigintcalc.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\bigintcalc\bigintcalc.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\atbegshi\atbegshi.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\base\atbegshi-ltx.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\base\atbegshi-ltx.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\hpdftex.def
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\hpdftex.def
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\hpdftex.def
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\atveryend\atveryend.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\base\atveryend-ltx.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\base\atveryend-ltx.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\rerunfilecheck\rerunfilecheck.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\rerunfilecheck\rerunfilecheck.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\uniquecounter\uniquecounter.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\uniquecounter\uniquecounter.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\geometry\geometry.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\geometry\geometry.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\iftex\ifvtex.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\generic\iftex\ifvtex.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\geometry\geometry.cfg
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\geometry\geometry.cfg
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\geometry\geometry.cfg
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\placeins\placeins.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\placeins\placeins.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\l3backend\l3backend-pdftex.def
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\l3backend\l3backend-pdftex.def
+INPUT .\heartlytics_singlecolumn.aux
+INPUT .\heartlytics_singlecolumn.aux
+INPUT heartlytics_singlecolumn.aux
+OUTPUT heartlytics_singlecolumn.aux
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\epstopdf-pkg\epstopdf-base.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\epstopdf-pkg\epstopdf-base.sty
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\00miktex\epstopdf-sys.cfg
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\00miktex\epstopdf-sys.cfg
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\tex\latex\00miktex\epstopdf-sys.cfg
+INPUT .\heartlytics_singlecolumn.out
+INPUT .\heartlytics_singlecolumn.out
+INPUT heartlytics_singlecolumn.out
+INPUT heartlytics_singlecolumn.out
+OUTPUT heartlytics_singlecolumn.pdf
+INPUT .\heartlytics_singlecolumn.out
+INPUT .\heartlytics_singlecolumn.out
+OUTPUT heartlytics_singlecolumn.out
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr17.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr12.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmmi12.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmsy10.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmex10.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\cmextra\cmex7.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr10.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx10.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx12.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr17.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx12.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\MiKTeX\fonts\map\pdftex\pdftex.map
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx12.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr8.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr6.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmmi12.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmmi8.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmmi6.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmsy10.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmsy8.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmsy6.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmex10.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\cmextra\cmex8.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\amsfonts\cmextra\cmex7.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmti12.tfm
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmtt12.tfm
+INPUT .\figures\dataset_composition_by_gender.png
+INPUT .\figures\dataset_composition_by_gender.png
+INPUT .\figures\dataset_composition_by_gender.png
+INPUT .\figures\dataset_composition_by_gender.png
+INPUT .\figures\dataset_composition_by_gender.png
+INPUT .\figures\dataset_composition_by_gender.png
+INPUT .\figures\age_distribution_by_gender.png
+INPUT .\figures\age_distribution_by_gender.png
+INPUT .\figures\age_distribution_by_gender.png
+INPUT .\figures\age_distribution_by_gender.png
+INPUT .\figures\age_distribution_by_gender.png
+INPUT .\figures\age_distribution_by_gender.png
+INPUT .\figures\age_distribution_by_dataset_site.png
+INPUT .\figures\age_distribution_by_dataset_site.png
+INPUT .\figures\age_distribution_by_dataset_site.png
+INPUT .\figures\age_distribution_by_dataset_site.png
+INPUT .\figures\age_distribution_by_dataset_site.png
+INPUT .\figures\age_distribution_by_dataset_site.png
+INPUT .\figures\age_distribution_of_patients.png
+INPUT .\figures\age_distribution_of_patients.png
+INPUT .\figures\age_distribution_of_patients.png
+INPUT .\figures\age_distribution_of_patients.png
+INPUT .\figures\age_distribution_of_patients.png
+INPUT .\figures\age_distribution_of_patients.png
+INPUT .\figures\age_distribution_by_severity_levels.png
+INPUT .\figures\age_distribution_by_severity_levels.png
+INPUT .\figures\age_distribution_by_severity_levels.png
+INPUT .\figures\age_distribution_by_severity_levels.png
+INPUT .\figures\age_distribution_by_severity_levels.png
+INPUT .\figures\age_distribution_by_severity_levels.png
+INPUT .\figures\age_distribution_by_chest_pain_type.png
+INPUT .\figures\age_distribution_by_chest_pain_type.png
+INPUT .\figures\age_distribution_by_chest_pain_type.png
+INPUT .\figures\age_distribution_by_chest_pain_type.png
+INPUT .\figures\age_distribution_by_chest_pain_type.png
+INPUT .\figures\age_distribution_by_chest_pain_type.png
+INPUT .\figures\heart_disease_severity_distribution.png
+INPUT .\figures\heart_disease_severity_distribution.png
+INPUT .\figures\heart_disease_severity_distribution.png
+INPUT .\figures\heart_disease_severity_distribution.png
+INPUT .\figures\heart_disease_severity_distribution.png
+INPUT .\figures\heart_disease_severity_distribution.png
+INPUT .\figures\heart_disease_frequency_by_chest_pain_type.png
+INPUT .\figures\heart_disease_frequency_by_chest_pain_type.png
+INPUT .\figures\heart_disease_frequency_by_chest_pain_type.png
+INPUT .\figures\heart_disease_frequency_by_chest_pain_type.png
+INPUT .\figures\heart_disease_frequency_by_chest_pain_type.png
+INPUT .\figures\heart_disease_frequency_by_chest_pain_type.png
+INPUT .\figures\chest_pain_categories_by_thallium_status.png
+INPUT .\figures\chest_pain_categories_by_thallium_status.png
+INPUT .\figures\chest_pain_categories_by_thallium_status.png
+INPUT .\figures\chest_pain_categories_by_thallium_status.png
+INPUT .\figures\chest_pain_categories_by_thallium_status.png
+INPUT .\figures\chest_pain_categories_by_thallium_status.png
+INPUT .\figures\thallium_test_results_vs_disease_status.png
+INPUT .\figures\thallium_test_results_vs_disease_status.png
+INPUT .\figures\thallium_test_results_vs_disease_status.png
+INPUT .\figures\thallium_test_results_vs_disease_status.png
+INPUT .\figures\thallium_test_results_vs_disease_status.png
+INPUT .\figures\thallium_test_results_vs_disease_status.png
+INPUT .\figures\resting_blood_pressure_by_disease_status.png
+INPUT .\figures\resting_blood_pressure_by_disease_status.png
+INPUT .\figures\resting_blood_pressure_by_disease_status.png
+INPUT .\figures\resting_blood_pressure_by_disease_status.png
+INPUT .\figures\resting_blood_pressure_by_disease_status.png
+INPUT .\figures\resting_blood_pressure_by_disease_status.png
+INPUT .\figures\serum_cholesterol_across_disease_stages.png
+INPUT .\figures\serum_cholesterol_across_disease_stages.png
+INPUT .\figures\serum_cholesterol_across_disease_stages.png
+INPUT .\figures\serum_cholesterol_across_disease_stages.png
+INPUT .\figures\serum_cholesterol_across_disease_stages.png
+INPUT .\figures\serum_cholesterol_across_disease_stages.png
+INPUT .\figures\deployment_topology.png
+INPUT .\figures\deployment_topology.png
+INPUT .\figures\deployment_topology.png
+INPUT .\figures\deployment_topology.png
+INPUT .\figures\deployment_topology.png
+INPUT .\figures\deployment_topology.png
+INPUT .\figures\envelope_encryption_workflow.png
+INPUT .\figures\envelope_encryption_workflow.png
+INPUT .\figures\envelope_encryption_workflow.png
+INPUT .\figures\envelope_encryption_workflow.png
+INPUT .\figures\envelope_encryption_workflow.png
+INPUT .\figures\envelope_encryption_workflow.png
+INPUT .\figures\c4_level_1_context.png
+INPUT .\figures\c4_level_1_context.png
+INPUT .\figures\c4_level_1_context.png
+INPUT .\figures\c4_level_1_context.png
+INPUT .\figures\c4_level_1_context.png
+INPUT .\figures\c4_level_1_context.png
+INPUT .\figures\c4_level_2_containers.png
+INPUT .\figures\c4_level_2_containers.png
+INPUT .\figures\c4_level_2_containers.png
+INPUT .\figures\c4_level_2_containers.png
+INPUT .\figures\c4_level_2_containers.png
+INPUT .\figures\c4_level_2_containers.png
+INPUT .\figures\c4_level_3_components.png
+INPUT .\figures\c4_level_3_components.png
+INPUT .\figures\c4_level_3_components.png
+INPUT .\figures\c4_level_3_components.png
+INPUT .\figures\c4_level_3_components.png
+INPUT .\figures\c4_level_3_components.png
+INPUT .\figures\high_level_system_architecture.png
+INPUT .\figures\high_level_system_architecture.png
+INPUT .\figures\high_level_system_architecture.png
+INPUT .\figures\high_level_system_architecture.png
+INPUT .\figures\high_level_system_architecture.png
+INPUT .\figures\high_level_system_architecture.png
+INPUT .\figures\sa.png
+INPUT .\figures\sa.png
+INPUT .\figures\sa.png
+INPUT .\figures\sa.png
+INPUT .\figures\sa.png
+INPUT .\figures\sa.png
+INPUT .\figures\database_erd.png
+INPUT .\figures\database_erd.png
+INPUT .\figures\database_erd.png
+INPUT .\figures\database_erd.png
+INPUT .\figures\database_erd.png
+INPUT .\figures\database_erd.png
+INPUT .\figures\role_based_access_control_rbac.png
+INPUT .\figures\role_based_access_control_rbac.png
+INPUT .\figures\role_based_access_control_rbac.png
+INPUT .\figures\role_based_access_control_rbac.png
+INPUT .\figures\role_based_access_control_rbac.png
+INPUT .\figures\role_based_access_control_rbac.png
+INPUT .\figures\security_aware_data_flow.png
+INPUT .\figures\security_aware_data_flow.png
+INPUT .\figures\security_aware_data_flow.png
+INPUT .\figures\security_aware_data_flow.png
+INPUT .\figures\security_aware_data_flow.png
+INPUT .\figures\security_aware_data_flow.png
+INPUT .\figures\threat_model_quickview.png
+INPUT .\figures\threat_model_quickview.png
+INPUT .\figures\threat_model_quickview.png
+INPUT .\figures\threat_model_quickview.png
+INPUT .\figures\threat_model_quickview.png
+INPUT .\figures\threat_model_quickview.png
+INPUT .\figures\encryptiondecryption_sequence.png
+INPUT .\figures\encryptiondecryption_sequence.png
+INPUT .\figures\encryptiondecryption_sequence.png
+INPUT .\figures\encryptiondecryption_sequence.png
+INPUT .\figures\encryptiondecryption_sequence.png
+INPUT .\figures\encryptiondecryption_sequence.png
+INPUT .\figures\sequence_of_interactions.png
+INPUT .\figures\sequence_of_interactions.png
+INPUT .\figures\sequence_of_interactions.png
+INPUT .\figures\sequence_of_interactions.png
+INPUT .\figures\sequence_of_interactions.png
+INPUT .\figures\sequence_of_interactions.png
+INPUT .\figures\fig_3_13_should_be_this.png
+INPUT .\figures\fig_3_13_should_be_this.png
+INPUT .\figures\fig_3_13_should_be_this.png
+INPUT .\figures\fig_3_13_should_be_this.png
+INPUT .\figures\fig_3_13_should_be_this.png
+INPUT .\figures\fig_3_13_should_be_this.png
+INPUT .\figures\bpmn_for_two_step_verification.png
+INPUT .\figures\bpmn_for_two_step_verification.png
+INPUT .\figures\bpmn_for_two_step_verification.png
+INPUT .\figures\bpmn_for_two_step_verification.png
+INPUT .\figures\bpmn_for_two_step_verification.png
+INPUT .\figures\bpmn_for_two_step_verification.png
+INPUT .\figures\detailed_data_flow.png
+INPUT .\figures\detailed_data_flow.png
+INPUT .\figures\detailed_data_flow.png
+INPUT .\figures\detailed_data_flow.png
+INPUT .\figures\detailed_data_flow.png
+INPUT .\figures\detailed_data_flow.png
+INPUT .\figures\otp_lifecycle_state_machine.png
+INPUT .\figures\otp_lifecycle_state_machine.png
+INPUT .\figures\otp_lifecycle_state_machine.png
+INPUT .\figures\otp_lifecycle_state_machine.png
+INPUT .\figures\otp_lifecycle_state_machine.png
+INPUT .\figures\otp_lifecycle_state_machine.png
+INPUT .\figures\password_reset_bpmn_process.png
+INPUT .\figures\password_reset_bpmn_process.png
+INPUT .\figures\password_reset_bpmn_process.png
+INPUT .\figures\password_reset_bpmn_process.png
+INPUT .\figures\password_reset_bpmn_process.png
+INPUT .\figures\password_reset_bpmn_process.png
+INPUT heartlytics_singlecolumn.aux
+INPUT .\heartlytics_singlecolumn.out
+INPUT .\heartlytics_singlecolumn.out
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx10.pfb
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx10.pfb
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx12.pfb
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx12.pfb
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi12.pfb
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmmi12.pfb
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr10.pfb
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr10.pfb
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr12.pfb
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr12.pfb
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr17.pfb
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr17.pfb
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmti12.pfb
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmti12.pfb
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt12.pfb
+INPUT C:\Users\Snow ghost\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt12.pfb
