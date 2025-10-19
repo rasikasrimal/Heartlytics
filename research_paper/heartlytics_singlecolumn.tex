@@ -3,9 +3,9 @@
 \usepackage{amsmath}
 \usepackage{array}
 \usepackage{booktabs}
-\\usepackage{hyperref}
-\\usepackage{float}
+\usepackage{hyperref}
 \usepackage{geometry}
+\usepackage{placeins}
 \graphicspath{{figures/}}
 \geometry{margin=1in}
 
@@ -70,7 +70,7 @@ We benchmarked tree ensembles, mirroring the dissertation's selection of Random 
 Heartlytics extends beyond predictive modeling by embedding security-by-design controls. Application-layer envelope encryption generates per-record AES-256-GCM data encryption keys that are wrapped by a managed master key; associated nonces, tags, and key identifiers are persisted to enable cryptographic erasure and rotation \cite{dworkin2007recommendation, googlekms, awskms}. User credentials are hashed with Argon2id and opportunistically upgraded from legacy hashes on login \cite{biryukov2015argon2, provos1999bcrypt}. Multi-factor authentication combines TOTP secrets with email fallbacks, hashed one-time codes, and enforced cooldowns, while rate limiting and peppered comparisons mitigate enumeration and replay risks \cite{grassi2017digital, mraihi2011totp, owasp2021}. Role-based access control (RBAC) gates server endpoints and UI routes, ensuring that Users, Doctors, Admins, and SuperAdmins operate within least-privilege boundaries \cite{ferraiolo2001proposed}. Tamper-evident audit logs record authentication, encryption, and administrative events to satisfy compliance expectations \cite{howard2006security, shostack2014threat}.
 
 \subsection{System Implementation and Testing}
-The Flask backend is decomposed into blueprints (\texttt{auth}, \texttt{predict}, \texttt{batch}, \texttt{doctor}, \texttt{user}, \texttt{superadmin}) that isolate responsibilities and simplify dependency injection \cite{grinberg2018flask}. Celery workers orchestrate asynchronous tasks such as batch prediction and PDF generation, preventing long-running jobs from blocking request handling \cite{celery}. Jinja2 templates coupled with Bootstrap 5 deliver a responsive, WCAG 2.1–compliant interface, while ReportLab renders printable reports with synchronized light/dark themes \cite{bootstrap5, reportlab, w3c_wcag21}. The test strategy mirrors the dissertation: pytest-driven unit tests cover preprocessing, encryption, and inference utilities; integration tests validate API contracts, RBAC enforcement, and encryption boundaries; and scenario tests trace MFA enrollment, batch uploads, simulations, and the research viewer end to end. Continuous integration executes these suites on every commit, and manual acceptance scripts document expected behaviour for release sign-off.
+The Flask backend is decomposed into blueprints (\texttt{auth}, \texttt{predict}, \texttt{batch}, \texttt{doctor}, \texttt{user}, \texttt{superadmin}) that isolate responsibilities and simplify dependency injection \cite{grinberg2018flask}. Celery workers orchestrate asynchronous tasks such as batch prediction and PDF generation, preventing long-running jobs from blocking request handling \cite{celery}. Jinja2 templates coupled with Bootstrap 5 deliver a responsive, WCAG 2.1-compliant interface, while ReportLab renders printable reports with synchronized light/dark themes \cite{bootstrap5, reportlab, w3c_wcag21}. The test strategy mirrors the dissertation: pytest-driven unit tests cover preprocessing, encryption, and inference utilities; integration tests validate API contracts, RBAC enforcement, and encryption boundaries; and scenario tests trace MFA enrollment, batch uploads, simulations, and the research viewer end to end. Continuous integration executes these suites on every commit, and manual acceptance scripts document expected behaviour for release sign-off.
 
 \subsection{Exploratory Data Analysis}
 Male participants account for approximately 79\% of the cohort, introducing fairness considerations. Figure~\ref{fig:gender} depicts the gender distribution, while Figure~\ref{fig:age_gender} disaggregates age bands by sex and Figure~\ref{fig:site} highlights the site-specific age skew that influences downstream sampling strategies.
@@ -340,19 +340,8 @@ Two limitations mirror those acknowledged in the dissertation. First, external v
 
 \section{Conclusion and Future Work}
 This work distilled the thesis contributions into an IEEE manuscript, evidencing that machine-learning-driven screening can coexist with rigorous security, testing, and usability practices. The resulting platform couples calibrated ensembles with envelope encryption, MFA, and RBAC, all validated through automated and scenario-based testing. Future research will extend along four axes: (i) federated or privacy-preserving learning to accommodate multi-institutional datasets without centralizing PHI; (ii) continuous calibration, drift, and fairness monitoring with automated alerts; (iii) richer feature spaces integrating medications, longitudinal vitals, and FHIR-based interoperability; and (iv) operational hardening that encompasses penetration tests, chaos drills for key-management and email dependencies, and comprehensive model documentation.
+\FloatBarrier
 
-\newpage
-  \section*{Acknowledgment}
-  This research was conducted independently by the author.
-\newpage
-\newpage
-\newpage
-\newpage
-\newpage
-\newpage
-\newpage
-\newpage
-\newpage
 \begin{thebibliography}{00}
 \bibitem{janosi1988uci} A.~Janosi, W.~Steinbrunn, M.~Pfisterer, and R.~Detrano, ``Heart disease dataset,'' UCI Machine Learning Repository, 1988.
 \bibitem{breiman2001random} L.~Breiman, ``Random forests,'' \emph{Machine Learning}, vol.~45, no.~1, pp.~5--32, 2001.

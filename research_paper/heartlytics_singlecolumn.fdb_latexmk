@@ -1,7 +1,7 @@
 # Fdb version 4
-["pdflatex"] 1760892605.76428 "g:/Heartlytics/research_paper/heartlytics_singlecolumn.tex" "heartlytics_singlecolumn.pdf" "heartlytics_singlecolumn" 1760892616.53097 0
+["pdflatex"] 1760894230.70759 "g:/Heartlytics/research_paper/heartlytics_singlecolumn.tex" "heartlytics_singlecolumn.pdf" "heartlytics_singlecolumn" 1760894241.57275 0
   "C:/Users/Snow" 1759393309 19039 987c26062e0982340c5164621e755ee1 ""
-  "C:/Users/Snow ghost/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1760890496 96176 40a8022d15c5925d7081b1ad66e03248 ""
+  "C:/Users/Snow ghost/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1760893715 96176 40a8022d15c5925d7081b1ad66e03248 ""
   "C:/Users/Snow ghost/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1759169554 24227442 7b3f8c3b1a73217f8405b13bdeeb9d44 ""
   "C:/Users/Snow ghost/AppData/Local/Programs/MiKTeX/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1233951848 1004 54797486969f23fa377b128694d548df ""
   "C:/Users/Snow ghost/AppData/Local/Programs/MiKTeX/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1233951848 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
@@ -76,6 +76,7 @@
   "C:/Users/Snow ghost/AppData/Local/Programs/MiKTeX/tex/latex/kvsetkeys/kvsetkeys.sty" 1665066333 13815 760b0c02f691ea230f5359c4e1de23a7 ""
   "C:/Users/Snow ghost/AppData/Local/Programs/MiKTeX/tex/latex/l3backend/l3backend-pdftex.def" 1704400941 30006 57b07afb710ee2f649c65cfbafda39c1 ""
   "C:/Users/Snow ghost/AppData/Local/Programs/MiKTeX/tex/latex/letltxmacro/letltxmacro.sty" 1575399536 5766 13a9e8766c47f30327caf893ece86ac8 ""
+  "C:/Users/Snow ghost/AppData/Local/Programs/MiKTeX/tex/latex/placeins/placeins.sty" 1113865200 4087 636308456f60d2b31cbf97867db5708d ""
   "C:/Users/Snow ghost/AppData/Local/Programs/MiKTeX/tex/latex/refcount/refcount.sty" 1576433952 9878 9e94e8fa600d95f9c7731bb21dfb67a4 ""
   "C:/Users/Snow ghost/AppData/Local/Programs/MiKTeX/tex/latex/rerunfilecheck/rerunfilecheck.sty" 1751104012 9684 a33a14b82ce60d6e77cb9be689d79ee6 ""
   "C:/Users/Snow ghost/AppData/Local/Programs/MiKTeX/tex/latex/tools/array.sty" 1700599895 12667 e4b5eb11e4b7239e6c8a52bbe074a6c6 ""
@@ -110,10 +111,10 @@
   "figures/serum_cholesterol_across_disease_stages.png" 1760890477 29528 aebbcaf3af07f4df9b892a1d76b9f98b ""
   "figures/thallium_test_results_vs_disease_status.png" 1760890477 41956 fc4de30f1859fa1635bd93562673d806 ""
   "figures/threat_model_quickview.png" 1760890477 38084 7314cb31bfabeb6c055c5d545e845181 ""
-  "g:/Heartlytics/research_paper/heartlytics_singlecolumn.tex" 1760892593 32243 15b6bd997c2e0e388c89c5e466087742 ""
-  "heartlytics_singlecolumn.aux" 1760892616 14441 010db64c27528093f6c1e5a477238d24 "pdflatex"
-  "heartlytics_singlecolumn.out" 1760892616 3572 749d6244f7f1548a169f4b9c851fbb19 "pdflatex"
-  "heartlytics_singlecolumn.tex" 1760892593 32243 15b6bd997c2e0e388c89c5e466087742 ""
+  "g:/Heartlytics/research_paper/heartlytics_singlecolumn.tex" 1760894218 32100 6c12823dc5974d7deeb0bc142af854ce ""
+  "heartlytics_singlecolumn.aux" 1760894241 14441 b7f9283b1fbc4e4b0659d09ca6bfed46 "pdflatex"
+  "heartlytics_singlecolumn.out" 1760894241 3572 749d6244f7f1548a169f4b9c851fbb19 "pdflatex"
+  "heartlytics_singlecolumn.tex" 1760894218 32100 6c12823dc5974d7deeb0bc142af854ce ""
   (generated)
   "heartlytics_singlecolumn.aux"
   "heartlytics_singlecolumn.log"
