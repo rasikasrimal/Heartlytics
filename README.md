@@ -448,12 +448,13 @@ sequenceDiagram
 <a id="section-role-policy"></a>
 ## Role Policy Matrix
 
-| Role       | Predict | Batch | Dashboard | Research | Admin Dashboard |
-|------------|:------:|:-----:|:--------:|:--------:|:--------:|
-| SuperAdmin |   ✔    |   ✔   |     ✔    |    ✔     |    ✔     |
-| Admin      |   ✗    |   ✗   |     ✗    |    ✗     |    ✔     |
-| Doctor     |   ✔    |   ✔   |     ✔    |    ✔     |    ✗     |
-| User       |   ✔    |   ✗   |     ✗    |    ✗     |    ✗     |
+| Role        | Predict | Batch | Dashboard | Research | Admin Dashboard |
+|-------------|:--------:|:------:|:----------:|:----------:|:----------------:|
+| **SuperAdmin** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Admin**      | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **Doctor**     | ✅ | ✅ | ✅ | ✅ | ❌ |
+| **User**       | ✅ | ❌ | ❌ | ❌ | ❌ |
+
 
 Use the Flask CLI to manage roles:
 
