@@ -1,4 +1,4 @@
-# Heart Disease Risk Prediction Web App
+# Heart Disease Risk Prediction Web App.
 
 A full-stack **Flask** application for predicting the risk of heart disease using a trained **Random Forest** model (scikit-learn).
 Users can enter patient data, upload CSV files for batch analysis, explore results in an interactive dashboard, and export rich PDF reports.
